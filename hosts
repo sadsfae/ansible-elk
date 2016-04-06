@@ -1,0 +1,5 @@
+[elk]
+host-01
+
+[elk-client]
+host-02

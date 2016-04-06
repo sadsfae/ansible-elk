@@ -1,0 +1,34 @@
+---
+#
+# Install/run elasticsearch
+#
+
+- name: Check for epel
+  shell: rpm -qa | grep -q epel-release
+  ignore_errors: true
+  register: epel_installed
+
+- name: Install epel repo
+  command: rpm -ivh {{ epel_repo }}
+  become: true
+  when: epel_installed.rc != 0
+
+- name: Copy elasticsearch yum repo file
+  copy:
+    src=elasticsearch.repo
+    dest=/etc/yum.repos.d/elasticsearch.repo
+    owner=root
+    group=root
+    mode=0644
+  become: true
+
+- name: Install elasticsearch rpms
+  yum: name={{ item }} state=present
+  become: true
+  with_items:
+    - elasticsearch
+
+- name: Update elasticsearch startup with heap size
+  become: true
+  lineinfile: dest=/usr/share/elasticsearch/bin/elasticsearch.in.sh line="ES_HEAP_SIZE={{ (ansible_memory_mb.real.total / 2) | int }}m" insertafter="^ES_CLASSPATH="
+  register: elasticsearch_updated
