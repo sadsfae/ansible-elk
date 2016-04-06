@@ -1,6 +1,6 @@
 ---
 #
-# Install/run elasticsearch
+# Install/run elasticsearch for browbeat
 #
 
 - name: Check for epel
@@ -32,3 +32,13 @@
   become: true
   lineinfile: dest=/usr/share/elasticsearch/bin/elasticsearch.in.sh line="ES_HEAP_SIZE={{ (ansible_memory_mb.real.total / 2) | int }}m" insertafter="^ES_CLASSPATH="
   register: elasticsearch_updated
+
+- name: Check Logstash forwarder SSL certificate
+  stat: path=/etc/pki/tls/certs/logstash-forwarder.crt
+  ignore_errors: true
+  register: logstash_forwarder_ssl_exists
+
+- name: Create Logstash Forwarder SSL certificate
+  command: openssl req -subj '/CN={{ansible_hostname}}/' -x509 -days 3650 -batch -nodes -newkey rsa:2048 -keyout /etc/pki/tls/private/logstash-forwarder.key -out /etc/pki/tls/certs/logstash-forwarder.crt
+  ignore_errors: true
+  when: logstash_forwarder_ssl_exists != 0 
