@@ -1,6 +1,6 @@
 ---
 #
-# Install/run elasticsearch for browbeat
+# Install/run Elasticsearch
 #
 
 - name: Check for epel
