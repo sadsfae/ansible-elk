@@ -28,7 +28,7 @@ ansible-playbook -i hosts install/elk.yml
    - Navigate to the server at http://yourhost
 ![ELK](/image/elk-index.png?raw=true "Click the green button.")
 
-   - You can find a video [here](http//https://youtu.be/pwpLPiPX2Mg)
+[![Ansible Elk](http://img.youtube.com/vi/pwpLPiPX2Mg/0.jpg)](http://www.youtube.com/watch?v=pwpLPiPX2Mg "Deploying ELK with Ansible")
 
 **To Do**
    - Write a client playbook for filebeat to send logs to the service
