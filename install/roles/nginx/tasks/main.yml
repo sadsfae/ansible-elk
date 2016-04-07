@@ -14,11 +14,12 @@
   become: true
   when: epel_installed.rc != 0
 
-- name: Install nginx rpms
+- name: Install nginx and httpd-tools
   yum: name={{ item }} state=present
   become: true
   with_items:
-    - nginx 
+    - nginx
+    - httpd-tools
 
 # deploy kibana.conf with FQDN
 - name: setup nginx reverse proxy for kibana
@@ -30,6 +31,17 @@
     mode=0644
   become: true
   register: nginx_needs_restart
+
+# deploy basic nginx.conf 8080 vhost
+- name: Setup nginx TCP/8080 vhost for SSL certificate
+  copy:
+    src=nginx.conf
+    dest=/etc/nginx/nginx.conf
+    owner=root
+    group=root
+    mode=0644
+  ignore_errors: true
+  become: true
 
 # start nginx service
 - name: Start nginx service

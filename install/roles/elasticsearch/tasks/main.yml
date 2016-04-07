@@ -1,6 +1,6 @@
 ---
 #
-# Install/run Elasticsearch
+# Install/run elasticsearch
 #
 
 - name: Check for epel
@@ -22,11 +22,12 @@
     mode=0644
   become: true
 
-- name: Install elasticsearch rpms
+- name: Install elasticsearch and openjdk
   yum: name={{ item }} state=present
   become: true
   with_items:
     - elasticsearch
+    - java-openjdk-headless
 
 - name: Update elasticsearch startup with heap size
   become: true
@@ -34,13 +35,42 @@
           line="ES_HEAP_SIZE={{ (ansible_memory_mb.real.total / 2) | int }}m" insertafter="^ES_CLASSPATH="
   register: elasticsearch_updated
 
-- name: Check Logstash forwarder SSL certificate
-  stat: path=/etc/pki/tls/certs/logstash-forwarder.crt
-  ignore_errors: true
-  register: logstash_forwarder_ssl_exists
+- name: Copy elasticsearch config
+  copy:
+    src=elasticsearch.yml
+    dest=/etc/elasticsearch/elasticsearch.yml
+    owner=root
+    group=root
+    mode=0755
+  become: true
+  register: elasticsearch_needs_restart
 
-- name: Create Logstash Forwarder SSL certificate
-  command: openssl req -subj '/CN={{ansible_hostname}}/' -x509 -days 3650 -batch -nodes -newkey rsa:2048 -keyout \
-          /etc/pki/tls/private/logstash-forwarder.key -out /etc/pki/tls/certs/logstash-forwarder.crt
+- name: Check Filebeat forwarder SSL certificate
+  stat: path=/etc/pki/tls/certs/filebeat-forwarder.crt
   ignore_errors: true
-  when: logstash_forwarder_ssl_exists != 0 
+  register: filebeat_forwarder_ssl_exists
+
+- name: Create Filebeat Forwarder SSL certificate
+  command: openssl req -subj '/CN={{ansible_hostname}}/' -x509 -days 3650 -batch -nodes -newkey rsa:2048 -keyout \
+          /etc/pki/tls/private/filebeat-forwarder.key -out /etc/pki/tls/certs/filebeat-forwarder.crt
+  ignore_errors: true
+  when: filebeat_forwarder_ssl_exists != 0 
+
+- name: Check Filebeat forwarder SSL certificate copy
+  stat: path=/usr/share/nginx/html/filebeat-forwarder.crt
+  ignore_errors: true
+  register: filebeat_forwarder_ssl_client_copy_exists
+
+- name: Copy Filebeat forwarder SSL certificate
+  command: cp /etc/pki/tls/certs/filebeat-forwarder.crt /usr/share/nginx/html/filebeat-forwarder.crt
+  ignore_errors: true
+  when: filebeat_forwarder_ssl_client_copy_exists != 0
+
+- name: Start elasticsearch service
+  command: systemctl start elasticsearch.service
+  ignore_errors: true
+  when: elasticsearch_needs_restart != 0
+
+- name: Setup elasticsearch service
+  service: name=elasticsearch state=started enabled=true
+  become: true

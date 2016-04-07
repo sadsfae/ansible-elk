@@ -27,3 +27,40 @@
   become: true
   with_items:
     - logstash
+
+- name: Copy logstash input filters
+  copy:
+    src=01-lumberjack-input.conf
+    dest=/etc/logstash/conf.d/01-lumberjack-input.conf
+    owner=root
+    group=root
+    mode=0644
+  become: true
+
+- name: Copy logstash output filters
+  copy:
+    src=30-lumberjack-output.conf
+    dest=/etc/logstash/conf.d/30-lumberjack-output.conf
+    owner=root
+    group=root
+    mode=0644
+  become: true
+
+- name: Copy logstash syslog filters
+  copy:
+    src=10-syslog.conf
+    dest=/etc/logstash/conf.d/10-syslog.conf
+    owner=root
+    group=root
+    mode=0644
+  become: true
+  register: logstash_needs_restart
+
+- name: Start logstash service
+  command: systemctl start logstash.service
+  ignore_errors: true
+  when: logstash_needs_restart != 0
+
+- name: Setup elasticsearch service
+  service: name=logstash state=started enabled=true
+  become: true

@@ -8,5 +8,5 @@
   roles:
     - { role: elasticsearch }
     - { role: logstash }
-    - { role: kibana }
     - { role: nginx }
+    - { role: kibana }
