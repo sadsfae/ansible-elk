@@ -4,14 +4,15 @@ Ansible Playbook for setting up the ELK Stack
 
 **What does it do?**
    - Automated deployment of a full ELK stack (elasticsearch, logstash, kibana)
-   - Uses nginx as a reverse proxy
-   - Generates SSL certificates for filebeat or logstash-forwarder
-   - Adds either iptables or firewalld rules if firewall is active
-   - It's fairly quick, takes around 3minutes on my local VM
+     * Uses nginx as a reverse proxy
+     * Generates SSL certificates for filebeat or logstash-forwarder
+     * Adds either iptables or firewalld rules if firewall is active
+     * Tunes elasticsearch heapsize to half your memory
+     * It's fairly quick, takes around 3minutes on my local VM
  
 **Requirements**
-   - EL7 or higher target Linux server
-   - Ansible 1.9.x
+   - RHEL7, CentOS or Fedora Linux server
+   - Ansible 1.8.x+
 
 **Instructions**
    - Clone repo and setup your hosts file
