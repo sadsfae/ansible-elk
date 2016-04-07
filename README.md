@@ -25,7 +25,11 @@ sed -i 's/host-01/yourhost/' hosts
 ```
 ansible-playbook -i hosts install/elk.yml
 ```
-   - Navigate to the Server at http://yourhost
+   - Navigate to the server at http://yourhost
+![ELK](/image/elk-index.png?raw=true "Click the green button.")
+
+   - You can find a video [here](http//https://youtu.be/pwpLPiPX2Mg "Ansible
+     Deployment of ELK") 
 
 **To Do**
    - Write a client playbook for filebeat to send logs to the service
