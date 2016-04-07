@@ -45,27 +45,6 @@
   become: true
   register: elasticsearch_needs_restart
 
-- name: Check Filebeat forwarder SSL certificate
-  stat: path=/etc/pki/tls/certs/filebeat-forwarder.crt
-  ignore_errors: true
-  register: filebeat_forwarder_ssl_exists
-
-- name: Create Filebeat Forwarder SSL certificate
-  command: openssl req -subj '/CN={{ansible_hostname}}/' -x509 -days 3650 -batch -nodes -newkey rsa:2048 -keyout \
-          /etc/pki/tls/private/filebeat-forwarder.key -out /etc/pki/tls/certs/filebeat-forwarder.crt
-  ignore_errors: true
-  when: filebeat_forwarder_ssl_exists != 0 
-
-- name: Check Filebeat forwarder SSL certificate copy
-  stat: path=/usr/share/nginx/html/filebeat-forwarder.crt
-  ignore_errors: true
-  register: filebeat_forwarder_ssl_client_copy_exists
-
-- name: Copy Filebeat forwarder SSL certificate
-  command: cp /etc/pki/tls/certs/filebeat-forwarder.crt /usr/share/nginx/html/filebeat-forwarder.crt
-  ignore_errors: true
-  when: filebeat_forwarder_ssl_client_copy_exists != 0
-
 - name: Start elasticsearch service
   command: systemctl start elasticsearch.service
   ignore_errors: true

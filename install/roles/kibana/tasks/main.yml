@@ -42,6 +42,27 @@
   service: name=kibana state=started enabled=true
   become: true
 
+- name: Check Filebeat forwarder SSL certificate
+  stat: path=/etc/pki/tls/certs/filebeat-forwarder.crt
+  ignore_errors: true
+  register: filebeat_forwarder_ssl_exists
+
+- name: Create Filebeat Forwarder SSL certificate
+  command: openssl req -subj '/CN={{ansible_hostname}}/' -x509 -days 3650 -batch -nodes -newkey rsa:2048 -keyout \
+          /etc/pki/tls/private/filebeat-forwarder.key -out /etc/pki/tls/certs/filebeat-forwarder.crt
+  ignore_errors: true
+  when: filebeat_forwarder_ssl_exists != 0 
+
+- name: Check Filebeat forwarder SSL certificate copy
+  stat: path=/usr/share/nginx/html/filebeat-forwarder.crt
+  ignore_errors: true
+  register: filebeat_forwarder_ssl_client_copy_exists
+
+- name: Copy Filebeat forwarder SSL certificate
+  command: cp /etc/pki/tls/certs/filebeat-forwarder.crt /usr/share/nginx/html/filebeat-forwarder.crt
+  ignore_errors: true
+  when: filebeat_forwarder_ssl_client_copy_exists != 0
+
 - name: Query index status
   shell: curl -GET http://localhost:9200/_cat/indices 2>/dev/null | grep yellow | wc -l
   ignore_errors: true
