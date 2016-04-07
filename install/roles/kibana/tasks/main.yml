@@ -24,14 +24,15 @@
 
 # We need to insert data to create initial an initial index, query if it exists
 - name: Query index status
-  shell: curl -GET http://localhost:9200/_cat/indices 2>/dev/null | grep yellow | wc -l
+  shell: curl -GET http://localhost:9200/_cat/indices 2>/dev/null | grep logstash | wc -l
   ignore_errors: true
   register: elasticsearch_no_index_present
 
 # Populate with our own logs
 - name: Populate elasticsearch index with local logs
   shell: cat /var/log/messages | /opt/logstash/bin/logstash -f /etc/logstash/conf.d/10-syslog.conf
-  when: elasticsearch_no_index_present.stdout|int == 1
+  when: elasticsearch_no_index_present.stdout|int != 1
+
 - name: Install kibana rpms
   yum: name={{ item }} state=present
   become: true
