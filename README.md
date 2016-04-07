@@ -4,7 +4,7 @@ Ansible Playbook for setting up the ELK Stack on a remote server
 
 **What does it do?**
    - Automated deployment of a full ELK stack (Elasticsearch, Logstash, Kibana)
-     * Uses nginx as a reverse proxy for Kibana
+     * Uses Nginx as a reverse proxy for Kibana
      * Generates SSL certificates for filebeat or logstash-forwarder
      * Adds either iptables or firewalld rules if firewall is active
      * Tunes Elasticsearch heapsize to half your memory
@@ -14,8 +14,9 @@ Ansible Playbook for setting up the ELK Stack on a remote server
    - Ansible 1.8.x+
 
 **Notes**
-   - Sets the nginx htpasswd to admin/admin initially
-   - It's fairly quick, takes around 3minutes on my local VM
+   - Sets the Nginx htpasswd to admin/admin initially
+   - Uses openJDK for Java
+   - It's fairly quick, takes around 3minutes on test VM
 
 **Instructions**
    - Clone repo and setup your hosts file
