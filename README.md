@@ -19,7 +19,7 @@ Ansible Playbook for setting up the ELK Stack on a remote server
    - Uses OpenJDK for Java
    - It's fairly quick, takes around 3minutes on test VM
 
-**Instructions**
+**ELK Server Instructions**
    - Clone repo and setup your hosts file
 ```
 git clone https://github.com/sadsfae/ansible-elk
@@ -33,16 +33,16 @@ ansible-playbook -i hosts install/elk.yml
    - Navigate to the server at http://yourhost
 ![ELK](/image/elk-index.png?raw=true "Click the green button.")
 
+**ELK Client Instructions**
+   - Run the client playbook against the generated elk_server variable
+```
+ansible-playbook -i hosts install/elk-client.yml --extra-vars 'elk_server=X.X.X.X'
+```
    - You can view a deployment video here:
 
 
 [![Ansible Elk](http://img.youtube.com/vi/pwpLPiPX2Mg/0.jpg)](http://www.youtube.com/watch?v=pwpLPiPX2Mg "Deploying ELK with Ansible")
 
-**Client Instructions**
-   - Run the client playbook against the generated elk_server variable
-```
-ansible-playbook -i hosts install/elk-client.yml --extra-vars 'elk_server=X.X.X.X'
-```
 
 **File Hierarchy**
 ```
