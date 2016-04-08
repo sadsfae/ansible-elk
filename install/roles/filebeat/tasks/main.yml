@@ -42,7 +42,7 @@
   shell: curl http://"{{ elk_server }}":8080/filebeat-forwarder.crt > /etc/pki/tls/certs/filebeat-forwarder.crt
   become: true
   when: elk_client_ssl_cert_exists != 0
- 
+
 - name: Start filebeat service
   command: systemctl start filebeat.service
   ignore_errors: true

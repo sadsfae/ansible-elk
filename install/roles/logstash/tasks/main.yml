@@ -96,9 +96,9 @@
   shell: grep "{{ ansible_default_ipv4.address }}" /etc/pki/tls/openssl.cnf | wc -l
   ignore_errors: true
   register: subjectAltName_exists
-  
+
 - name: Add OpenSSL SANs (SubjectAltName) entry for CA
-  lineinfile: 
+  lineinfile:
     dest: /etc/pki/tls/openssl.cnf
     line: 'subjectAltName = "{{ ansible_default_ipv4.address }}"'
     regexp: '^ Extensions for a typical CA'
@@ -110,7 +110,7 @@
   command: curl -XPUT 'http://localhost:9200/_template/filebeat?pretty' -d@/tmp/filebeat-index-template.json
   ignore_errors: true
   become: true
-  
+
 - name: Refresh logstash service
   command: systemctl restart logstash.service
   ignore_errors: true
@@ -160,7 +160,7 @@
 
 - name: Add firewall rule for TCP/5044 (iptables-services)
   lineinfile:
-    dest: /etc/sysconfig/iptables 
+    dest: /etc/sysconfig/iptables
     line: '-A INPUT -p tcp -m tcp --dport 5044 -j ACCEPT'
     regexp: '^INPUT -i lo -j ACCEPT'
     insertbefore: '-A INPUT -i lo -j ACCEPT'

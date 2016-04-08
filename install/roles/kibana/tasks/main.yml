@@ -89,7 +89,7 @@
     -x509 -days 3650 -batch -nodes -newkey rsa:2048 -keyout /etc/pki/tls/private/filebeat-forwarder.key \
     -out /etc/pki/tls/certs/filebeat-forwarder.crt
   ignore_errors: true
-  when: filebeat_forwarder_ssl_exists != 0 
+  when: filebeat_forwarder_ssl_exists != 0
 
 - name: Check Filebeat forwarder SSL certificate copy
   stat: path=/usr/share/nginx/html/filebeat-forwarder.crt
@@ -109,11 +109,11 @@
 - name: Print SSL post-setup information
   debug: msg="Filebeat SSL Certificate available at http://{{ ansible_hostname }}:8080/filebeat-forwarder.crt"
 
-- name: Print post-setup URL  
+- name: Print post-setup URL
   debug: msg="*** ELK Services available at http://{{ ansible_hostname }}/ ***"
 
 - name: Print index creation instructions
-  debug: msg="** Navigate to http://{{ ansible_hostname }} and login with admin/admin, click 'create' on the green index button ***"
+  debug: msg="** 1) Navigate to http://{{ ansible_hostname }} and login with admin/admin, click 'create' on the green index button ***"
 
 - name: Print filebeat client setup instructions
-  debug: msg="** Run ansible-playbook -i hosts install/elk-client.yml --extra-vars 'elk_server={{ ansible_default_ipv4.address }}' to setup clients against this ELK ***"
+  debug: msg="** 2) Run ansible-playbook -i hosts install/elk-client.yml --extra-vars 'elk_server={{ ansible_default_ipv4.address }}' to setup clients ***"
