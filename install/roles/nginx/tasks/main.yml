@@ -49,6 +49,7 @@
   ignore_errors: true
   when: nginx_needs_restart != 0 
 
+# we need TCP/80 and TCP/8080 open
 # determine firewall status and take action
 # 1) use firewall-cmd if firewalld is utilized
 # 2) insert iptables rule if iptables is used
@@ -97,6 +98,54 @@
   register: iptables_needs_restart
 
 - name: Restart iptables-services for TCP/80 (iptables-services)
+  shell: systemctl restart iptables.service
+  ignore_errors: true
+  when: iptables_needs_restart != 0 and firewalld_in_use.rc != 0 and firewalld_is_active.rc != 0
+
+# Firewalld 
+- name: Determine if firewalld is in use
+  shell: systemctl is-enabled firewalld.service | egrep -qv 'masked|disabled'
+  ignore_errors: true
+  register: firewalld_in_use  
+
+- name: Determine if firewalld is active
+  shell: systemctl is-active firewalld.service | grep -vq inactive
+  ignore_errors: true
+  register: firewalld_is_active
+
+- name: Determine if TCP/8080 is already active
+  shell: firewall-cmd --list-ports | egrep -q "^8080/tcp"
+  ignore_errors: true
+  register: firewalld_tcp8080_exists
+
+# add firewall rule via firewall-cmd
+- name: Add firewall rule for TCP/8080 (firewalld)
+  command: "{{ item }}" 
+  with_items:
+    - firewall-cmd --zone=public --add-port=8080/tcp --permanent
+    - firewall-cmd --reload
+  ignore_errors: true
+  become: true
+  when: firewalld_in_use.rc == 0 and firewalld_is_active.rc == 0 and firewalld_tcp8080_exists.rc != 0 
+
+# iptables-services
+- name: check firewall rules for TCP/8080 (iptables-services)
+  shell: grep "dport 8080 \-j ACCEPT" /etc/sysconfig/iptables | wc -l
+  ignore_errors: true
+  register: iptables_tcp8080_exists
+  failed_when: iptables_tcp8080_exists == 127
+
+- name: Add firewall rule for TCP/8080 (iptables-services)
+  lineinfile: 
+    dest: /etc/sysconfig/iptables 
+    line: '-A INPUT -p tcp -m tcp --dport 8080 -j ACCEPT'
+    regexp: '^INPUT -i lo -j ACCEPT'
+    insertbefore: '-A INPUT -i lo -j ACCEPT'
+    backup: yes
+  when: firewalld_in_use.rc != 0 and firewalld_is_active.rc != 0 and iptables_tcp8080_exists.stdout|int == 0
+  register: iptables_needs_restart
+
+- name: Restart iptables-services for TCP/8080 (iptables-services)
   shell: systemctl restart iptables.service
   ignore_errors: true
   when: iptables_needs_restart != 0 and firewalld_in_use.rc != 0 and firewalld_is_active.rc != 0

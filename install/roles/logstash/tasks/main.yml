@@ -39,7 +39,7 @@
 
 - name: Copy logstash output filters
   copy:
-    src=30-lumberjack-output.conf
+    src=30-elasticsearch-output.conf
     dest=/etc/logstash/conf.d/30-lumberjack-output.conf
     owner=root
     group=root
@@ -54,13 +54,121 @@
     group=root
     mode=0644
   become: true
+
+- name: Copy logstash local syslog filter
+  copy:
+    src=10-syslog-filter.conf
+    dest=/etc/logstash/conf.d/10-syslog-filter.conf
+    owner=root
+    group=root
+    mode=0644
+  become: true
   register: logstash_needs_restart
 
-- name: Start logstash service
-  command: systemctl start logstash.service
-  ignore_errors: true
-  when: logstash_needs_restart != 0
+- name: Copy filebeat input filter
+  copy:
+    src=02-beats-input.conf
+    dest=/etc/logstash/conf.d/02-beats-input.conf
+    owner=root
+    group=root
+    mode=0644
+  become: true
 
-- name: Setup elasticsearch service
+- name: Stage filebeat JSON index template
+  copy:
+    src=filebeat-index-template.json
+    dest=/tmp/filebeat-index-template.json
+    owner=root
+    group=root
+    mode=0644
+  become: true
+
+- name: Load OpenSSL CA Extended Configuration
+  template:
+    src=openssl_extras.cnf.j2
+    dest=/etc/pki/tls/openssl_extras.cnf
+    owner=root
+    group=root
+    mode=0644
+  become: true
+
+- name: Check OpenSSL SANs (SubjectAltName) entry for CA
+  shell: grep "{{ ansible_default_ipv4.address }}" /etc/pki/tls/openssl.cnf | wc -l
+  ignore_errors: true
+  register: subjectAltName_exists
+  
+- name: Add OpenSSL SANs (SubjectAltName) entry for CA
+  lineinfile: 
+    dest: /etc/pki/tls/openssl.cnf
+    line: 'subjectAltName = "{{ ansible_default_ipv4.address }}"'
+    regexp: '^ Extensions for a typical CA'
+    insertbefore: '# Extensions for a typical CA'
+    backup: yes
+  when: subjectAltName_exists.stdout|int == 0
+
+- name: Load filebeat JSON index template
+  command: curl -XPUT 'http://localhost:9200/_template/filebeat?pretty' -d@/tmp/filebeat-index-template.json
+  ignore_errors: true
+  become: true
+  
+- name: Refresh logstash service
+  command: systemctl restart logstash.service
+  ignore_errors: true
+  become: true
+
+- name: Setup logstash service
   service: name=logstash state=started enabled=true
   become: true
+
+# we need TCP/80 and TCP/8080 open
+# determine firewall status and take action
+# 1) use firewall-cmd if firewalld is utilized
+# 2) insert iptables rule if iptables is used
+
+# Firewalld 
+- name: Determine if firewalld is in use
+  shell: systemctl is-enabled firewalld.service | egrep -qv 'masked|disabled'
+  ignore_errors: true
+  register: firewalld_in_use  
+
+- name: Determine if firewalld is active
+  shell: systemctl is-active firewalld.service | grep -vq inactive
+  ignore_errors: true
+  register: firewalld_is_active
+
+- name: Determine if TCP/5044 is already active
+  shell: firewall-cmd --list-ports | egrep -q "^5044/tcp"
+  ignore_errors: true
+  register: firewalld_tcp5044_exists
+
+# add firewall rule via firewall-cmd
+- name: Add firewall rule for TCP/5044 (firewalld)
+  command: "{{ item }}" 
+  with_items:
+    - firewall-cmd --zone=public --add-port=5044/tcp --permanent
+    - firewall-cmd --reload
+  ignore_errors: true
+  become: true
+  when: firewalld_in_use.rc == 0 and firewalld_is_active.rc == 0 and firewalld_tcp5044_exists.rc != 0 
+
+# iptables-services
+- name: check firewall rules for TCP/5044 (iptables-services)
+  shell: grep "dport 5044 \-j ACCEPT" /etc/sysconfig/iptables | wc -l
+  ignore_errors: true
+  register: iptables_tcp5044_exists
+  failed_when: iptables_tcp5044_exists == 127
+
+- name: Add firewall rule for TCP/5044 (iptables-services)
+  lineinfile: 
+    dest: /etc/sysconfig/iptables 
+    line: '-A INPUT -p tcp -m tcp --dport 5044 -j ACCEPT'
+    regexp: '^INPUT -i lo -j ACCEPT'
+    insertbefore: '-A INPUT -i lo -j ACCEPT'
+    backup: yes
+  when: firewalld_in_use.rc != 0 and firewalld_is_active.rc != 0 and iptables_tcp5044_exists.stdout|int == 0
+  register: iptables_needs_restart
+
+- name: Restart iptables-services for TCP/5044 (iptables-services)
+  shell: systemctl restart iptables.service
+  ignore_errors: true
+  when: iptables_needs_restart != 0 and firewalld_in_use.rc != 0 and firewalld_is_active.rc != 0

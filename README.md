@@ -5,9 +5,10 @@ Ansible Playbook for setting up the ELK Stack on a remote server
 **What does it do?**
    - Automated deployment of a full ELK stack (Elasticsearch, Logstash, Kibana)
      * Uses Nginx as a reverse proxy for Kibana
-     * Generates SSL certificates for filebeat or logstash-forwarder
+     * Generates SSL certificates for Filebeat or Logstash-forwarder
      * Adds either iptables or firewalld rules if firewall is active
      * Tunes Elasticsearch heapsize to half your memory
+     * Deploys ELK clients using SSL and Filebeat
  
 **Requirements**
    - RHEL7, CentOS or Fedora Linux server
@@ -15,7 +16,7 @@ Ansible Playbook for setting up the ELK Stack on a remote server
 
 **Notes**
    - Sets the Nginx htpasswd to admin/admin initially
-   - Uses openJDK for Java
+   - Uses OpenJDK for Java
    - It's fairly quick, takes around 3minutes on test VM
 
 **Instructions**
@@ -37,11 +38,16 @@ ansible-playbook -i hosts install/elk.yml
 
 [![Ansible Elk](http://img.youtube.com/vi/pwpLPiPX2Mg/0.jpg)](http://www.youtube.com/watch?v=pwpLPiPX2Mg "Deploying ELK with Ansible")
 
-**To Do**
-   - Write a client playbook for filebeat to send logs to the service
+**Client Instructions**
+   - Run the client playbook against the generated elk_server variable
+```
+ansible-playbook -i hosts install/elk-client.yml --extra-vars 'elk_server=X.X.X.X'
+```
 
 ```
 ├── hosts
+├── image
+│   └── elk-index.png
 └── install
     ├── elk.yml
     ├── group_vars
@@ -54,8 +60,16 @@ ansible-playbook -i hosts install/elk.yml
         │   │   └── elasticsearch.yml
         │   └── tasks
         │       └── main.yml
+        ├── filebeat
+        │   ├── files
+        │   │   └── filebeat.repo
+        │   ├── tasks
+        │   │   └── main.yml
+        │   └── templates
+        │       └── filebeat.yml.j2
         ├── kibana
         │   ├── files
+        │   │   ├── filebeat-dashboards.zip
         │   │   ├── kibana.repo
         │   │   └── logstash.repo
         │   └── tasks
@@ -63,11 +77,17 @@ ansible-playbook -i hosts install/elk.yml
         ├── logstash
         │   ├── files
         │   │   ├── 01-lumberjack-input.conf
+        │   │   ├── 02-beats-input.conf
         │   │   ├── 10-syslog.conf
+        │   │   ├── 10-syslog-filter.conf
+        │   │   ├── 30-elasticsearch-output.conf
         │   │   ├── 30-lumberjack-output.conf
+        │   │   ├── filebeat-index-template.json
         │   │   └── logstash.repo
-        │   └── tasks
-        │       └── main.yml
+        │   ├── tasks
+        │   │   └── main.yml
+        │   └── templates
+        │       └── openssl_extras.cnf.j2
         └── nginx
             ├── files
             │   └── nginx.conf
@@ -76,4 +96,5 @@ ansible-playbook -i hosts install/elk.yml
             │   └── main.yml
             └── templates
                 └── kibana.conf.j2
+
 ```
