@@ -1,6 +1,6 @@
 ---
 #
-# Install/run nginx
+# Install/run nginxt
 #
 
 # satisfy package dependencies
@@ -49,12 +49,16 @@
   ignore_errors: true
   when: nginx_needs_restart != 0
 
+- name: Set nginx to start on boot
+  command: systemctl enable nginx.service
+  ignore_errors: true
+
 # we need TCP/80 and TCP/8080 open
 # determine firewall status and take action
 # 1) use firewall-cmd if firewalld is utilized
 # 2) insert iptables rule if iptables is used
 
-# Firewalld 
+# Firewalld
 - name: Determine if firewalld is in use
   shell: systemctl is-enabled firewalld.service | egrep -qv 'masked|disabled'
   ignore_errors: true
@@ -102,7 +106,7 @@
   ignore_errors: true
   when: iptables_needs_restart != 0 and firewalld_in_use.rc != 0 and firewalld_is_active.rc != 0
 
-# Firewalld 
+# Firewalld
 - name: Determine if firewalld is in use
   shell: systemctl is-enabled firewalld.service | egrep -qv 'masked|disabled'
   ignore_errors: true
@@ -136,7 +140,7 @@
   failed_when: iptables_tcp8080_exists == 127
 
 - name: Add firewall rule for TCP/8080 (iptables-services)
-  lineinfile: 
+  lineinfile:
     dest: /etc/sysconfig/iptables
     line: '-A INPUT -p tcp -m tcp --dport 8080 -j ACCEPT'
     regexp: '^INPUT -i lo -j ACCEPT'
