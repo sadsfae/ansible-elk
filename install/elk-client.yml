@@ -1,0 +1,9 @@
+---
+#
+# Playbook to install the ELK stack
+#
+
+- hosts: elk-client
+  remote_user: root
+  roles:
+    - { role: filebeat }
