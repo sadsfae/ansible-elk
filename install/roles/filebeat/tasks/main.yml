@@ -1,6 +1,6 @@
 ---
 #
-# install/run filebeat ELK client
+# install/run filebeat elk client
 #
 
 - name: Copy filebeat yum repo file
@@ -46,7 +46,7 @@
 - name: Start filebeat service
   command: systemctl start filebeat.service
   ignore_errors: true
-  when: filebeat_needs_restart != 0 
+  when: filebeat_needs_restart != 0
 
 - name: Setup filebeat service
   service: name=filebeat state=started enabled=true

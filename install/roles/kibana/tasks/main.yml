@@ -73,7 +73,7 @@
 - name: Create kibana admin user
   command: htpasswd -b -c /etc/nginx/htpasswd.users admin admin
   ignore_errors: true
-  when: kibana_user_pwfile_exists != 0 
+  when: kibana_user_pwfile_exists != 0
 
 - name: Setup kibana service
   service: name=kibana state=started enabled=true

@@ -125,11 +125,11 @@
 # 1) use firewall-cmd if firewalld is utilized
 # 2) insert iptables rule if iptables is used
 
-# Firewalld 
+# Firewalld
 - name: Determine if firewalld is in use
   shell: systemctl is-enabled firewalld.service | egrep -qv 'masked|disabled'
   ignore_errors: true
-  register: firewalld_in_use  
+  register: firewalld_in_use
 
 - name: Determine if firewalld is active
   shell: systemctl is-active firewalld.service | grep -vq inactive
@@ -143,13 +143,13 @@
 
 # add firewall rule via firewall-cmd
 - name: Add firewall rule for TCP/5044 (firewalld)
-  command: "{{ item }}" 
+  command: "{{ item }}"
   with_items:
     - firewall-cmd --zone=public --add-port=5044/tcp --permanent
     - firewall-cmd --reload
   ignore_errors: true
   become: true
-  when: firewalld_in_use.rc == 0 and firewalld_is_active.rc == 0 and firewalld_tcp5044_exists.rc != 0 
+  when: firewalld_in_use.rc == 0 and firewalld_is_active.rc == 0 and firewalld_tcp5044_exists.rc != 0
 
 # iptables-services
 - name: check firewall rules for TCP/5044 (iptables-services)
@@ -159,7 +159,7 @@
   failed_when: iptables_tcp5044_exists == 127
 
 - name: Add firewall rule for TCP/5044 (iptables-services)
-  lineinfile: 
+  lineinfile:
     dest: /etc/sysconfig/iptables 
     line: '-A INPUT -p tcp -m tcp --dport 5044 -j ACCEPT'
     regexp: '^INPUT -i lo -j ACCEPT'
