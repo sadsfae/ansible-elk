@@ -82,4 +82,4 @@
   debug: msg="*** ELK Services available at http://{{ ansible_hostname }}/ ***"
 
 - name: Print index creation instructions
-  debug: msg="** Navigate to http://{{ ansible_hostname }} and click 'create' on the green index button ***"
+  debug: msg="** Navigate to http://{{ ansible_hostname }} and login with admin/admin, click 'create' on the green index button ***"
