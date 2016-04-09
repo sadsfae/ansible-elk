@@ -43,6 +43,11 @@ ansible-playbook -i hosts install/elk-client.yml --extra-vars 'elk_server=X.X.X.
 
 [![Ansible Elk](http://img.youtube.com/vi/pwpLPiPX2Mg/0.jpg)](http://www.youtube.com/watch?v=pwpLPiPX2Mg "Deploying ELK with Ansible")
 
+**TO DO**
+   - Provide detection for systems with >=128GB of memory, as a heapsize greater
+     than 32GB can cause crashes and other issues.  Apply logic to only set to a
+     max of 32GB if 1/2 of system memory exceeds 64G.
+   - Use the yum module instead of command/shell for repo management
 
 **File Hierarchy**
 ```
