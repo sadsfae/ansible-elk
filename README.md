@@ -11,8 +11,8 @@ Ansible Playbook for setting up the ELK Stack on a remote server
      * Deploys ELK clients using SSL and Filebeat
  
 **Requirements**
-   - RHEL7, CentOS or Fedora Linux server
-   - Ansible 1.8.x+
+   - RHEL7, CentOS or Fedora Linux server/client
+   - Deployment tested on Ansible 1.9.4
 
 **Notes**
    - Sets the Nginx htpasswd to admin/admin initially
