@@ -1,9 +1,8 @@
 ---
 #
-# Install/run nginxt
+# Install/run nginx
 #
 
-# satisfy package dependencies
 - name: Check for epel
   shell: rpm -qa | grep -q epel-release
   ignore_errors: true
