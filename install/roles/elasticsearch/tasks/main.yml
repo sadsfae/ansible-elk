@@ -19,26 +19,31 @@
     - elasticsearch
     - java-openjdk-headless
 
+- name: Check if system memory is greater than 64G
+  debug: msg="System memory is {{ansible_memory_mb.real.total | int}} so setting heapsize to 32G upper limit"
+  when: ansible_memory_mb.real.total|int >= 65536
+
+- name: Apply heapsize tuning for systems with greater than 64G memory
+  lineinfile: dest=/usr/share/elasticsearch/bin/elasticsearch.in.sh \
+          line="ES_HEAP_SIZE=32g" insertafter="^ES_CLASSPATH="
+  when: ansible_memory_mb.real.total|int >= 65536
+  register: elasticsearch_updated
+
+- name: Print extended documentation for heapsize tuning
+  debug: msg="Refer to https://www.elastic.co/guide/en/elasticsearch/guide/current/_limiting_memory_usage.html"
+  when: ansible_memory_mb.real.total|int >= 65536
+
 - name: Update elasticsearch startup with heap size
   become: true
   lineinfile: dest=/usr/share/elasticsearch/bin/elasticsearch.in.sh \
           line="ES_HEAP_SIZE={{ (ansible_memory_mb.real.total / 2) | int }}m" insertafter="^ES_CLASSPATH="
+  when: ansible_memory_mb.real.total|int < 65536
   register: elasticsearch_updated
-
-- name: Copy elasticsearch config
-  copy:
-    src=elasticsearch.yml
-    dest=/etc/elasticsearch/elasticsearch.yml
-    owner=root
-    group=root
-    mode=0755
-  become: true
-  register: elasticsearch_needs_restart
 
 - name: Start elasticsearch service
   command: systemctl start elasticsearch.service
   ignore_errors: true
-  when: elasticsearch_needs_restart != 0
+  when: elasticsearch_updated != 0
 
 - name: Setup elasticsearch service
   service: name=elasticsearch state=started enabled=true
