@@ -7,9 +7,9 @@ Ansible Playbook for setting up the ELK Stack on a remote server
      * Uses Nginx as a reverse proxy for Kibana
      * Generates SSL certificates for Filebeat or Logstash-forwarder
      * Adds either iptables or firewalld rules if firewall is active
-     * Tunes Elasticsearch heapsize to half your memory
+     * Tunes Elasticsearch heapsize to half your memory, to a max of 32G
      * Deploys ELK clients using SSL and Filebeat
- 
+
 **Requirements**
    - RHEL7, CentOS or Fedora Linux server/client
    - Deployment tested on Ansible 1.9.4
@@ -51,6 +51,7 @@ ansible-playbook -i hosts install/elk-client.yml --extra-vars 'elk_server=X.X.X.
 ├── image
 │   └── elk-index.png
 └── install
+    ├── elk-client.yml
     ├── elk.yml
     ├── group_vars
     │   └── all
@@ -58,8 +59,7 @@ ansible-playbook -i hosts install/elk-client.yml --extra-vars 'elk_server=X.X.X.
         ├── elasticsearch
         │   ├── files
         │   │   ├── elasticsearch.in.sh
-        │   │   ├── elasticsearch.repo
-        │   │   └── elasticsearch.yml
+        │   │   └── elasticsearch.repo
         │   └── tasks
         │       └── main.yml
         ├── filebeat
@@ -93,10 +93,8 @@ ansible-playbook -i hosts install/elk-client.yml --extra-vars 'elk_server=X.X.X.
         └── nginx
             ├── files
             │   └── nginx.conf
-            ├── main.yml
             ├── tasks
             │   └── main.yml
             └── templates
                 └── kibana.conf.j2
-
 ```
