@@ -3,13 +3,13 @@
 # Install/run nginx
 #
 
-- name: Check for epel
+- name: Check for EPEL
   shell: rpm -qa | grep -q epel-release
   ignore_errors: true
   register: epel_installed
 
-- name: Install epel repo
-  command: rpm -ivh {{ epel_repo }}
+- name: Install EPEL repo
+  yum: name={{ epel_repo }}
   become: true
   when: epel_installed.rc != 0
 
@@ -21,7 +21,7 @@
     - httpd-tools
 
 # deploy kibana.conf with FQDN
-- name: setup nginx reverse proxy for kibana
+- name: Setup nginx reverse proxy for kibana
   template:
     src=kibana.conf.j2
     dest=/etc/nginx/conf.d/kibana.conf
@@ -152,3 +152,9 @@
   shell: systemctl restart iptables.service
   ignore_errors: true
   when: iptables_needs_restart != 0 and firewalld_in_use.rc != 0 and firewalld_is_active.rc != 0
+
+- name: Disable EPEL Repo
+  ini_file: dest=/etc/yum.repos.d/epel.repo
+    section=epel
+    option=enabled
+    value=0
