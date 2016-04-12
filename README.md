@@ -9,6 +9,7 @@ Ansible Playbook for setting up the ELK Stack on a remote server
      * Adds either iptables or firewalld rules if firewall is active
      * Tunes Elasticsearch heapsize to half your memory, to a max of 32G
      * Deploys ELK clients using SSL and Filebeat
+     * More information [available here](https://hobo.house/2016/04/08/automate-elk-stack-and-clients-with-ansible/]
 
 **Requirements**
    - RHEL7, CentOS or Fedora Linux server/client
@@ -18,6 +19,7 @@ Ansible Playbook for setting up the ELK Stack on a remote server
    - Sets the Nginx htpasswd to admin/admin initially
    - Uses OpenJDK for Java
    - It's fairly quick, takes around 3minutes on test VM
+   - Filebeat templating is focused around OpenStack service logs
 
 **ELK Server Instructions**
    - Clone repo and setup your hosts file
