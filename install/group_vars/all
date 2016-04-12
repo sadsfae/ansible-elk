@@ -1,5 +1,5 @@
 ---
 
-# EPEL Repository for collectd packages
+# EPEL Repository for extra packages
 epel_repo: https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
 
