@@ -2,6 +2,8 @@ ansible-elk
 ===========
 Ansible Playbook for setting up the ELK Stack on a remote server
 
+![ELK](/image/ansible-elk.png?raw=true){: .floatleft}
+
 **What does it do?**
    - Automated deployment of a full ELK stack (Elasticsearch, Logstash, Kibana)
      * Uses Nginx as a reverse proxy for Kibana
