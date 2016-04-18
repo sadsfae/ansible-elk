@@ -13,7 +13,7 @@
   become: true
 
 # We need to insert data to create an initial index, query if it exists
-- name: Check elasticsearch index
+- name: Check elasticsearch index for content
   uri:
     url=http://localhost:9200/_cat/indices
     method=GET
