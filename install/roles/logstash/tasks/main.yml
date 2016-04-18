@@ -100,7 +100,7 @@
 # https://github.com/ansible/ansible-modules-core/issues/265
 # http://stackoverflow.com/questions/28997007/translate-curl-put-into-ansible-uri-module
 - name: Load filebeat JSON index template
-  command: curl -XPUT 'http://localhost:9200/_template/filebeat?pretty' -d@/tmp/filebeat-index-template.json
+  command: curl -XPOST 'http://localhost:9200/_template/filebeat?pretty' -d@/tmp/filebeat-index-template.json
   ignore_errors: true
   become: true
 
