@@ -20,9 +20,6 @@
     return_content=yes
   register: elasticsearch_index
 
-- name: print stuff
-  debug: msg="our content is {{elasticsearch_index}}"
-
 # Populate with our own logs
 - name: Populate elasticsearch index with local logs
   shell: cat /var/log/messages | /opt/logstash/bin/logstash -f /etc/logstash/conf.d/10-syslog.conf
