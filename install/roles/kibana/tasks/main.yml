@@ -12,16 +12,21 @@
     mode=0644
   become: true
 
-# We need to insert data to create initial an initial index, query if it exists
-- name: Query index status
-  shell: curl -GET http://localhost:9200/_cat/indices 2>/dev/null | grep logstash | wc -l
-  ignore_errors: true
-  register: elasticsearch_no_index_present
+# We need to insert data to create an initial index, query if it exists
+- name: Check elasticsearch index
+  uri:
+    url=http://localhost:9200/_cat/indices
+    method=GET
+    return_content=yes
+  register: elasticsearch_index
+
+- name: print stuff
+  debug: msg="our content is {{elasticsearch_index}}"
 
 # Populate with our own logs
 - name: Populate elasticsearch index with local logs
   shell: cat /var/log/messages | /opt/logstash/bin/logstash -f /etc/logstash/conf.d/10-syslog.conf
-  when: elasticsearch_no_index_present.stdout|int == 0
+  when: "'logstash-' not in elasticsearch_index.content"
 
 - name: Install kibana rpms
   yum: name={{ item }} state=present

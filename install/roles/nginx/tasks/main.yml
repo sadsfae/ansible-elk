@@ -6,12 +6,13 @@
 - name: Check for EPEL repo
   yum: name=epel-release state=present
 
-- name: Install nginx and httpd-tools
+- name: Install nginx, httpd-tools and httplib2
   yum: name={{ item }} state=present
   become: true
   with_items:
     - nginx
     - httpd-tools
+    - python-httplib2
 
 # deploy kibana.conf with FQDN
 - name: Setup nginx reverse proxy for kibana
