@@ -13,9 +13,10 @@
   become: true
 
 - name: Import filebeat GPG key
-  command: rpm --import http://packages.elastic.co/GPG-KEY-elasticsearch
+  rpm_key:
+    key=http://packages.elastic.co/GPG-KEY-elasticsearch
+    state=present
   ignore_errors: true
-  become: true
 
 - name: Install filebeat rpms
   yum: name={{ item }} state=present
@@ -39,7 +40,8 @@
   register: elk_client_ssl_cert_exists
 
 - name: Install ELK server SSL client certificate
-  shell: curl http://"{{ elk_server }}":8080/filebeat-forwarder.crt > /etc/pki/tls/certs/filebeat-forwarder.crt
+  get_url: url=http://{{ elk_server }}:8080/filebeat-forwarder.crt
+    dest=/etc/pki/tls/certs/filebeat-forwarder.crt
   become: true
   when: elk_client_ssl_cert_exists != 0
 
