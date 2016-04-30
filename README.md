@@ -28,7 +28,8 @@ Ansible Playbook for setting up the ELK Stack and Filebeat client on remote host
 ```
 git clone https://github.com/sadsfae/ansible-elk
 cd ansible-elk
-sed -i 's/host-01/yourhost/' hosts
+sed -i 's/host-01/elkserver/' hosts
+sed -i 's/host-02/elkclient/' hosts
 ```
    - Run the playbook
 ```
