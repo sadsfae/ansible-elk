@@ -15,27 +15,27 @@ filebeat:
         - /var/log/*.log
         - /var/log/messages
         # foreman
-        - var/log/foreman/*.log",
-        - var/log/foreman-proxy/*.log",
+        - /var/log/foreman/*.log
+        - /var/log/foreman-proxy/*.log
         # openstack
-        - var/log/nova/*.log",
-        - var/log/neutron/*.log",
-        - var/log/cinder/*.log",
-        - var/log/keystone/*.log",
-        - var/log/horizon/*.log",
-        - var/log/glance/*.log",
-        - var/log/mariadb/*.log",
-        - var/log/rabbitmq/*.log",
-        - var/log/mongodb/*.log",
-        - var/log/ceilometer/*.log",
-        - var/log/ceph/*.log",
-        - var/log/heat/*.log",
-        - var/log/openvswitch/*.log",
-        - var/log/pcsd/*.log",
-        - var/log/puppet/*.log",
-        - var/log/redis/*.log",
-        - var/log/glusterfs/*.log",
-        - var/log/swift/*.log"
+        - /var/log/nova/*.log
+        - /var/log/neutron/*.log
+        - /var/log/cinder/*.log
+        - /var/log/keystone/*.log
+        - /var/log/horizon/*.log
+        - /var/log/glance/*.log
+        - /var/log/mariadb/*.log
+        - /var/log/rabbitmq/*.log
+        - /var/log/mongodb/*.log
+        - /var/log/ceilometer/*.log
+        - /var/log/ceph/*.log
+        - /var/log/heat/*.log
+        - /var/log/openvswitch/*.log
+        - /var/log/pcsd/*.log
+        - /var/log/puppet/*.log
+        - /var/log/redis/*.log
+        - /var/log/glusterfs/*.log
+        - /var/log/swift/*.log
 
       # Configure the file encoding for reading files with international characters
       # following the W3C recommendation for HTML5 (http://www.w3.org/TR/encoding).
