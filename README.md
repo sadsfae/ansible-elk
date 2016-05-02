@@ -14,8 +14,8 @@ Ansible Playbook for setting up the ELK Stack and Filebeat client on remote host
      * More information [available here](https://hobo.house/2016/04/08/automate-elk-stack-and-clients-with-ansible/)
 
 **Requirements**
-   - RHEL7, CentOS or Fedora Linux server/client
-   - Deployment tested on Ansible 1.9.4
+   - RHEL7 or CentOS7+ server/client
+   - Deployment tested on Ansible 1.9.4 and 2.0.2
 
 **Notes**
    - Sets the Nginx htpasswd to admin/admin initially
