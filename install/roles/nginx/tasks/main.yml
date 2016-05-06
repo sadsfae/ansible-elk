@@ -24,6 +24,13 @@
 - name: Apply SELinux boolean httpd_can_network_connect
   seboolean: name=httpd_can_network_connect state=yes persistent=yes
 
+# Set standard nginx ports if we're not pointing towards an undercloud
+- name: Assign ELK Server and nginx port values
+  set_fact:
+    nginx_kibana_port: 80
+    elk_server_ssl_cert_port: 8080
+  when: ((nginx_kibana_port is none) and (elk_server_ssl_cert_port is none))
+
 # deploy kibana.conf with FQDN
 - name: Setup nginx reverse proxy for kibana
   template:
@@ -37,13 +44,12 @@
 
 # deploy basic nginx.conf 8080 vhost
 - name: Setup nginx TCP/8080 vhost for SSL certificate
-  copy:
-    src=nginx.conf
+  template:
+    src=nginx.conf.j2
     dest=/etc/nginx/nginx.conf
     owner=root
     group=root
     mode=0644
-  ignore_errors: true
   become: true
 
 # start nginx service
@@ -72,39 +78,39 @@
   ignore_errors: true
   register: firewalld_is_active
 
-- name: Determine if TCP/80 is already active
-  shell: firewall-cmd --list-ports | egrep -q "^80/tcp"
+- name: Determine if TCP/{{nginx_kibana_port}} is already active
+  shell: firewall-cmd --list-ports | egrep -q "^{{nginx_kibana_port}}/tcp"
   ignore_errors: true
   register: firewalld_tcp80_exists
 
 # add firewall rule via firewall-cmd
-- name: Add firewall rule for TCP/80 (firewalld)
+- name: Add firewall rule for TCP/{{nginx_kibana_port}} (firewalld)
   command: "{{ item }}"
   with_items:
-    - firewall-cmd --zone=public --add-port=80/tcp --permanent
+    - firewall-cmd --zone=public --add-port={{nginx_kibana_port}}/tcp --permanent
     - firewall-cmd --reload
   ignore_errors: true
   become: true
   when: firewalld_in_use.rc == 0 and firewalld_is_active.rc == 0 and firewalld_tcp80_exists.rc != 0
 
 # iptables-services
-- name: check firewall rules for TCP/80 (iptables-services)
-  shell: grep "dport 80 \-j ACCEPT" /etc/sysconfig/iptables | wc -l
+- name: check firewall rules for TCP/{{nginx_kibana_port}} (iptables-services)
+  shell: grep "dport {{nginx_kibana_port}} \-j ACCEPT" /etc/sysconfig/iptables | wc -l
   ignore_errors: true
   register: iptables_tcp80_exists
   failed_when: iptables_tcp80_exists == 127
 
-- name: Add firewall rule for TCP/80 (iptables-services)
+- name: Add firewall rule for TCP/{{nginx_kibana_port}} (iptables-services)
   lineinfile:
     dest: /etc/sysconfig/iptables
-    line: '-A INPUT -p tcp -m tcp --dport 80 -j ACCEPT'
+    line: '-A INPUT -p tcp -m tcp --dport {{nginx_kibana_port}} -j ACCEPT'
     regexp: '^INPUT -i lo -j ACCEPT'
     insertbefore: '-A INPUT -i lo -j ACCEPT'
     backup: yes
   when: firewalld_in_use.rc != 0 and firewalld_is_active.rc != 0 and iptables_tcp80_exists.stdout|int == 0
   register: iptables_needs_restart
 
-- name: Restart iptables-services for TCP/80 (iptables-services)
+- name: Restart iptables-services for TCP/{{nginx_kibana_port}} (iptables-services)
   shell: systemctl restart iptables.service
   ignore_errors: true
   when: iptables_needs_restart != 0 and firewalld_in_use.rc != 0 and firewalld_is_active.rc != 0
@@ -120,39 +126,39 @@
   ignore_errors: true
   register: firewalld_is_active
 
-- name: Determine if TCP/8080 is already active
-  shell: firewall-cmd --list-ports | egrep -q "^8080/tcp"
+- name: Determine if TCP/{{elk_server_ssl_cert_port}} is already active
+  shell: firewall-cmd --list-ports | egrep -q "^{{elk_server_ssl_cert_port}}/tcp"
   ignore_errors: true
   register: firewalld_tcp8080_exists
 
 # add firewall rule via firewall-cmd
-- name: Add firewall rule for TCP/8080 (firewalld)
+- name: Add firewall rule for TCP/{{elk_server_ssl_cert_port}} (firewalld)
   command: "{{ item }}"
   with_items:
-    - firewall-cmd --zone=public --add-port=8080/tcp --permanent
+    - firewall-cmd --zone=public --add-port={{elk_server_ssl_cert_port}}/tcp --permanent
     - firewall-cmd --reload
   ignore_errors: true
   become: true
   when: firewalld_in_use.rc == 0 and firewalld_is_active.rc == 0 and firewalld_tcp8080_exists.rc != 0
 
 # iptables-services
-- name: check firewall rules for TCP/8080 (iptables-services)
-  shell: grep "dport 8080 \-j ACCEPT" /etc/sysconfig/iptables | wc -l
+- name: check firewall rules for TCP/{{elk_server_ssl_cert_port}} (iptables-services)
+  shell: grep "dport {{elk_server_ssl_cert_port}} \-j ACCEPT" /etc/sysconfig/iptables | wc -l
   ignore_errors: true
   register: iptables_tcp8080_exists
   failed_when: iptables_tcp8080_exists == 127
 
-- name: Add firewall rule for TCP/8080 (iptables-services)
+- name: Add firewall rule for TCP/{{elk_server_ssl_cert_port}} (iptables-services)
   lineinfile:
     dest: /etc/sysconfig/iptables
-    line: '-A INPUT -p tcp -m tcp --dport 8080 -j ACCEPT'
+    line: '-A INPUT -p tcp -m tcp --dport {{elk_server_ssl_cert_port}} -j ACCEPT'
     regexp: '^INPUT -i lo -j ACCEPT'
     insertbefore: '-A INPUT -i lo -j ACCEPT'
     backup: yes
   when: firewalld_in_use.rc != 0 and firewalld_is_active.rc != 0 and iptables_tcp8080_exists.stdout|int == 0
   register: iptables_needs_restart
 
-- name: Restart iptables-services for TCP/8080 (iptables-services)
+- name: Restart iptables-services for TCP/{{elk_server_ssl_cert_port}} (iptables-services)
   shell: systemctl restart iptables.service
   ignore_errors: true
   when: iptables_needs_restart != 0 and firewalld_in_use.rc != 0 and firewalld_is_active.rc != 0

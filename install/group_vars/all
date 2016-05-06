@@ -3,3 +3,18 @@
 # EPEL Repository for extra packages
 epel_repo: https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
 
+########################################
+# ELK Server Variables
+########################################
+### nginx ###
+# add nonstandard port here for undercloud usage
+# note: you should use nonstandard ports for both here
+# if you choose to do this.
+#
+# usage: port nginx listens to reverse-proxy Kibana
+# e.g. 8888
+nginx_kibana_port:
+#
+# usage: port filebeat client grabs the client SSL certificate
+# e.g. 9999
+elk_server_ssl_cert_port:
