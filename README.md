@@ -15,10 +15,13 @@ Ansible Playbook for setting up the ELK Stack and Filebeat client on remote host
 
 **Requirements**
    - RHEL7 or CentOS7+ server/client
+     - Fedora 23 or higher needs to have ```python2 python2-dnf libselinux-python``` packages.
    - Deployment tested on Ansible 1.9.4 and 2.0.2
 
 **Notes**
-   - Sets the Nginx htpasswd to admin/admin initially
+   - Sets the nginx htpasswd to admin/admin initially
+   - nginx listen ports default to 80/8080 for Kibana and SSL cert retrieval
+     - You can modify this in the ```group_vars/all``` file
    - Uses OpenJDK for Java
    - It's fairly quick, takes around 3minutes on test VM
    - Filebeat templating is focused around OpenStack service logs
