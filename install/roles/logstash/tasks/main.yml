@@ -104,12 +104,7 @@
   ignore_errors: true
   become: true
 
-- name: Refresh logstash service
-  command: systemctl restart logstash.service
-  ignore_errors: true
-  become: true
-
-- name: Setup logstash service
+- name: Enable logstash service
   service: name=logstash state=started enabled=true
   become: true
 
