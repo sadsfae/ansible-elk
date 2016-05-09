@@ -54,7 +54,7 @@
 
 # start nginx service
 - name: Start nginx service
-  command: systemctl start nginx.service
+  command: systemctl restart nginx.service
   ignore_errors: true
   when: nginx_needs_restart != 0
 
