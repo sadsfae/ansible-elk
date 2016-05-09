@@ -15,7 +15,7 @@ Ansible Playbook for setting up the ELK Stack and Filebeat client on remote host
 
 **Requirements**
    - RHEL7 or CentOS7+ server/client
-     - Fedora 23 or higher needs to have ```python2 python2-dnf libselinux-python``` packages.
+     - Fedora 23 or higher needs to have ```yum python2 python2-dnf libselinux-python``` packages.
    - Deployment tested on Ansible 1.9.4 and 2.0.2
 
 **Notes**
@@ -57,9 +57,12 @@ ansible-playbook -i hosts install/elk-client.yml --extra-vars 'elk_server=X.X.X.
 ```
 ├── hosts
 ├── image
+│   ├── ansible-elk.png
 │   └── elk-index.png
 └── install
+    ├── elk-client.retry
     ├── elk-client.yml
+    ├── elk.retry
     ├── elk.yml
     ├── group_vars
     │   └── all
@@ -99,10 +102,9 @@ ansible-playbook -i hosts install/elk-client.yml --extra-vars 'elk_server=X.X.X.
         │   └── templates
         │       └── openssl_extras.cnf.j2
         └── nginx
-            ├── files
-            │   └── nginx.conf
             ├── tasks
             │   └── main.yml
             └── templates
-                └── kibana.conf.j2
+                ├── kibana.conf.j2
+                └── nginx.conf.j2
 ```
