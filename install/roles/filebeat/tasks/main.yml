@@ -12,10 +12,9 @@
     mode=0644
   become: true
 
-- name: Import filebeat GPG key
-  command: rpm --import http://packages.elastic.co/GPG-KEY-elasticsearch
-  ignore_errors: true
-  become: true
+- name: Import Filebeat GPG Key
+  rpm_key: key=http://packages.elastic.co/GPG-KEY-elasticsearch
+    state=present
 
 - name: Install filebeat rpms
   yum: name={{ item }} state=present
