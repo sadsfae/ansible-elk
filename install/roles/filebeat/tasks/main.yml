@@ -13,10 +13,9 @@
   become: true
 
 - name: Import filebeat GPG key
-  rpm_key:
-    key=http://packages.elastic.co/GPG-KEY-elasticsearch
-    state=present
+  command: rpm --import http://packages.elastic.co/GPG-KEY-elasticsearch
   ignore_errors: true
+  become: true
 
 - name: Install filebeat rpms
   yum: name={{ item }} state=present
@@ -39,15 +38,21 @@
   ignore_errors: true
   register: elk_client_ssl_cert_exists
 
+# Set standard nginx ports if we're not pointing towards an undercloud
+- name: Assign ELK nginx port value for SSL client certificate
+  set_fact:
+    elk_server_ssl_cert_port: 8080
+  when: elk_server_ssl_cert_port is none
+
 - name: Install ELK server SSL client certificate
-  get_url: url=http://{{ elk_server }}:8080/filebeat-forwarder.crt
-    dest=/etc/pki/tls/certs/filebeat-forwarder.crt
+  shell: curl http://"{{ elk_server }}":{{ elk_server_ssl_cert_port }}/filebeat-forwarder.crt > /etc/pki/tls/certs/filebeat-forwarder.crt
   become: true
   when: elk_client_ssl_cert_exists != 0
 
 - name: Start filebeat service
   command: systemctl start filebeat.service
   ignore_errors: true
+  become: true
   when: filebeat_needs_restart != 0
 
 - name: Setup filebeat service
