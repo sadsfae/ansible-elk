@@ -16,8 +16,8 @@ Ansible Playbook for setting up the ELK Stack and Filebeat client on remote host
 **Requirements**
    - RHEL7 or CentOS7+ server/client with no modifications
      - Fedora 23 or higher needs to have ```yum python2 python2-dnf libselinux-python``` packages.
-       * Run this against Fedora clients:
-       - ```ansible 192.168.122.84 -u root -m shell -i hosts -a "dnf install yum python2 libsemanage-python python2-dnf -y"```
+       * You can run this against Fedora clients prior to running Ansible ELK:
+       - ```ansible fedora-client-01 -u root -m shell -i hosts -a "dnf install yum python2 libsemanage-python python2-dnf -y"```
    - Deployment tested on Ansible 1.9.4 and 2.0.2
 
 **Notes**
