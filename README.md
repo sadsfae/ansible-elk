@@ -11,7 +11,9 @@ Ansible Playbook for setting up the ELK/EFK Stack and Filebeat client on remote 
      * Adds either iptables or firewalld rules if firewall is active
      * Tunes Elasticsearch heapsize to half your memory, to a max of 32G
      * Deploys ELK clients using SSL and Filebeat for Logstash (Default)
-     * Deploys rsyslog if Fluentd is chosen over Logstash
+     * Deploys rsyslog if Fluentd is chosen over Logstash, however if there is
+       [ample demand](https://github.com/sadsfae/ansible-elk/issues/new) to
+       provide deployment of the more recommended [fluentd-forwarder](https://github.com/fluent/fluentd-forwarder) I'll work on this, time permitting 
      * All service ports can be modified
      * More information [available here](https://hobo.house/2016/04/08/automate-elk-stack-and-clients-with-ansible/)
 
