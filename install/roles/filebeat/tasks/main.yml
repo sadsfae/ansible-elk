@@ -10,17 +10,20 @@
     owner=root
     group=root
     mode=0644
+  when: (logging_backend != 'fluentd')
   become: true
 
 - name: Import Filebeat GPG Key
   rpm_key: key=http://packages.elastic.co/GPG-KEY-elasticsearch
     state=present
+  when: (logging_backend != 'fluentd')
 
 - name: Install filebeat rpms
   yum: name={{ item }} state=present
   become: true
   with_items:
     - filebeat
+  when: (logging_backend != 'fluentd')
 
 - name: Generate filebeat configuration template
   template:
@@ -30,30 +33,46 @@
     group=root
     mode=0644
   become: true
+  when: (logging_backend != 'fluentd')
   register: filebeat_needs_restart
 
 - name: Check ELK server SSL client certificate
   stat: path=/etc/pki/tls/certs/filebeat-forwarder.crt
   ignore_errors: true
   register: elk_client_ssl_cert_exists
-
-# Set standard nginx ports if we're not pointing towards an undercloud
-- name: Assign ELK nginx port value for SSL client certificate
-  set_fact:
-    elk_server_ssl_cert_port: 8080
-  when: elk_server_ssl_cert_port is none
+  when: (logging_backend != 'fluentd')
 
 - name: Install ELK server SSL client certificate
   shell: curl http://"{{ elk_server }}":{{ elk_server_ssl_cert_port }}/filebeat-forwarder.crt > /etc/pki/tls/certs/filebeat-forwarder.crt
   become: true
-  when: elk_client_ssl_cert_exists != 0
+  when: ((elk_client_ssl_cert_exists != 0) and (logging_backend != 'fluentd'))
 
 - name: Start filebeat service
   command: systemctl start filebeat.service
   ignore_errors: true
   become: true
-  when: filebeat_needs_restart != 0
+  when: ((filebeat_needs_restart != 0) and (logging_backend != 'fluentd'))
 
 - name: Setup filebeat service
   service: name=filebeat state=started enabled=true
   become: true
+  when: (logging_backend != 'fluentd')
+
+- name: Install rsyslogd for fluentd
+  yum: name={{ item }} state=present
+  become: true
+  with_items:
+    - rsyslog
+  when: (logging_backend == 'fluentd')
+
+- name: Setup rsyslogd for fluentd
+  lineinfile: dest=/etc/rsyslog.conf \
+          line="*.* @{{ elk_server }}:{{ fluentd_syslog_port }}"
+  when: (logging_backend == 'fluentd')
+  register: rsyslog_updated
+
+- name: Restarting rsyslog for fluentd
+  command: systemctl restart rsyslog.service
+  ignore_errors: true
+  when: rsyslog_updated != 0
+

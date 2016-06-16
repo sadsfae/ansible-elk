@@ -7,6 +7,7 @@
   remote_user: root
   roles:
     - { role: elasticsearch }
-    - { role: logstash }
+    - { role: fluentd, when: (logging_backend == 'fluentd') }
+    - { role: logstash, when: ((logging_backend is none) or (logging_backend == 'logstash')) }
     - { role: nginx }
     - { role: kibana }

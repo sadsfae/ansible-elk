@@ -1,0 +1,86 @@
+####
+## Output descriptions:
+##
+
+# Treasure Data (http://www.treasure-data.com/) provides cloud based data
+# analytics platform, which easily stores and processes data from td-agent.
+# FREE plan is also provided.
+# @see http://docs.fluentd.org/articles/http-to-td
+#
+# This section matches events whose tag is td.DATABASE.TABLE
+<match td.*.*>
+  type tdlog
+  apikey YOUR_API_KEY
+
+  auto_create_table
+  buffer_type file
+  buffer_path /var/log/td-agent/buffer/td
+
+  <secondary>
+    type file
+    path /var/log/td-agent/failed_records
+  </secondary>
+</match>
+
+## match tag=debug.** and dump to console
+<match debug.**>
+  type stdout
+</match>
+
+####
+## Source descriptions:
+##
+
+## built-in TCP input
+## @see http://docs.fluentd.org/articles/in_forward
+<source>
+  type forward
+</source>
+
+## built-in UNIX socket input
+#<source>
+#  type unix
+#</source>
+
+# HTTP input
+# POST http://localhost:8888/<tag>?json=<json>
+# POST http://localhost:8888/td.myapp.login?json={"user"%3A"me"}
+# @see http://docs.fluentd.org/articles/in_http
+<source>
+  type http
+  port {{ fluentd_http_port }}
+</source>
+
+## live debugging agent
+<source>
+  type debug_agent
+  bind 127.0.0.1
+  port {{ fluentd_debug_port }}
+</source>
+
+
+# collect the dmesg output
+<source>
+  type syslog
+  port {{ fluentd_syslog_port }}
+  tag syslog
+</source>
+
+<match syslog.**>
+  type elasticsearch
+  logstash_format true  #Kibana understands only logstash format
+  flush_interval 10s    # for testing
+</match>
+
+<source>
+  @type beats
+  metadata_as_tag
+</source>
+
+# Forward all events from beats to each index on elasticsearch
+<match *beat>
+  @type elasticsearch_dynamic
+  logstash_format true
+  logstash_prefix ${tag_parts[0]}
+  type_name ${record['type']}
+</match>

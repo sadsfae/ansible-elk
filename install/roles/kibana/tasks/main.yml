@@ -20,10 +20,29 @@
     return_content=yes
   register: elasticsearch_index
 
-# Populate with our own logs
-- name: Populate elasticsearch index with local logs
+# Populate elasticsearch with local logs if using logstash
+- name: Populate elasticsearch index with local logs via logstash
   shell: cat /var/log/messages | /opt/logstash/bin/logstash -f /etc/logstash/conf.d/10-syslog.conf
   when: "'logstash-' not in elasticsearch_index.content"
+  ignore_errors: true
+
+- name: Install local rsyslogd for fluentd
+  yum: name={{ item }} state=present
+  become: true
+  with_items:
+    - rsyslog
+  when: (logging_backend == 'fluentd')
+
+- name: Setup local rsyslogd for fluentd
+  lineinfile: dest=/etc/rsyslog.conf \
+          line="*.* @localhost:{{ fluentd_syslog_port }}"
+  when: (logging_backend == 'fluentd')
+  register: rsyslog_updated
+
+- name: Populate elasticsearch index with local logs via fluentd
+  command: systemctl restart rsyslog.service
+  ignore_errors: true
+  when: rsyslog_updated != 0
 
 - name: Install kibana rpms
   yum: name={{ item }} state=present
@@ -96,6 +115,12 @@
 - name: Refresh logstash service
   command: systemctl restart logstash.service
   ignore_errors: true
+  when: (logging_backend != 'fluentd')
+  become: true
+
+- name: Refresh fluentd service
+  command: systemctl restart td-agent.service
+  when: (logging_backend == 'fluentd')
   become: true
 
 - name: Print SSL post-setup information

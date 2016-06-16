@@ -1,0 +1,185 @@
+---
+#
+# Install/run fluentd
+#
+
+- name: Copy fluentd yum repo file
+  copy:
+    src=fluentd.repo
+    dest=/etc/yum.repos.d/fluentd.repo
+    owner=root
+    group=root
+    mode=0644
+  become: true
+
+- name: Import fluentd GPG Key
+  rpm_key: key=https://packages.treasuredata.com/GPG-KEY-td-agent
+    state=present
+
+- name: Install fluentd
+  yum: name={{ item }} state=present
+  become: true
+  with_items:
+    - td-agent
+
+- name: Setup fluentd configuration files
+  template:
+    src=td-agent.conf.j2
+    dest=/etc/td-agent/td-agent.conf
+    owner=root
+    group=root
+    mode=0644
+  become: true
+  register: fluentd_needs_restart
+
+### begin firewall settings here ###
+# we need TCP/42185 and TCP/9919 open
+# determine firewall status and take action
+# 1) use firewall-cmd if firewalld is utilized
+# 2) insert iptables rule if iptables is used
+
+# Firewalld
+- name: Determine if firewalld is in use
+  shell: systemctl is-enabled firewalld.service | egrep -qv 'masked|disabled'
+  ignore_errors: true
+  register: firewalld_in_use
+
+- name: Determine if firewalld is active
+  shell: systemctl is-active firewalld.service | grep -vq inactive
+  ignore_errors: true
+  register: firewalld_is_active
+
+- name: Determine if TCP/{{fluentd_syslog_port}} is already active
+  shell: firewall-cmd --list-ports | egrep -q "^{{fluentd_syslog_port}}/tcp"
+  ignore_errors: true
+  register: firewalld_tcp42185_exists
+
+# add firewall rule via firewall-cmd
+- name: Add firewall rule for TCP/{{fluentd_syslog_port}} (firewalld)
+  command: "{{ item }}"
+  with_items:
+    - firewall-cmd --zone=public --add-port={{fluentd_syslog_port}}/tcp --permanent
+    - firewall-cmd --reload
+  ignore_errors: true
+  become: true
+  when: firewalld_in_use.rc == 0 and firewalld_is_active.rc == 0 and firewalld_tcp42185_exists.rc != 0
+
+# iptables-services
+- name: check firewall rules for TCP/{{fluentd_syslog_port}} (iptables-services)
+  shell: grep "dport {{fluentd_syslog_port}} \-j ACCEPT" /etc/sysconfig/iptables | wc -l
+  ignore_errors: true
+  register: iptables_tcp42185_exists
+  failed_when: iptables_tcp42185_exists == 127
+
+- name: Add firewall rule for TCP/{{fluentd_syslog_port}} (iptables-services)
+  lineinfile:
+    dest: /etc/sysconfig/iptables
+    line: '-A INPUT -p tcp -m tcp --dport {{fluentd_syslog_port}} -j ACCEPT'
+    regexp: '^INPUT -i lo -j ACCEPT'
+    insertbefore: '-A INPUT -i lo -j ACCEPT'
+    backup: yes
+  when: firewalld_in_use.rc != 0 and firewalld_is_active.rc != 0 and iptables_tcp42185_exists.stdout|int == 0
+  register: iptables_needs_restart
+
+- name: Restart iptables-services for TCP/{{fluentd_syslog_port}} (iptables-services)
+  shell: systemctl restart iptables.service
+  ignore_errors: true
+  when: iptables_needs_restart != 0 and firewalld_in_use.rc != 0 and firewalld_is_active.rc != 0
+
+# Firewalld
+- name: Determine if firewalld is in use
+  shell: systemctl is-enabled firewalld.service | egrep -qv 'masked|disabled'
+  ignore_errors: true
+  register: firewalld_in_use
+
+- name: Determine if firewalld is active
+  shell: systemctl is-active firewalld.service | grep -vq inactive
+  ignore_errors: true
+  register: firewalld_is_active
+
+- name: Determine if TCP/{{fluentd_http_port}} is already active
+  shell: firewall-cmd --list-ports | egrep -q "^{{fluentd_http_port}}/tcp"
+  ignore_errors: true
+  register: firewalld_tcp9919_exists
+
+# add firewall rule via firewall-cmd
+- name: Add firewall rule for TCP/{{fluentd_http_port}} (firewalld)
+  command: "{{ item }}"
+  with_items:
+    - firewall-cmd --zone=public --add-port={{fluentd_http_port}}/tcp --permanent
+    - firewall-cmd --reload
+  ignore_errors: true
+  become: true
+  when: firewalld_in_use.rc == 0 and firewalld_is_active.rc == 0 and firewalld_tcp9919_exists.rc != 0
+
+# iptables-services
+- name: check firewall rules for TCP/{{fluentd_http_port}} (iptables-services)
+  shell: grep "dport {{fluentd_http_port}} \-j ACCEPT" /etc/sysconfig/iptables | wc -l
+  ignore_errors: true
+  register: iptables_tcp9919_exists
+  failed_when: iptables_tcp9919_exists == 127
+
+- name: Add firewall rule for TCP/{{fluentd_http_port}} (iptables-services)
+  lineinfile:
+    dest: /etc/sysconfig/iptables
+    line: '-A INPUT -p tcp -m tcp --dport {{fluentd_http_port}} -j ACCEPT'
+    regexp: '^INPUT -i lo -j ACCEPT'
+    insertbefore: '-A INPUT -i lo -j ACCEPT'
+    backup: yes
+  when: firewalld_in_use.rc != 0 and firewalld_is_active.rc != 0 and iptables_tcp9919_exists.stdout|int == 0
+  register: iptables_needs_restart
+
+- name: Restart iptables-services for TCP/{{fluentd_http_port}} (iptables-services)
+  shell: systemctl restart iptables.service
+  ignore_errors: true
+  when: iptables_needs_restart != 0 and firewalld_in_use.rc != 0 and firewalld_is_active.rc != 0
+
+### end firewall settings ###
+
+- name: Install fluentd elasticsearch plugin
+  gem:
+    name=fluent-plugin-elasticsearch
+    state=latest
+    include_dependencies=yes
+    user_install=no
+    executable=/usr/sbin/td-agent-gem
+  become: true
+  ignore_errors: false
+
+- name: Install fluentd beats plugin
+  gem:
+    name=fluent-plugin-beats
+    state=latest
+    include_dependencies=yes
+    user_install=no
+    executable=/usr/sbin/td-agent-gem
+  become: true
+  ignore_errors: false
+
+### setup SSL subsystem for AltSANS Support for filebeat SSL certificates
+
+- name: Stage filebeat JSON index template
+  copy:
+    src=filebeat-index-template.json
+    dest=/tmp/filebeat-index-template.json
+    owner=root
+    group=root
+    mode=0644
+  become: true
+
+# note: we can't currently use the Ansible uri module here, curl is a workaround
+# https://github.com/ansible/ansible-modules-core/issues/265
+# http://stackoverflow.com/questions/28997007/translate-curl-put-into-ansible-uri-module
+- name: Load filebeat JSON index template
+  command: curl -XPOST 'http://localhost:9200/_template/filebeat?pretty' -d@/tmp/filebeat-index-template.json
+  ignore_errors: true
+  become: true
+
+- name: Start fluentd service
+  command: systemctl start td-agent.service
+  ignore_errors: true
+  when: fluentd_needs_restart != 0
+
+- name: Setup fluentd service
+  service: name=td-agent state=started enabled=true
+  become: true

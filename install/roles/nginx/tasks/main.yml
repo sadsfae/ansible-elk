@@ -24,13 +24,6 @@
 - name: Apply SELinux boolean httpd_can_network_connect
   seboolean: name=httpd_can_network_connect state=yes persistent=yes
 
-# Set standard nginx ports if we're not pointing towards an undercloud
-- name: Assign ELK Server and nginx port values
-  set_fact:
-    nginx_kibana_port: 80
-    elk_server_ssl_cert_port: 8080
-  when: ((nginx_kibana_port is none) and (elk_server_ssl_cert_port is none))
-
 # deploy kibana.conf with FQDN
 - name: Setup nginx reverse proxy for kibana
   template:
