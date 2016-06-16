@@ -156,8 +156,6 @@
   become: true
   ignore_errors: false
 
-### setup SSL subsystem for AltSANS Support for filebeat SSL certificates
-
 - name: Stage filebeat JSON index template
   copy:
     src=filebeat-index-template.json
