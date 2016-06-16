@@ -1,6 +1,6 @@
 ansible-elk
 ===========
-Ansible Playbook for setting up the ELK/EFK Stack and clients on remote hosts
+Ansible Playbook for setting up the ELK/EFK Stack and Filebeat client on remote hosts
 
 ![ELK](/image/ansible-elk.png?raw=true)
 
@@ -29,8 +29,8 @@ Ansible Playbook for setting up the ELK/EFK Stack and clients on remote hosts
    - Uses OpenJDK for Java
    - It's fairly quick, takes around 3minutes on test VM
    - Filebeat templating is focused around OpenStack service logs
-   - Fluentd can be substituted for Logstash
-     - Use ```fluentd``` in the ```logging_backend:``` settings  in ```group_vars/all```
+   - Fluentd can be substituted for the default Logstash
+     - Use ```fluentd``` in the ```logging_backend:``` setting  in ```group_vars/all.yml```
 
 **ELK Server Instructions**
    - Clone repo and setup your hosts file
@@ -50,6 +50,7 @@ ansible-playbook -i hosts install/elk.yml
 
 **ELK Client Instructions**
    - Run the client playbook against the generated elk_server variable
+   - Note: if Fluentd is used instead of Logstash rsyslog will be setup instead
 ```
 ansible-playbook -i hosts install/elk-client.yml --extra-vars 'elk_server=X.X.X.X'
 ```
@@ -62,16 +63,11 @@ ansible-playbook -i hosts install/elk-client.yml --extra-vars 'elk_server=X.X.X.
 **File Hierarchy**
 ```
 ├── hosts
-├── image
-│   ├── ansible-elk.png
-│   └── elk-index.png
 └── install
-    ├── elk-client.retry
     ├── elk-client.yml
-    ├── elk.retry
     ├── elk.yml
     ├── group_vars
-    │   └── all
+    │   └── all.yml
     └── roles
         ├── elasticsearch
         │   ├── files
@@ -86,6 +82,14 @@ ansible-playbook -i hosts install/elk-client.yml --extra-vars 'elk_server=X.X.X.
         │   │   └── main.yml
         │   └── templates
         │       └── filebeat.yml.j2
+        ├── fluentd
+        │   ├── files
+        │   │   ├── filebeat-index-template.json
+        │   │   └── fluentd.repo
+        │   ├── tasks
+        │   │   └── main.yml
+        │   └── templates
+        │       └── td-agent.conf.j2
         ├── kibana
         │   ├── files
         │   │   ├── filebeat-dashboards.zip
@@ -96,7 +100,6 @@ ansible-playbook -i hosts install/elk-client.yml --extra-vars 'elk_server=X.X.X.
         ├── logstash
         │   ├── files
         │   │   ├── 01-lumberjack-input.conf
-        │   │   ├── 02-beats-input.conf
         │   │   ├── 10-syslog.conf
         │   │   ├── 10-syslog-filter.conf
         │   │   ├── 30-elasticsearch-output.conf
@@ -106,6 +109,7 @@ ansible-playbook -i hosts install/elk-client.yml --extra-vars 'elk_server=X.X.X.
         │   ├── tasks
         │   │   └── main.yml
         │   └── templates
+        │       ├── 02-beats-input.conf.j2
         │       └── openssl_extras.cnf.j2
         └── nginx
             ├── tasks
