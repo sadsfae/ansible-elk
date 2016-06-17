@@ -11,10 +11,9 @@ Ansible Playbook for setting up the ELK/EFK Stack and Filebeat client on remote 
      * Adds either iptables or firewalld rules if firewall is active
      * Tunes Elasticsearch heapsize to half your memory, to a max of 32G
      * Deploys ELK clients using SSL and Filebeat for Logstash (Default)
-     * Deploys rsyslog if Fluentd is chosen over Logstash, however if there is
-       [ample demand](https://github.com/sadsfae/ansible-elk/issues/new) to
-       provide deployment of the more recommended [fluentd-forwarder](https://github.com/fluent/fluentd-forwarder) I'll work on this, time permitting 
-     * All service ports can be modified
+     * Deploys rsyslog if Fluentd is chosen over Logstash, however this picks up
+       the same set of OpenStack-related logs in /var/log/*
+     * All service ports can be modified in ```install/group_vars/all.yml```
      * More information [available here](https://hobo.house/2016/04/08/automate-elk-stack-and-clients-with-ansible/)
 
 **Requirements**
@@ -26,8 +25,7 @@ Ansible Playbook for setting up the ELK/EFK Stack and Filebeat client on remote 
 
 **Notes**
    - Sets the nginx htpasswd to admin/admin initially
-   - nginx listen ports default to 80/8080 for Kibana and SSL cert retrieval
-     - You can modify this in the ```group_vars/all``` file
+   - nginx ports default to 80/8080 for Kibana and SSL cert retrieval (configurable)
    - Uses OpenJDK for Java
    - It's fairly quick, takes around 3minutes on test VM
    - Filebeat templating is focused around OpenStack service logs
