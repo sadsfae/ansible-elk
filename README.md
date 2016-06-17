@@ -11,7 +11,7 @@ Ansible Playbook for setting up the ELK/EFK Stack and Filebeat client on remote 
      * Adds either iptables or firewalld rules if firewall is active
      * Tunes Elasticsearch heapsize to half your memory, to a max of 32G
      * Deploys ELK clients using SSL and Filebeat for Logstash (Default)
-     * Deploys rsyslog if Fluentd is chosen over Logstash, and picks up
+     * Deploys rsyslog if Fluentd is chosen over Logstash, picks up
        the same set of OpenStack-related logs in /var/log/*
      * All service ports can be modified in ```install/group_vars/all.yml```
      * More information [available here](https://hobo.house/2016/04/08/automate-elk-stack-and-clients-with-ansible/)
@@ -49,8 +49,7 @@ ansible-playbook -i hosts install/elk.yml
 ![ELK](/image/elk-index.png?raw=true "Click the green button.")
 
 **ELK Client Instructions**
-   - Run the client playbook against the generated elk_server variable
-   - Note: if Fluentd is used instead of Logstash rsyslog will be setup instead
+   - Run the client playbook against the generated ``elk_server`` variable
 ```
 ansible-playbook -i hosts install/elk-client.yml --extra-vars 'elk_server=X.X.X.X'
 ```
