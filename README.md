@@ -83,7 +83,8 @@ ansible-playbook -i hosts install/elk-client.yml --extra-vars 'elk_server=X.X.X.
         │   ├── tasks
         │   │   └── main.yml
         │   └── templates
-        │       └── filebeat.yml.j2
+        │       ├── filebeat.yml.j2
+        │       └── rsyslog-openstack.conf.j2
         ├── fluentd
         │   ├── files
         │   │   ├── filebeat-index-template.json
@@ -119,4 +120,6 @@ ansible-playbook -i hosts install/elk-client.yml --extra-vars 'elk_server=X.X.X.
             └── templates
                 ├── kibana.conf.j2
                 └── nginx.conf.j2
+
+24 directories, 32 files
 ```
