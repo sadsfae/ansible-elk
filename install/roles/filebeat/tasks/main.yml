@@ -71,8 +71,18 @@
   when: (logging_backend == 'fluentd')
   register: rsyslog_updated
 
+- name: Setup common OpenStack rsyslog logging
+  template:
+    src=rsyslog-openstack.conf.j2
+    dest=/etc/rsyslog.d/openstack-logs.conf
+    owner=root
+    group=root
+    mode=0644
+  become: true
+  register: rsyslog_updated
+  when: (logging_backend == 'fluentd')
+
 - name: Restarting rsyslog for fluentd
   command: systemctl restart rsyslog.service
   ignore_errors: true
   when: rsyslog_updated != 0
-
