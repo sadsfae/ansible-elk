@@ -65,16 +65,19 @@
   shell: systemctl is-enabled firewalld.service | egrep -qv 'masked|disabled'
   ignore_errors: true
   register: firewalld_in_use
+  no_log: true
 
 - name: Determine if firewalld is active
   shell: systemctl is-active firewalld.service | grep -vq inactive
   ignore_errors: true
   register: firewalld_is_active
+  no_log: true
 
 - name: Determine if TCP/{{nginx_kibana_port}} is already active
   shell: firewall-cmd --list-ports | egrep -q "^{{nginx_kibana_port}}/tcp"
   ignore_errors: true
   register: firewalld_tcp80_exists
+  no_log: true
 
 # add firewall rule via firewall-cmd
 - name: Add firewall rule for TCP/{{nginx_kibana_port}} (firewalld)
@@ -92,6 +95,7 @@
   ignore_errors: true
   register: iptables_tcp80_exists
   failed_when: iptables_tcp80_exists == 127
+  no_log: true
 
 - name: Add firewall rule for TCP/{{nginx_kibana_port}} (iptables-services)
   lineinfile:
@@ -113,16 +117,19 @@
   shell: systemctl is-enabled firewalld.service | egrep -qv 'masked|disabled'
   ignore_errors: true
   register: firewalld_in_use
+  no_log: true
 
 - name: Determine if firewalld is active
   shell: systemctl is-active firewalld.service | grep -vq inactive
   ignore_errors: true
   register: firewalld_is_active
+  no_log: true
 
 - name: Determine if TCP/{{elk_server_ssl_cert_port}} is already active
   shell: firewall-cmd --list-ports | egrep -q "^{{elk_server_ssl_cert_port}}/tcp"
   ignore_errors: true
   register: firewalld_tcp8080_exists
+  no_log: true
 
 # add firewall rule via firewall-cmd
 - name: Add firewall rule for TCP/{{elk_server_ssl_cert_port}} (firewalld)
@@ -140,6 +147,7 @@
   ignore_errors: true
   register: iptables_tcp8080_exists
   failed_when: iptables_tcp8080_exists == 127
+  no_log: true
 
 - name: Add firewall rule for TCP/{{elk_server_ssl_cert_port}} (iptables-services)
   lineinfile:

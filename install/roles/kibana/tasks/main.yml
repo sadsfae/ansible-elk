@@ -25,6 +25,7 @@
   shell: cat /var/log/messages | /opt/logstash/bin/logstash -f /etc/logstash/conf.d/10-syslog.conf
   when: "'logstash-' not in elasticsearch_index.content"
   ignore_errors: true
+  no_log: true
 
 - name: Install local rsyslogd for fluentd
   yum: name={{ item }} state=present
@@ -125,6 +126,7 @@
 
 - name: Print SSL post-setup information
   debug: msg="Filebeat SSL Certificate available at http://{{ ansible_hostname }}:{{ elk_server_ssl_cert_port }}/filebeat-forwarder.crt"
+  when: (logging_backend != 'fluentd')
 
 - name: Print post-setup URL
   debug: msg="*** ELK Services available at http://{{ ansible_hostname }}:{{ nginx_kibana_port }} ***"

@@ -43,16 +43,19 @@
   shell: systemctl is-enabled firewalld.service | egrep -qv 'masked|disabled'
   ignore_errors: true
   register: firewalld_in_use
+  no_log: true
 
 - name: Determine if firewalld is active
   shell: systemctl is-active firewalld.service | grep -vq inactive
   ignore_errors: true
   register: firewalld_is_active
+  no_log: true
 
 - name: Determine if TCP/{{fluentd_syslog_port}} is already active
   shell: firewall-cmd --list-ports | egrep -q "^{{fluentd_syslog_port}}/tcp"
   ignore_errors: true
   register: firewalld_tcp42185_exists
+  no_log: true
 
 # add firewall rule via firewall-cmd
 - name: Add firewall rule for TCP/{{fluentd_syslog_port}} (firewalld)
@@ -70,6 +73,7 @@
   ignore_errors: true
   register: iptables_tcp42185_exists
   failed_when: iptables_tcp42185_exists == 127
+  no_log: true
 
 - name: Add firewall rule for TCP/{{fluentd_syslog_port}} (iptables-services)
   lineinfile:
@@ -91,16 +95,19 @@
   shell: systemctl is-enabled firewalld.service | egrep -qv 'masked|disabled'
   ignore_errors: true
   register: firewalld_in_use
+  no_log: true
 
 - name: Determine if firewalld is active
   shell: systemctl is-active firewalld.service | grep -vq inactive
   ignore_errors: true
   register: firewalld_is_active
+  no_log: true
 
 - name: Determine if TCP/{{fluentd_http_port}} is already active
   shell: firewall-cmd --list-ports | egrep -q "^{{fluentd_http_port}}/tcp"
   ignore_errors: true
   register: firewalld_tcp9919_exists
+  no_log: true
 
 # add firewall rule via firewall-cmd
 - name: Add firewall rule for TCP/{{fluentd_http_port}} (firewalld)
@@ -118,6 +125,7 @@
   ignore_errors: true
   register: iptables_tcp9919_exists
   failed_when: iptables_tcp9919_exists == 127
+  no_log: true
 
 - name: Add firewall rule for TCP/{{fluentd_http_port}} (iptables-services)
   lineinfile:
