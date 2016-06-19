@@ -1,4 +1,14 @@
-# aggregate common openstack logs via rsyslog
+# This template aggregates common OpenStack logs
+# via rsyslog.  You should edit this file with any
+# application logs that need to be captured that
+# are not sent to rsyslog.
+#
+# If you enable the ForwardToSyslog option in
+# journalctl you can send anything logged by systemd
+# as well:
+# file: /etc/systemd/journald.conf
+# parameter: ForwardToSyslog=yes
+# action: systemctl restart systemd-journald
 
 $ModLoad imfile
 
