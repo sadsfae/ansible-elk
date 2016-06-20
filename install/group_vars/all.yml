@@ -39,6 +39,6 @@ fluentd_debug_port: 24230
 ### install curator tool ###
 # curator is the recommended tool for managing elasticsearch indexes
 # https://www.elastic.co/guide/en/elasticsearch/client/curator/current/index.html
-# default is no (set to lank)
+# default is no (set to blank)
 # set the below variable to 'install' to activate
 es_curator_tool:
