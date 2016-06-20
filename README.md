@@ -14,6 +14,7 @@ Ansible Playbook for setting up the ELK/EFK Stack and Filebeat client on remote 
      * Deploys rsyslog if Fluentd is chosen over Logstash, picks up
        the same set of OpenStack-related logs in /var/log/*
      * All service ports can be modified in ```install/group_vars/all.yml```
+     * Optionally install [curator](https://www.elastic.co/guide/en/elasticsearch/client/curator/current/index.html) via ```es_curator_tool: install``` in ```install/group_vars/all.yml```
      * More information [available here](https://hobo.house/2016/04/08/automate-elk-stack-and-clients-with-ansible/)
 
 **Requirements**
@@ -31,6 +32,7 @@ Ansible Playbook for setting up the ELK/EFK Stack and Filebeat client on remote 
    - Filebeat templating is focused around OpenStack service logs
    - Fluentd can be substituted for the default Logstash
      - Use ```fluentd``` in the ```logging_backend:``` setting  in ```group_vars/all.yml```
+   - Install curator by setting ```es_curator_tool: install``` in ```install/group_vars/all.yml```
 
 **ELK Server Instructions**
    - Clone repo and setup your hosts file
@@ -61,6 +63,7 @@ ansible-playbook -i hosts install/elk-client.yml --extra-vars 'elk_server=X.X.X.
 
 **File Hierarchy**
 ```
+.
 ├── hosts
 └── install
     ├── elk-client.yml
@@ -68,6 +71,11 @@ ansible-playbook -i hosts install/elk-client.yml --extra-vars 'elk_server=X.X.X.
     ├── group_vars
     │   └── all.yml
     └── roles
+        ├── curator
+        │   ├── files
+        │   │   └── curator.repo
+        │   └── tasks
+        │       └── main.yml
         ├── elasticsearch
         │   ├── files
         │   │   ├── elasticsearch.in.sh
@@ -118,5 +126,5 @@ ansible-playbook -i hosts install/elk-client.yml --extra-vars 'elk_server=X.X.X.
                 ├── kibana.conf.j2
                 └── nginx.conf.j2
 
-24 directories, 32 files
+27 directories, 34 files
 ```
