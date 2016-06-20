@@ -1,0 +1,28 @@
+
+---
+#
+# install curator tool for managing elasticsearch
+#
+
+- name: Copy curator yum repo file
+  copy:
+    src=curator.repo
+    dest=/etc/yum.repos.d/curator.repo
+    owner=root
+    group=root
+    mode=0644
+  become: true
+  when: (es_curator_tool == 'install')
+
+- name: Import curator GPG Key
+  rpm_key: key=http://packages.elastic.co/GPG-KEY-elasticsearch
+    state=present
+  when: (es_curator_tool == 'install')
+
+- name: Install curator and python-setuptools
+  yum: name={{ item }} state=present
+  become: true
+  with_items:
+    - python-elasticsearch-curator
+    - python-setuptools
+  when: (es_curator_tool == 'install')

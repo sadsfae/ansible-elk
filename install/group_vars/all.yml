@@ -36,3 +36,9 @@ logstash_syslog_port: 5044
 fluentd_syslog_port: 42185
 fluentd_http_port: 9919
 fluentd_debug_port: 24230
+### install curator tool ###
+# curator is the recommended tool for managing elasticsearch indexes
+# https://www.elastic.co/guide/en/elasticsearch/client/curator/current/index.html
+# default is no (set to lank)
+# set the below variable to 'install' to activate
+es_curator_tool:
