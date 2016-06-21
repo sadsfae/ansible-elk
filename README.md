@@ -14,7 +14,7 @@ Ansible Playbook for setting up the ELK/EFK Stack and Filebeat client on remote 
      * Deploys rsyslog if Fluentd is chosen over Logstash, picks up
        the same set of OpenStack-related logs in /var/log/*
      * All service ports can be modified in ```install/group_vars/all.yml```
-     * Optionally install [curator](https://www.elastic.co/guide/en/elasticsearch/client/curator/current/index.html) via ```es_curator_tool: install``` in ```install/group_vars/all.yml```
+     * Optionally install [curator](https://www.elastic.co/guide/en/elasticsearch/client/curator/current/index.html)
 
 **Requirements**
    - RHEL7 or CentOS7+ server/client with no modifications
@@ -30,8 +30,8 @@ Ansible Playbook for setting up the ELK/EFK Stack and Filebeat client on remote 
    - It's fairly quick, takes around 3minutes on test VM
    - Filebeat templating is focused around OpenStack service logs
    - Fluentd can be substituted for the default Logstash
-     - Use ```fluentd``` in the ```logging_backend:``` setting  in ```group_vars/all.yml```
-   - Install curator by setting ```es_curator_tool: install``` in ```install/group_vars/all.yml```
+     - Set ```logging_backend: fluentd``` in ```group_vars/all.yml```
+   - Install curator by setting ```install_curator_tool: true``` in ```install/group_vars/all.yml```
 
 **ELK Server Instructions**
    - Clone repo and setup your hosts file
