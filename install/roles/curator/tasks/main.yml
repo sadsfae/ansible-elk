@@ -12,12 +12,12 @@
     group=root
     mode=0644
   become: true
-  when: (es_curator_tool == 'install')
+  when: install_curator_tool
 
 - name: Import curator GPG Key
   rpm_key: key=http://packages.elastic.co/GPG-KEY-elasticsearch
     state=present
-  when: (es_curator_tool == 'install')
+  when: install_curator_tool
 
 - name: Install curator and python-setuptools
   yum: name={{ item }} state=present
@@ -25,4 +25,4 @@
   with_items:
     - python-elasticsearch-curator
     - python-setuptools
-  when: (es_curator_tool == 'install')
+  when: install_curator_tool
