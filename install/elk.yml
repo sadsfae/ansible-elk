@@ -10,5 +10,5 @@
     - { role: fluentd, when: (logging_backend == 'fluentd') }
     - { role: logstash, when: ((logging_backend is none) or (logging_backend == 'logstash')) }
     - { role: nginx }
-    - { role: curator, when: (es_curator_tool == 'install') }
+    - { role: curator, when: install_curator_tool }
     - { role: kibana }
