@@ -3,14 +3,6 @@
 # Install/run nginx
 #
 
-- name: Import EPEL GPG Key
-  rpm_key: key=https://dl.fedoraproject.org/pub/epel/RPM-GPG-KEY-EPEL-7
-    state=present
-
-- name: Check for EPEL repo
-  yum: name=https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
-    state=present
-
 - name: Install nginx, httpd-tools, httplib2, libsemanage-python
   yum: name={{ item }} state=present
   become: true
@@ -23,6 +15,12 @@
 # SELinux boolean for nginx
 - name: Apply SELinux boolean httpd_can_network_connect
   seboolean: name=httpd_can_network_connect state=yes persistent=yes
+
+# create /etc/nginx/conf.d/ directory
+- name: Create nginx directory structure
+  file: path=/etc/nginx/conf.d/
+    state=directory
+    mode=0755
 
 # deploy kibana.conf with FQDN
 - name: Setup nginx reverse proxy for kibana
@@ -164,8 +162,3 @@
   ignore_errors: true
   when: iptables_needs_restart != 0 and firewalld_in_use.rc != 0 and firewalld_is_active.rc != 0
 
-- name: Disable EPEL Repo
-  ini_file: dest=/etc/yum.repos.d/epel.repo
-    section=epel
-    option=enabled
-    value=0
