@@ -97,7 +97,7 @@
   register: filebeat_forwarder_ssl_exists
 
 - name: Create client forwarder SSL certificate
-  command: openssl req -subj '/CN={{ ansible_hostname }}/' -config /etc/pki/tls/openssl_extras.cnf \
+  command: openssl req -subj '/CN={{ ansible_fqdn }}/' -config /etc/pki/tls/openssl_extras.cnf \
     -x509 -days 3650 -batch -nodes -newkey rsa:2048 -keyout /etc/pki/tls/private/filebeat-forwarder.key \
     -out /etc/pki/tls/certs/filebeat-forwarder.crt
   ignore_errors: true
@@ -125,17 +125,14 @@
   become: true
 
 - name: Print SSL post-setup information
-  debug: msg="Filebeat SSL Certificate available at http://{{ ansible_hostname }}:{{ elk_server_ssl_cert_port }}/filebeat-forwarder.crt"
+  debug: msg="Filebeat SSL Certificate available at http://{{ ansible_fqdn }}:{{ elk_server_ssl_cert_port }}/filebeat-forwarder.crt"
   when: (logging_backend != 'fluentd')
 
 - name: Print post-setup URL
-  debug: msg="*** ELK Services available at http://{{ ansible_hostname }}:{{ nginx_kibana_port }} ***"
+  debug: msg="*** ELK Services available at http://{{ ansible_fqdn }}:{{ nginx_kibana_port }} ***"
 
 - name: Print index creation instructions
-  debug: msg="** 1) Navigate to http://{{ ansible_hostname }}:{{ nginx_kibana_port }} and login with admin/admin, click 'create' on the green index button ***"
-
-- name: Print filebeat openstack client setup instructions
-  debug: msg="** 2) Run ansible-playbook -i hosts install/elk-openstack-client.yml --extra-vars 'elk_server={{ ansible_default_ipv4.address }}' to setup OpenStack clients ***"
+  debug: msg="** 1) Navigate to http://{{ ansible_fqdn }}:{{ nginx_kibana_port }} and login with admin/admin, click 'create' on the green index button ***"
 
 - name: Print filebeat client setup instructions
   debug: msg="** 2) Run ansible-playbook -i hosts install/elk-client.yml --extra-vars 'elk_server={{ ansible_default_ipv4.address }}' to setup clients ***"
