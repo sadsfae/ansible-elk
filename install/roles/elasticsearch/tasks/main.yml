@@ -41,6 +41,7 @@
   register: elasticsearch_updated
 
 - name: Start elasticsearch service
+  sudo: yes
   command: systemctl start elasticsearch.service
   ignore_errors: true
   when: elasticsearch_updated != 0

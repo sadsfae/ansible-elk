@@ -3,6 +3,10 @@
 # Install/run nginx
 #
 
+- name: install epel-release
+  sudo: yes
+  yum: name=epel-release state=latest
+
 - name: Install nginx, httpd-tools, httplib2, libsemanage-python
   yum: name={{ item }} state=present
   become: true
@@ -14,6 +18,7 @@
 
 # SELinux boolean for nginx
 - name: Apply SELinux boolean httpd_can_network_connect
+  sudo: yes
   seboolean: name=httpd_can_network_connect state=yes persistent=yes
 
 # create /etc/nginx/conf.d/ directory
@@ -45,11 +50,13 @@
 
 # start nginx service
 - name: Start nginx service
+  sudo : yes
   command: systemctl restart nginx.service
   ignore_errors: true
   when: nginx_needs_restart != 0
 
 - name: Set nginx to start on boot
+  sudo : yes
   command: systemctl enable nginx.service
   ignore_errors: true
 
