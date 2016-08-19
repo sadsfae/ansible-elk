@@ -22,6 +22,7 @@
 
 # Populate elasticsearch with local logs if using logstash
 - name: Populate elasticsearch index with local logs via logstash
+  sudo: yes
   shell: cat /var/log/messages | /opt/logstash/bin/logstash -f /etc/logstash/conf.d/10-syslog.conf
   when: "'logstash-' not in elasticsearch_index.content"
   ignore_errors: true
@@ -35,12 +36,14 @@
   when: (logging_backend == 'fluentd')
 
 - name: Setup local rsyslogd for fluentd
+  sudo: yes
   lineinfile: dest=/etc/rsyslog.conf \
           line="*.* @localhost:{{ fluentd_syslog_port }}"
   when: (logging_backend == 'fluentd')
   register: rsyslog_updated
 
 - name: Populate elasticsearch index with local logs via fluentd
+  sudo: yes
   command: systemctl restart rsyslog.service
   ignore_errors: true
   when: rsyslog_updated != 0
@@ -69,6 +72,7 @@
   when: kibana_dashboards_present != 0
 
 - name: Install kibana filebeat dashboards
+  sudo: yes
   unarchive: src=/tmp/filebeat-dashboards.zip dest=/tmp/ copy=no
   ignore_errors: true
   when: kibana_dashboards_present != 0
@@ -78,11 +82,13 @@
   ignore_errors: true
 
 - name: Check kibana users
+  sudo: yes
   stat: path=/etc/nginx/htpasswd.users
   ignore_errors: true
   register: kibana_user_pwfile_exists
 
 - name: Create kibana admin user
+  sudo: yes
   command: htpasswd -b -c /etc/nginx/htpasswd.users admin admin
   ignore_errors: true
   when: kibana_user_pwfile_exists != 0
@@ -97,6 +103,7 @@
   register: filebeat_forwarder_ssl_exists
 
 - name: Create client forwarder SSL certificate
+  sudo: yes
   command: openssl req -subj '/CN={{ ansible_fqdn }}/' -config /etc/pki/tls/openssl_extras.cnf \
     -x509 -days 3650 -batch -nodes -newkey rsa:2048 -keyout /etc/pki/tls/private/filebeat-forwarder.key \
     -out /etc/pki/tls/certs/filebeat-forwarder.crt
@@ -108,7 +115,8 @@
   ignore_errors: true
   register: filebeat_forwarder_ssl_client_copy_exists
 
-- name: Copy Filebeat forwarder SSL certificate
+- name: Copy Filebeat forwarder SSL certificate'
+  sudo: yes
   command: cp /etc/pki/tls/certs/filebeat-forwarder.crt /usr/share/nginx/html/filebeat-forwarder.crt
   ignore_errors: true
   when: filebeat_forwarder_ssl_client_copy_exists != 0
@@ -132,6 +140,7 @@
   debug: msg="*** ELK Services available at http://{{ ansible_fqdn }}:{{ nginx_kibana_port }} ***"
 
 - name: Print index creation instructions
+  sudo: yes
   debug: msg="** 1) Navigate to http://{{ ansible_fqdn }}:{{ nginx_kibana_port }} and login with admin/admin, click 'create' on the green index button ***"
 
 - name: Print filebeat client setup instructions
