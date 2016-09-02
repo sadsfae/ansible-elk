@@ -1,6 +1,6 @@
 ---
 #
-# install/run filebeat elk client
+# install/run filebeat elk client for browbeat
 #
 
 - name: Copy filebeat yum repo file
@@ -43,7 +43,9 @@
   when: (logging_backend != 'fluentd')
 
 - name: Install ELK server SSL client certificate
-  shell: curl http://"{{ elk_server }}":{{ elk_server_ssl_cert_port }}/filebeat-forwarder.crt > /etc/pki/tls/certs/filebeat-forwarder.crt
+  get_url:
+    url=http://{{ elk_server }}:{{ elk_server_ssl_cert_port }}/filebeat-forwarder.crt
+    dest=/etc/pki/tls/certs/filebeat-forwarder.crt
   become: true
   when: ((elk_client_ssl_cert_exists != 0) and (logging_backend != 'fluentd'))
 

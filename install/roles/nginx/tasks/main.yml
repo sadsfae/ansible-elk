@@ -49,9 +49,19 @@
   ignore_errors: true
   when: nginx_needs_restart != 0
 
+- name: Check if nginx is in use
+  shell: systemctl is-enabled nginx.service | egrep -qv 'masked|disabled'
+  register: nginx_in_use
+  ignore_errors: yes
+  tags:
+    # Skip ANSIBLE0012 Commands should not change things if nothing needs doing
+    # Determine if nginx is enabled
+    - skip_ansible_lint
+
 - name: Set nginx to start on boot
   command: systemctl enable nginx.service
   ignore_errors: true
+  when: nginx_in_use.rc != 0
 
 # we need TCP/80 and TCP/8080 open
 # determine firewall status and take action
@@ -64,18 +74,30 @@
   ignore_errors: true
   register: firewalld_in_use
   no_log: true
+  tags:
+    # Skip ANSIBLE0012 Commands should not change things if nothing needs doing
+    # Need to check if firewall is active
+    - skip_ansible_lint
 
 - name: Determine if firewalld is active
   shell: systemctl is-active firewalld.service | grep -vq inactive
   ignore_errors: true
   register: firewalld_is_active
   no_log: true
+  tags:
+    # Skip ANSIBLE0012 Commands should not change things if nothing needs doing
+    # Need to check if firewall is active
+    - skip_ansible_lint
 
 - name: Determine if TCP/{{nginx_kibana_port}} is already active
   shell: firewall-cmd --list-ports | egrep -q "^{{nginx_kibana_port}}/tcp"
   ignore_errors: true
   register: firewalld_tcp80_exists
   no_log: true
+  tags:
+    # Skip ANSIBLE0012 Commands should not change things if nothing needs doing
+    # Need to check if firewall rule already exists
+    - skip_ansible_lint
 
 # add firewall rule via firewall-cmd
 - name: Add firewall rule for TCP/{{nginx_kibana_port}} (firewalld)
@@ -94,6 +116,10 @@
   register: iptables_tcp80_exists
   failed_when: iptables_tcp80_exists == 127
   no_log: true
+  tags:
+    # Skip ANSIBLE0012 Commands should not change things if nothing needs doing
+    # Need to check if firewall rule already exists
+    - skip_ansible_lint
 
 - name: Add firewall rule for TCP/{{nginx_kibana_port}} (iptables-services)
   lineinfile:
@@ -109,6 +135,10 @@
   shell: systemctl restart iptables.service
   ignore_errors: true
   when: iptables_needs_restart != 0 and firewalld_in_use.rc != 0 and firewalld_is_active.rc != 0
+  tags:
+    # Skip ANSIBLE0013 Use shell only when shell functionality is required
+    # No systemctl module available in current stable release (Ansible 2.1)
+    - skip_ansible_lint
 
 # Firewalld
 - name: Determine if firewalld is in use
@@ -116,18 +146,30 @@
   ignore_errors: true
   register: firewalld_in_use
   no_log: true
+  tags:
+    # Skip ANSIBLE0012 Commands should not change things if nothing needs doing
+    # Need to check if firewall is active
+    - skip_ansible_lint
 
 - name: Determine if firewalld is active
   shell: systemctl is-active firewalld.service | grep -vq inactive
   ignore_errors: true
   register: firewalld_is_active
   no_log: true
+  tags:
+    # Skip ANSIBLE0012 Commands should not change things if nothing needs doing
+    # Need to check if firewall is active
+    - skip_ansible_lint
 
 - name: Determine if TCP/{{elk_server_ssl_cert_port}} is already active
   shell: firewall-cmd --list-ports | egrep -q "^{{elk_server_ssl_cert_port}}/tcp"
   ignore_errors: true
   register: firewalld_tcp8080_exists
   no_log: true
+  tags:
+    # Skip ANSIBLE0012 Commands should not change things if nothing needs doing
+    # Need to check if firewall rule already exists
+    - skip_ansible_lint
 
 # add firewall rule via firewall-cmd
 - name: Add firewall rule for TCP/{{elk_server_ssl_cert_port}} (firewalld)
@@ -146,6 +188,10 @@
   register: iptables_tcp8080_exists
   failed_when: iptables_tcp8080_exists == 127
   no_log: true
+  tags:
+    # Skip ANSIBLE0012 Commands should not change things if nothing needs doing
+    # Need to check if firewall rule already exists
+    - skip_ansible_lint
 
 - name: Add firewall rule for TCP/{{elk_server_ssl_cert_port}} (iptables-services)
   lineinfile:
@@ -161,4 +207,7 @@
   shell: systemctl restart iptables.service
   ignore_errors: true
   when: iptables_needs_restart != 0 and firewalld_in_use.rc != 0 and firewalld_is_active.rc != 0
-
+  tags:
+    # Skip ANSIBLE0013 Use shell only when shell functionality is required
+    # No systemctl module available in current stable release (Ansible 2.1)
+    - skip_ansible_lint
