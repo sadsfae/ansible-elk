@@ -54,7 +54,7 @@
 - name: Determine if TCP/{{fluentd_syslog_port}} is already active
   shell: firewall-cmd --list-ports | egrep -q "^{{fluentd_syslog_port}}/tcp"
   ignore_errors: true
-  register: firewalld_tcp42185_exists
+  register: firewalld_fluentd_syslog_exists
   no_log: true
 
 # add firewall rule via firewall-cmd
@@ -65,14 +65,14 @@
     - firewall-cmd --reload
   ignore_errors: true
   become: true
-  when: firewalld_in_use.rc == 0 and firewalld_is_active.rc == 0 and firewalld_tcp42185_exists.rc != 0
+  when: firewalld_in_use.rc == 0 and firewalld_is_active.rc == 0 and firewalld_fluentd_syslog_exists.rc != 0
 
 # iptables-services
 - name: check firewall rules for TCP/{{fluentd_syslog_port}} (iptables-services)
   shell: grep "dport {{fluentd_syslog_port}} \-j ACCEPT" /etc/sysconfig/iptables | wc -l
   ignore_errors: true
-  register: iptables_tcp42185_exists
-  failed_when: iptables_tcp42185_exists == 127
+  register: iptables_fluentd_syslog_exists
+  failed_when: iptables_fluentd_syslog_exists == 127
   no_log: true
 
 - name: Add firewall rule for TCP/{{fluentd_syslog_port}} (iptables-services)
@@ -82,7 +82,7 @@
     regexp: '^INPUT -i lo -j ACCEPT'
     insertbefore: '-A INPUT -i lo -j ACCEPT'
     backup: yes
-  when: firewalld_in_use.rc != 0 and firewalld_is_active.rc != 0 and iptables_tcp42185_exists.stdout|int == 0
+  when: firewalld_in_use.rc != 0 and firewalld_is_active.rc != 0 and iptables_fluentd_syslog_exists.stdout|int == 0
   register: iptables_needs_restart
 
 - name: Restart iptables-services for TCP/{{fluentd_syslog_port}} (iptables-services)
@@ -106,7 +106,7 @@
 - name: Determine if TCP/{{fluentd_http_port}} is already active
   shell: firewall-cmd --list-ports | egrep -q "^{{fluentd_http_port}}/tcp"
   ignore_errors: true
-  register: firewalld_tcp9919_exists
+  register: firewalld_fluentd_http_exists
   no_log: true
 
 # add firewall rule via firewall-cmd
@@ -117,14 +117,14 @@
     - firewall-cmd --reload
   ignore_errors: true
   become: true
-  when: firewalld_in_use.rc == 0 and firewalld_is_active.rc == 0 and firewalld_tcp9919_exists.rc != 0
+  when: firewalld_in_use.rc == 0 and firewalld_is_active.rc == 0 and firewalld_fluentd_http_exists.rc != 0
 
 # iptables-services
 - name: check firewall rules for TCP/{{fluentd_http_port}} (iptables-services)
   shell: grep "dport {{fluentd_http_port}} \-j ACCEPT" /etc/sysconfig/iptables | wc -l
   ignore_errors: true
-  register: iptables_tcp9919_exists
-  failed_when: iptables_tcp9919_exists == 127
+  register: iptables_fluentd_http_exists
+  failed_when: iptables_fluentd_http_exists == 127
   no_log: true
 
 - name: Add firewall rule for TCP/{{fluentd_http_port}} (iptables-services)
@@ -134,7 +134,7 @@
     regexp: '^INPUT -i lo -j ACCEPT'
     insertbefore: '-A INPUT -i lo -j ACCEPT'
     backup: yes
-  when: firewalld_in_use.rc != 0 and firewalld_is_active.rc != 0 and iptables_tcp9919_exists.stdout|int == 0
+  when: firewalld_in_use.rc != 0 and firewalld_is_active.rc != 0 and iptables_fluentd_http_exists.stdout|int == 0
   register: iptables_needs_restart
 
 - name: Restart iptables-services for TCP/{{fluentd_http_port}} (iptables-services)
@@ -164,20 +164,12 @@
   become: true
   ignore_errors: false
 
-- name: Stage filebeat JSON index template
-  copy:
-    src=filebeat-index-template.json
-    dest=/tmp/filebeat-index-template.json
-    owner=root
-    group=root
-    mode=0644
-  become: true
-
-# note: we can't currently use the Ansible uri module here, curl is a workaround
-# https://github.com/ansible/ansible-modules-core/issues/265
-# http://stackoverflow.com/questions/28997007/translate-curl-put-into-ansible-uri-module
 - name: Load filebeat JSON index template
-  command: curl -XPOST 'http://localhost:9200/_template/filebeat?pretty' -d@/tmp/filebeat-index-template.json
+  uri:
+    url: http://localhost:9200/_template/filebeat?pretty
+    method: POST
+    body: "{{ lookup('file', 'filebeat-index-template.json') }}"
+    body_format: json
   ignore_errors: true
   become: true
 

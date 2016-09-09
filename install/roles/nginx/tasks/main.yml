@@ -92,7 +92,7 @@
 - name: Determine if TCP/{{nginx_kibana_port}} is already active
   shell: firewall-cmd --list-ports | egrep -q "^{{nginx_kibana_port}}/tcp"
   ignore_errors: true
-  register: firewalld_tcp80_exists
+  register: firewalld_kibana_port_exists
   no_log: true
   tags:
     # Skip ANSIBLE0012 Commands should not change things if nothing needs doing
@@ -107,14 +107,14 @@
     - firewall-cmd --reload
   ignore_errors: true
   become: true
-  when: firewalld_in_use.rc == 0 and firewalld_is_active.rc == 0 and firewalld_tcp80_exists.rc != 0
+  when: firewalld_in_use.rc == 0 and firewalld_is_active.rc == 0 and firewalld_kibana_port_exists.rc != 0
 
 # iptables-services
 - name: check firewall rules for TCP/{{nginx_kibana_port}} (iptables-services)
   shell: grep "dport {{nginx_kibana_port}} \-j ACCEPT" /etc/sysconfig/iptables | wc -l
   ignore_errors: true
-  register: iptables_tcp80_exists
-  failed_when: iptables_tcp80_exists == 127
+  register: iptables_kibana_port_exists
+  failed_when: iptables_kibana_port_exists == 127
   no_log: true
   tags:
     # Skip ANSIBLE0012 Commands should not change things if nothing needs doing
@@ -128,7 +128,7 @@
     regexp: '^INPUT -i lo -j ACCEPT'
     insertbefore: '-A INPUT -i lo -j ACCEPT'
     backup: yes
-  when: firewalld_in_use.rc != 0 and firewalld_is_active.rc != 0 and iptables_tcp80_exists.stdout|int == 0
+  when: firewalld_in_use.rc != 0 and firewalld_is_active.rc != 0 and iptables_kibana_port_exists.stdout|int == 0
   register: iptables_needs_restart
 
 - name: Restart iptables-services for TCP/{{nginx_kibana_port}} (iptables-services)
@@ -164,7 +164,7 @@
 - name: Determine if TCP/{{elk_server_ssl_cert_port}} is already active
   shell: firewall-cmd --list-ports | egrep -q "^{{elk_server_ssl_cert_port}}/tcp"
   ignore_errors: true
-  register: firewalld_tcp8080_exists
+  register: firewalld_elk_server_ssl_exists
   no_log: true
   tags:
     # Skip ANSIBLE0012 Commands should not change things if nothing needs doing
@@ -179,14 +179,14 @@
     - firewall-cmd --reload
   ignore_errors: true
   become: true
-  when: firewalld_in_use.rc == 0 and firewalld_is_active.rc == 0 and firewalld_tcp8080_exists.rc != 0
+  when: firewalld_in_use.rc == 0 and firewalld_is_active.rc == 0 and firewalld_elk_server_ssl_exists.rc != 0
 
 # iptables-services
 - name: check firewall rules for TCP/{{elk_server_ssl_cert_port}} (iptables-services)
   shell: grep "dport {{elk_server_ssl_cert_port}} \-j ACCEPT" /etc/sysconfig/iptables | wc -l
   ignore_errors: true
-  register: iptables_tcp8080_exists
-  failed_when: iptables_tcp8080_exists == 127
+  register: iptables_elk_server_ssl_exists
+  failed_when: iptables_elk_server_ssl_exists == 127
   no_log: true
   tags:
     # Skip ANSIBLE0012 Commands should not change things if nothing needs doing
@@ -200,7 +200,7 @@
     regexp: '^INPUT -i lo -j ACCEPT'
     insertbefore: '-A INPUT -i lo -j ACCEPT'
     backup: yes
-  when: firewalld_in_use.rc != 0 and firewalld_is_active.rc != 0 and iptables_tcp8080_exists.stdout|int == 0
+  when: firewalld_in_use.rc != 0 and firewalld_is_active.rc != 0 and iptables_elk_server_ssl_exists.stdout|int == 0
   register: iptables_needs_restart
 
 - name: Restart iptables-services for TCP/{{elk_server_ssl_cert_port}} (iptables-services)

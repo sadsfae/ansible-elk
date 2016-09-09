@@ -66,7 +66,7 @@
 - name: Determine if TCP/{{es_local_port}} is already active
   shell: firewall-cmd --list-ports | egrep -q "^{{es_local_port}}/tcp"
   ignore_errors: true
-  register: firewalld_tcp9200_exists
+  register: firewalld_es_local_port_exists
   no_log: true
   when: es_listen_external
 
@@ -78,14 +78,14 @@
     - firewall-cmd --reload
   ignore_errors: true
   become: true
-  when: es_listen_external and firewalld_in_use.rc == 0 and firewalld_is_active.rc == 0 and firewalld_tcp9200_exists.rc != 0
+  when: es_listen_external and firewalld_in_use.rc == 0 and firewalld_is_active.rc == 0 and firewalld_es_local_port_exists.rc != 0
 
 # iptables-services
 - name: check firewall rules for TCP/{{es_local_port}} (iptables-services)
   shell: grep "dport {{es_local_port}} \-j ACCEPT" /etc/sysconfig/iptables | wc -l
   ignore_errors: true
-  register: iptables_tcp9200_exists
-  failed_when: iptables_tcp9200_exists == 127
+  register: iptables_es_local_port_exists
+  failed_when: iptables_es_local_port_exists == 127
   no_log: true
   when: es_listen_external
 
@@ -96,7 +96,7 @@
     regexp: '^INPUT -i lo -j ACCEPT'
     insertbefore: '-A INPUT -i lo -j ACCEPT'
     backup: yes
-  when: es_listen_external and firewalld_in_use.rc != 0 and firewalld_is_active.rc != 0 and iptables_tcp9200_exists.stdout|int == 0
+  when: es_listen_external and firewalld_in_use.rc != 0 and firewalld_is_active.rc != 0 and iptables_es_local_port_exists.stdout|int == 0
   register: iptables_needs_restart
 
 - name: Restart iptables-services for TCP/{{es_local_port}} (iptables-services)
