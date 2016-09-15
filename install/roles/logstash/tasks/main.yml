@@ -83,6 +83,7 @@
     - skip_ansible_lint
 
 - name: Add OpenSSL SANs (SubjectAltName) entry for CA
+  sudo: yes
   lineinfile:
     dest: /etc/pki/tls/openssl.cnf
     line: 'subjectAltName = "{{ ansible_default_ipv4.address }}"'

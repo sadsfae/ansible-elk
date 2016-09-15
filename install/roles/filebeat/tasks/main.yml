@@ -85,6 +85,7 @@
   when: (logging_backend == 'fluentd')
 
 - name: Restarting rsyslog for fluentd
+  sudo: yes
   command: systemctl restart rsyslog.service
   ignore_errors: true
   when: rsyslog_updated != 0
