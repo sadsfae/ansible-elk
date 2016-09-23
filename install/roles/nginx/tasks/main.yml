@@ -3,6 +3,10 @@
 # Install/run nginx
 #
 
+- name: Check/Install EPEL Repo for nginx
+  yum: name={{epel_repo}}
+      state=present
+
 - name: Install nginx, httpd-tools, httplib2, libsemanage-python
   yum: name={{ item }} state=present
   become: true
@@ -211,3 +215,7 @@
     # Skip ANSIBLE0013 Use shell only when shell functionality is required
     # No systemctl module available in current stable release (Ansible 2.1)
     - skip_ansible_lint
+
+- name: Remove EPEL Repo
+  yum: name={{epel_repo}}
+      state=absent
