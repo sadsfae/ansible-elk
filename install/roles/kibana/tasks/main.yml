@@ -74,7 +74,7 @@
   when: kibana_dashboards_present != 0
 
 - name: Configure kibana filebeat dashboards
-  shell: sh /tmp/beats-dashboards-master/load.sh -url "http://localhost:9200" -user "admin:admin"
+  shell: sh /tmp/beats-dashboards-master/load.sh -url "http://localhost:9200" -user "{{kibana_user}}:{{kibana_password}}"
   ignore_errors: true
 
 - name: Check kibana users
@@ -83,7 +83,7 @@
   register: kibana_user_pwfile_exists
 
 - name: Create kibana admin user
-  command: htpasswd -b -c /etc/nginx/htpasswd.users admin admin
+  command: htpasswd -b -c /etc/nginx/htpasswd.users {{kibana_user}} {{kibana_password}}
   ignore_errors: true
   when: kibana_user_pwfile_exists != 0
 
