@@ -42,6 +42,7 @@
 
 - name: Populate elasticsearch index with local logs via fluentd
   command: systemctl restart rsyslog.service
+  become: true
   ignore_errors: true
   when: rsyslog_updated != 0
 
@@ -84,6 +85,7 @@
 
 - name: Create kibana admin user
   command: htpasswd -b -c /etc/nginx/htpasswd.users {{kibana_user}} {{kibana_password}}
+  become: true
   ignore_errors: true
   when: kibana_user_pwfile_exists != 0
 
@@ -100,6 +102,7 @@
   command: openssl req -subj '/CN={{ ansible_fqdn }}/' -config /etc/pki/tls/openssl_extras.cnf \
     -x509 -days 3650 -batch -nodes -newkey rsa:2048 -keyout /etc/pki/tls/private/filebeat-forwarder.key \
     -out /etc/pki/tls/certs/filebeat-forwarder.crt
+  become: true
   ignore_errors: true
   when: filebeat_forwarder_ssl_exists != 0
 
@@ -110,6 +113,7 @@
 
 - name: Copy Filebeat forwarder SSL certificate
   command: cp /etc/pki/tls/certs/filebeat-forwarder.crt /usr/share/nginx/html/filebeat-forwarder.crt
+  become: true
   ignore_errors: true
   when: filebeat_forwarder_ssl_client_copy_exists != 0
 

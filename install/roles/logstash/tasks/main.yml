@@ -89,6 +89,7 @@
     regexp: '^ Extensions for a typical CA'
     insertbefore: '# Extensions for a typical CA'
     backup: yes
+  become: true
   when: subjectAltName_exists.stdout|int == 0
 
 - name: Load filebeat JSON index template
