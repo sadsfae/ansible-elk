@@ -16,6 +16,7 @@
 - name: Import Filebeat GPG Key
   rpm_key: key=http://packages.elastic.co/GPG-KEY-elasticsearch
     state=present
+  become: true
   when: (logging_backend != 'fluentd')
 
 - name: Install filebeat rpms
@@ -86,5 +87,6 @@
 
 - name: Restarting rsyslog for fluentd
   command: systemctl restart rsyslog.service
+  become: true
   ignore_errors: true
   when: rsyslog_updated != 0
