@@ -3,8 +3,6 @@
 # Playbook to install the ELK stack
 #
 
-- include: bootstrap.yml
-
 - hosts: elk
   remote_user: root
   roles:

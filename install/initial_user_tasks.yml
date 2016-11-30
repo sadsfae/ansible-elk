@@ -5,11 +5,21 @@
 - name: Host about to be bootstrapped
   debug: msg="Making '{{ ssh_user }}' user with current user key from '{{ bootstrapped_key_loc }}'"
 
+
+- name: Allow 'wheel' group to have passwordless sudo
+  lineinfile:
+    dest: /etc/sudoers
+    state: present
+    regexp: '^%wheel'
+    line: '%wheel ALL=(ALL) NOPASSWD: ALL'
+
+
 - name: Make ssh_user with sudo privileges
   user: >
       name="{{ ssh_user }}"
       comment="Ansible User"
-      shell=/bin/bash group=sudo
+      shell="/bin/bash"
+      group="wheel"
 
 - name: Bootstrap ssh_user with current SSH key
   authorized_key: >
@@ -51,7 +61,7 @@
 # NOTE manually added a single SSHD restart, has trouble getting notify to work
 # NOTE adjusted to be a manual command because 'service' module was failing
 - name: Bounce SSHD
-  command: service ssh restart
+  command: systemctl restart sshd.service
   # service: name=ssh state=restarted
 
 - name: Wait for SSH to become available on new port

@@ -7,8 +7,8 @@
   copy:
     src=logstash.repo
     dest=/etc/yum.repos.d/logstash.repo
-    owner=root
-    group=root
+    owner=huqadmin
+    group=wheel
     mode=0644
   become: true
 
@@ -22,8 +22,8 @@
   copy:
     src=01-lumberjack-input.conf
     dest=/etc/logstash/conf.d/01-lumberjack-input.conf
-    owner=root
-    group=root
+    owner=huqadmin
+    group=wheel
     mode=0644
   become: true
 
@@ -31,8 +31,8 @@
   copy:
     src=30-elasticsearch-output.conf
     dest=/etc/logstash/conf.d/30-lumberjack-output.conf
-    owner=root
-    group=root
+    owner=huqadmin
+    group=wheel
     mode=0644
   become: true
 
@@ -40,8 +40,8 @@
   copy:
     src=10-syslog.conf
     dest=/etc/logstash/conf.d/10-syslog.conf
-    owner=root
-    group=root
+    owner=huqadmin
+    group=wheel
     mode=0644
   become: true
 
@@ -49,8 +49,8 @@
   copy:
     src=10-syslog-filter.conf
     dest=/etc/logstash/conf.d/10-syslog-filter.conf
-    owner=root
-    group=root
+    owner=huqadmin
+    group=wheel
     mode=0644
   become: true
   register: logstash_needs_restart
@@ -59,8 +59,8 @@
   template:
     src=02-beats-input.conf.j2
     dest=/etc/logstash/conf.d/02-beats-input.conf
-    owner=root
-    group=root
+    owner=huqadmin
+    group=wheel
     mode=0644
   become: true
 
@@ -68,8 +68,8 @@
   template:
     src=openssl_extras.cnf.j2
     dest=/etc/pki/tls/openssl_extras.cnf
-    owner=root
-    group=root
+    owner=huqadmin
+    group=wheel
     mode=0644
   become: true
 
@@ -90,6 +90,7 @@
     insertbefore: '# Extensions for a typical CA'
     backup: yes
   when: subjectAltName_exists.stdout|int == 0
+  become: true
 
 - name: Load filebeat JSON index template
   uri:

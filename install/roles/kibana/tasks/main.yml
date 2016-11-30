@@ -7,8 +7,8 @@
   copy:
     src=kibana.repo
     dest=/etc/yum.repos.d/kibana.repo
-    owner=root
-    group=root
+    owner=huqadmin
+    group=wheel
     mode=0644
   become: true
 
@@ -26,6 +26,7 @@
   when: "'logstash-' not in elasticsearch_index.content"
   ignore_errors: true
   no_log: true
+  become: true
 
 - name: Install local rsyslogd for fluentd
   yum: name={{ item }} state=present
@@ -44,6 +45,7 @@
   command: systemctl restart rsyslog.service
   ignore_errors: true
   when: rsyslog_updated != 0
+  become: true
 
 - name: Install kibana rpms
   yum: name={{ item }} state=present
@@ -61,8 +63,8 @@
   copy:
     src=filebeat-dashboards.zip
     dest=/tmp/filebeat-dashboards.zip
-    owner=root
-    group=root
+    owner=huqadmin
+    group=wheel
     mode=0644
   become: true
   ignore_errors: true
@@ -86,6 +88,7 @@
   command: htpasswd -b -c /etc/nginx/htpasswd.users {{kibana_user}} {{kibana_password}}
   ignore_errors: true
   when: kibana_user_pwfile_exists != 0
+  become: true
 
 - name: Setup kibana service
   service: name=kibana state=started enabled=true
@@ -95,6 +98,7 @@
   stat: path=/etc/pki/tls/certs/filebeat-forwarder.crt
   ignore_errors: true
   register: filebeat_forwarder_ssl_exists
+  become: true
 
 - name: Create client forwarder SSL certificate
   command: openssl req -subj '/CN={{ ansible_fqdn }}/' -config /etc/pki/tls/openssl_extras.cnf \
@@ -102,16 +106,19 @@
     -out /etc/pki/tls/certs/filebeat-forwarder.crt
   ignore_errors: true
   when: filebeat_forwarder_ssl_exists != 0
+  become: true
 
 - name: Check Filebeat forwarder SSL certificate copy
   stat: path=/usr/share/nginx/html/filebeat-forwarder.crt
   ignore_errors: true
   register: filebeat_forwarder_ssl_client_copy_exists
+  become: true
 
 - name: Copy Filebeat forwarder SSL certificate
   command: cp /etc/pki/tls/certs/filebeat-forwarder.crt /usr/share/nginx/html/filebeat-forwarder.crt
   ignore_errors: true
   when: filebeat_forwarder_ssl_client_copy_exists != 0
+  become: true
 
 - name: Refresh logstash service
   command: systemctl restart logstash.service

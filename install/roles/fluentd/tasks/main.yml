@@ -7,8 +7,8 @@
   copy:
     src=fluentd.repo
     dest=/etc/yum.repos.d/fluentd.repo
-    owner=root
-    group=root
+    owner=huqadmin
+    group=wheel
     mode=0644
   become: true
 
@@ -26,8 +26,8 @@
   template:
     src=td-agent.conf.j2
     dest=/etc/td-agent/td-agent.conf
-    owner=root
-    group=root
+    owner=huqadmin
+    group=wheel
     mode=0644
   become: true
   register: fluentd_needs_restart

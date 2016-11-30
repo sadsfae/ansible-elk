@@ -6,6 +6,7 @@
 - name: Check/Install EPEL Repo for nginx
   yum: name={{epel_repo}}
       state=present
+  become: true
 
 - name: Install nginx, httpd-tools, httplib2, libsemanage-python
   yum: name={{ item }} state=present
@@ -17,8 +18,8 @@
     - libsemanage-python
 
 # SELinux boolean for nginx
-- name: Apply SELinux boolean httpd_can_network_connect
-  seboolean: name=httpd_can_network_connect state=yes persistent=yes
+#- name: Apply SELinux boolean httpd_can_network_connect
+#  seboolean: name=httpd_can_network_connect state=yes persistent=yes
 
 # create /etc/nginx/conf.d/ directory
 - name: Create nginx directory structure
@@ -31,8 +32,8 @@
   template:
     src=kibana.conf.j2
     dest=/etc/nginx/conf.d/kibana.conf
-    owner=root
-    group=root
+    owner=huqadmin
+    group=wheel
     mode=0644
   become: true
   register: nginx_needs_restart
@@ -42,8 +43,8 @@
   template:
     src=nginx.conf.j2
     dest=/etc/nginx/nginx.conf
-    owner=root
-    group=root
+    owner=huqadmin
+    group=wheel
     mode=0644
   become: true
 
@@ -52,6 +53,7 @@
   command: systemctl restart nginx.service
   ignore_errors: true
   when: nginx_needs_restart != 0
+  become: true  
 
 - name: Check if nginx is in use
   shell: systemctl is-enabled nginx.service | egrep -qv 'masked|disabled'
@@ -61,11 +63,13 @@
     # Skip ANSIBLE0012 Commands should not change things if nothing needs doing
     # Determine if nginx is enabled
     - skip_ansible_lint
+  become: true  
 
 - name: Set nginx to start on boot
   command: systemctl enable nginx.service
   ignore_errors: true
   when: nginx_in_use.rc != 0
+  become: true
 
 # we need TCP/80 and TCP/8080 open
 # determine firewall status and take action
@@ -219,3 +223,4 @@
 - name: Remove EPEL Repo
   yum: name={{epel_repo}}
       state=absent
+  become: true

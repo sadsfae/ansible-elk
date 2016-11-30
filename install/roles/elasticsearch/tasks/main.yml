@@ -3,12 +3,13 @@
 # Install/run elasticsearch
 #
 
+
 - name: Copy elasticsearch yum repo file
   copy:
     src=elasticsearch.repo
     dest=/etc/yum.repos.d/elasticsearch.repo
-    owner=root
-    group=root
+    owner=huqadmin
+    group=wheel
     mode=0644
   become: true
 

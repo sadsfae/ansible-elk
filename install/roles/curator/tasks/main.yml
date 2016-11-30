@@ -8,8 +8,8 @@
   copy:
     src=curator.repo
     dest=/etc/yum.repos.d/curator.repo
-    owner=root
-    group=root
+    owner=huqadmin
+    group=wheel
     mode=0644
   become: true
   when: install_curator_tool
