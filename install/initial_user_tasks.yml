@@ -1,0 +1,63 @@
+---
+# Create the "Ansible User" with the username as specifed in the inventory
+# file's `project_user` variable and grant it sudo access without password.
+
+- name: Host about to be bootstrapped
+  debug: msg="Making '{{ ssh_user }}' user with current user key from '{{ bootstrapped_key_loc }}'"
+
+- name: Make ssh_user with sudo privileges
+  user: >
+      name="{{ ssh_user }}"
+      comment="Ansible User"
+      shell=/bin/bash group=sudo
+
+- name: Bootstrap ssh_user with current SSH key
+  authorized_key: >
+      user="{{ ssh_user }}"
+      key="{{ lookup('file', bootstrapped_key_loc) }}"
+
+- name: Ensure that sudo users can sudo without password
+  lineinfile: >
+      dest=/etc/sudoers
+      state=present
+      regexp='^%sudo\s+ALL\='
+      line='%sudo ALL=(ALL) NOPASSWD:ALL'
+      validate='visudo -cf %s'
+
+- name: Turn off root login on ssh
+  lineinfile: >
+      dest=/etc/ssh/sshd_config
+      state=present
+      regexp='PermitRootLogin\s+'
+      line='PermitRootLogin no'
+      validate='/usr/sbin/sshd -T -f %s'
+
+- name: Change ssh port to `ssh_port`
+  lineinfile: >
+      dest=/etc/ssh/sshd_config
+      state=present
+      regexp='Port\s+'
+      line='Port {{ ssh_port }}'
+      validate='/usr/sbin/sshd -T -f %s'
+
+- name: Disallow password authentication
+  lineinfile: >
+      dest=/etc/ssh/sshd_config
+      state=present
+      regexp='PasswordAuthentication\s+'
+      line='PasswordAuthentication no'
+      validate='/usr/sbin/sshd -T -f %s'
+
+# NOTE manually added a single SSHD restart, has trouble getting notify to work
+# NOTE adjusted to be a manual command because 'service' module was failing
+- name: Bounce SSHD
+  command: service ssh restart
+  # service: name=ssh state=restarted
+
+- name: Wait for SSH to become available on new port
+  local_action: >
+    wait_for
+    host="{{ ansible_ssh_host }}"
+    port="{{ ssh_port }}"
+    delay=5
+    timeout=15
