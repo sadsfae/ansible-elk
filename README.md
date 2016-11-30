@@ -1,5 +1,16 @@
 ansible-elk
 ===========
+
+NOTE:
+```
+before running anything, make sure the IP of the elkstack server is correct in host_vars/elkserver
+
+from the install directory, first run ansible-playbook -i hosts install/boostrapper.yml
+
+then run ansible-playbook -i hosts install/elk.yml
+```
+_________________________
+
 Ansible Playbook for setting up the ELK/EFK Stack and Filebeat client on remote hosts
 
 ![ELK](/image/ansible-elk.png?raw=true)
