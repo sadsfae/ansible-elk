@@ -1,6 +1,6 @@
 ---
 
-ansible_ssh_host: 188.166.146.121
+ansible_ssh_host: 178.62.38.201
 ansible_ssh_port: 22
 ansible_ssh_user: huqadmin
 

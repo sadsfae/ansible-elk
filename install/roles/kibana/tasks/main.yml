@@ -143,3 +143,12 @@
 
 - name: Print filebeat client setup instructions
   debug: msg="** 2) Run ansible-playbook -i hosts install/elk-client.yml --extra-vars 'elk_server={{ ansible_default_ipv4.address }}' to setup clients ***"
+
+- name: Copy over Huq logo
+  copy:
+    src=logo.svg
+    dest=/opt/kibana/optimize/bundles/src/ui/public/images/kibana.svg
+    owner=huqadmin
+    group=wheel
+    mode=0644
+  become: true
