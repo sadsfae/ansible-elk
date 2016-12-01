@@ -37,7 +37,7 @@
 - name: Update elasticsearch startup with heap size
   become: true
   lineinfile: dest=/usr/share/elasticsearch/bin/elasticsearch.in.sh \
-          line="ES_HEAP_SIZE={{ (ansible_memory_mb.real.total / 2) | int }}m" insertafter="^ES_CLASSPATH="
+          line="ES_HEAP_SIZE=1g" insertafter="^ES_CLASSPATH="
   when: ansible_memory_mb.real.total|int < 65536
   register: elasticsearch_updated
 
