@@ -1,0 +1,23 @@
+---
+## Bootstrap
+
+# Check if `initial_ssh_user`@[bootstrappers]:22 is allowed. If so, run
+# initial_user_tasks.yml playbook to change to
+# `ansible_ssh_user`@[bootstrappers]:`ansible_ssh_port`
+
+- hosts: elk
+
+  # First ensure that root access is not allowed
+  # See this code: https://github.com/ansible/ansible/issues/4688#issuecomment-53725060
+  gather_facts: False
+  vars:
+    - ansible_ssh_user: "{{ initial_ssh_user }}"
+    - ansible_ssh_port: 22
+  tasks:
+    - name: Check for `initial_ssh_user` access
+      action: ping
+      register: initial_user
+      ignore_errors: True
+
+    - include: initial_user_tasks.yml
+      when: initial_user|success

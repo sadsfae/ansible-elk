@@ -1,0 +1,15 @@
+---
+
+ansible_ssh_host: 5.39.75.63
+ansible_ssh_port: 22
+ansible_ssh_user: huqadmin
+
+
+# Bootstrap info - should match settings above for port and user
+ssh_user: huqadmin
+ssh_port: 22
+initial_ssh_user: root
+# This is where the initial cert will be sourced. Will get replaced when
+# build
+# happens, next and is just temporary.
+bootstrapped_key_loc: ~/.ssh/id_rsa.pub

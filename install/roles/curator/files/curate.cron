@@ -1,0 +1,1 @@
+curator --config /home/huqadmin/cfg.yml af.yml

@@ -8,8 +8,8 @@
   copy:
     src=curator.repo
     dest=/etc/yum.repos.d/curator.repo
-    owner=root
-    group=root
+    owner=huqadmin
+    group=wheel
     mode=0644
   become: true
   when: install_curator_tool
@@ -26,3 +26,32 @@
     - python-elasticsearch-curator
     - python-setuptools
   when: install_curator_tool
+
+- name: Install curator config
+  copy:
+    src=cfg.yml
+    dest=/home/huqadmin/cfg.yml
+    owner=huqadmin
+    group=wheel
+    mode=0644
+  become: true
+
+
+- name: Install curator action file
+  copy:
+    src=af.yml
+    dest=/home/huqadmin/af.yml
+    owner=huqadmin
+    group=wheel
+    mode=0644
+  become: true
+
+
+- name: Set up daily cron job
+  copy:
+    src=curate.cron
+    dest=/etc/cron.daily/curate.cron
+    owner=huqadmin
+    group=wheel
+    mode=0644
+  become: true

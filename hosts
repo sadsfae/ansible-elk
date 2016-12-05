@@ -1,5 +1,7 @@
 [elk]
-host-01
+elkserver
+
+[bootstrappers]
+elkserver
 
 [elk-client]
-host-02

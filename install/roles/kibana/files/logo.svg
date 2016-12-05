@@ -1,0 +1,37 @@
+dobe Illustrator 19.1.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+     viewBox="0 0 411.1 251.5" style="enable-background:new 0 0 411.1 251.5;" xml:space="preserve">
+<style type="text/css">
+    .st0{fill:#FFFFFF;}
+    .st1{opacity:0.75;}
+    .st2{clip-path:url(#SVGID_1_);}
+    .st3{clip-path:url(#SVGID_2_);fill:#FFFFFF;}
+</style>
+<g>
+    <path class="st0" d="M0,0h26.9v100.1C34.1,86.3,47.4,78,64.2,78C88.9,78,106,95.6,106,126v66.3H79.1v-64.2c0-16-7.4-25.3-23.2-25.3
+        c-17.6,0-29,10.7-29,28.8v60.7H0V0z"/>
+    <path class="st0" d="M123.3,142.5V80.4h26.9v61.3c0,19.2,7.2,29.6,25,29.6c17.8,0,25-10.4,25-29.6V80.4h26.9v62.1
+        c0,32.8-19.7,52.5-53,52.5C141.4,194.9,123.3,175.2,123.3,142.5"/>
+    <path class="st0" d="M332.6,173.1c-6.6,12.5-20,21.6-38.6,21.6c-29,0-52.5-24.8-52.5-58.6c0-33.8,23.4-58.1,51.9-58.1
+        c19.7,0,32.8,9.6,40,23.2l-0.8-20.8h26.9v168.3h-26.9V173.1z M333.4,136.1c0-20.2-12.8-34.1-32.5-34.1c-19.4,0-31.7,13.9-31.7,34.1
+        c0,21,12.2,34.9,31.7,34.9C320.7,171,333.4,157.1,333.4,136.1"/>
+    <g class="st1">
+        <defs>
+            <rect id="SVGID_5_" x="331.1" y="196.9" class="st1" width="80.1" height="54.6"/>
+        </defs>
+        <clipPath id="SVGID_1_">
+            <use xlink:href="#SVGID_5_"  style="overflow:visible;"/>
+        </clipPath>
+        <g class="st2">
+            <defs>
+                <rect id="SVGID_7_" x="332.2" y="198.6" width="78.7" height="50.1"/>
+            </defs>
+            <clipPath id="SVGID_2_">
+                <use xlink:href="#SVGID_7_"  style="overflow:visible;"/>
+            </clipPath>
+            <polygon class="st3" points="360.4,248.7 332.2,248.7 384,198.6 410.9,198.6             "/>
+        </g>
+    </g>
+</g>
+</svg>
+
