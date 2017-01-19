@@ -1,0 +1,57 @@
+---
+
+# EPEL Repository for extra packages
+epel_repo: https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
+
+########################################
+# ELK Server Variables
+########################################
+### nginx ###
+# add nonstandard port here for undercloud usage
+# note: you should use nonstandard ports for both here
+# if you choose to do this.
+#
+# usage: port nginx listens to reverse-proxy Kibana
+# default is 80
+# e.g. 8888
+nginx_kibana_port: 80
+#
+# usage: port filebeat client grabs the client SSL certificate
+# default is 8080
+# e.g. 9999
+elk_server_ssl_cert_port: 8080
+#
+# Kibana options
+# change this to affect nginx-wrapped htpasswd authentication
+kibana_user: admin
+kibana_password: admin
+
+### logging backend ###
+# you can pick between logstash or fluentd
+# if left empty logstash will be used
+### accepted options ###
+# logging_backend:
+# logging_backend: logstash
+# logging_backend: fluentd
+logging_backend:
+#
+### logstash options ###
+logstash_syslog_port: 5044
+### fluentd options ###
+fluentd_syslog_port: 42185
+fluentd_http_port: 9919
+fluentd_debug_port: 24230
+## elasticsearch local port listener
+# general usage will not need elasticsearch listening
+# outside of localhost, if you want to apply firewall rules
+# to allow external connections to elasticsearch change the below setting
+# to true
+# we will set this to false by default
+es_local_port: 9200
+es_listen_external: false
+### install curator tool ###
+# curator is the recommended tool for managing elasticsearch indexes
+# https://www.elastic.co/guide/en/elasticsearch/client/curator/current/index.html
+# default is no (set to blank) or false
+# set the below variable to 'true' to activate
+install_curator_tool: false
