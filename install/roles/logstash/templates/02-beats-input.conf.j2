@@ -1,8 +1,18 @@
-    input {
-      beats {
-        port => {{logstash_syslog_port}}
-        ssl => true
-        ssl_certificate => "/etc/pki/tls/certs/filebeat-forwarder.crt"
-        ssl_key => "/etc/pki/tls/private/filebeat-forwarder.key"
-      }
-    }
+input {
+  beats {
+    port => "{{logstash_syslog_port}}"
+    ssl => true
+    ssl_certificate => /usr/share/logstash/filebeat-forwarder.crt
+    ssl_key => /usr/share/logstash/filebeat-forwarder.key
+    ssl_verify_mode => none
+  }
+}
+
+output {
+  elasticsearch {
+    hosts => "localhost:{{es_local_port}}"
+    manage_template => false
+    index => "%{[@metadata][beat]}-%{+YYYY.MM.dd}"
+    document_type => "%{[@metadata][type]}"
+  }
+}

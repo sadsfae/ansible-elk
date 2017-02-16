@@ -37,6 +37,11 @@ logging_backend:
 #
 ### logstash options ###
 logstash_syslog_port: 5044
+logstash_localsyslog_port: 5000
+### rsyslog options
+# set this to true if you want to accept
+# external syslog traffic
+syslog_listen_external: false
 ### fluentd options ###
 fluentd_syslog_port: 42185
 fluentd_http_port: 9919

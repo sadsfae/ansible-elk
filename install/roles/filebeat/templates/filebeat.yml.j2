@@ -215,22 +215,23 @@ output:
     #topology_expire: 15
 
     # tls configuration. By default is off.
-    tls:
+    ssl:
       # List of root certificates for HTTPS server verifications
-      certificate_authorities: ["/etc/pki/tls/certs/filebeat-forwarder.crt"]
+      certificate_authorities: [/etc/filebeat/filebeat-forwarder.crt]
 
       # Certificate for TLS client authentication
-      #certificate: "/etc/pki/client/cert.pem"
+      certificate: "/etc/filebeat/filebeat-forwarder.crt"
 
       # Client Certificate Key
-      #certificate_key: "/etc/pki/client/cert.key"
+      key: "/etc/filebeat/filebeat-forwarder.key"
 
       # Controls whether the client verifies server certificates and host name.
       # If insecure is set to true, all server host names and certificates will be
-      # accepted. In this mode TLS based connections are susceptible to
+      # Accepted. In this mode TLS based connections are susceptible to
       # man-in-the-middle attacks. Use only for testing.
       #insecure: true
-
+      # specify protocols here:
+      supported_protocols: [TLSv1.0, TLSv1.1, TLSv1.2, SSLv3]
       # Configure cipher suites to be used for TLS connections
       #cipher_suites: []
 
@@ -239,10 +240,10 @@ output:
 
       # Configure minimum TLS version allowed for connection to logstash
       #min_version: 1.0
-
+      min_version: 1.0
       # Configure maximum TLS version allowed for connection to logstash
       #max_version: 1.2
-
+      max_version: 1.2
 
   ### Logstash as output
   #logstash:

@@ -18,49 +18,12 @@
   with_items:
     - logstash
 
-- name: Copy logstash input filters
-  copy:
-    src=01-lumberjack-input.conf
-    dest=/etc/logstash/conf.d/01-lumberjack-input.conf
-    owner=root
-    group=root
-    mode=0644
-  become: true
-
-- name: Copy logstash output filters
-  copy:
-    src=30-elasticsearch-output.conf
-    dest=/etc/logstash/conf.d/30-lumberjack-output.conf
-    owner=root
-    group=root
-    mode=0644
-  become: true
-
-- name: Copy logstash syslog filters
-  copy:
-    src=10-syslog.conf
-    dest=/etc/logstash/conf.d/10-syslog.conf
-    owner=root
-    group=root
-    mode=0644
-  become: true
-
-- name: Copy logstash local syslog filter
-  copy:
-    src=10-syslog-filter.conf
-    dest=/etc/logstash/conf.d/10-syslog-filter.conf
-    owner=root
-    group=root
-    mode=0644
-  become: true
-  register: logstash_needs_restart
-
-- name: Copy filebeat input filter
+- name: Copy logstash filter configuration
   template:
-    src=02-beats-input.conf.j2
-    dest=/etc/logstash/conf.d/02-beats-input.conf
-    owner=root
-    group=root
+    src=logstash.conf.j2
+    dest=/etc/logstash/conf.d/logstash.conf
+    owner=logstash
+    group=logstash
     mode=0644
   become: true
 
@@ -98,10 +61,6 @@
     body: "{{ lookup('file', 'filebeat-index-template.json') }}"
     body_format: json
   ignore_errors: true
-  become: true
-
-- name: Enable logstash service
-  service: name=logstash state=started enabled=true
   become: true
 
 # we need TCP/80 and TCP/8080 open

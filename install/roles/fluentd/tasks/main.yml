@@ -32,6 +32,36 @@
   become: true
   register: fluentd_needs_restart
 
+# this is for compability
+- name: Load OpenSSL CA Extended Configuration
+  template:
+    src=openssl_extras.cnf.j2
+    dest=/etc/pki/tls/openssl_extras.cnf
+    owner=root
+    group=root
+    mode=0644
+  become: true
+
+# this is for compatibility
+- name: Check OpenSSL SANs (SubjectAltName) entry for CA
+  shell: grep "{{ ansible_default_ipv4.address }}" /etc/pki/tls/openssl.cnf | wc -l
+  ignore_errors: true
+  register: subjectAltName_exists
+  tags:
+    # Skip ANSIBLE0012 Commands should not change things if nothing needs doing
+    # Need to understand if an entry exists
+    - skip_ansible_lint
+
+# this is for compability
+- name: Add OpenSSL SANs (SubjectAltName) entry for CA
+  lineinfile:
+    dest: /etc/pki/tls/openssl.cnf
+    line: 'subjectAltName = "{{ ansible_default_ipv4.address }}"'
+    regexp: '^ Extensions for a typical CA'
+    insertbefore: '# Extensions for a typical CA'
+    backup: yes
+  when: subjectAltName_exists.stdout|int == 0
+
 ### begin firewall settings here ###
 # we need TCP/42185 and TCP/9919 open
 # determine firewall status and take action

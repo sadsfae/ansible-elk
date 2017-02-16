@@ -1,6 +1,8 @@
-[kibana-4.6]
-name=Kibana repository for 4.6.x packages
-baseurl=http://packages.elastic.co/kibana/4.6/centos
+[kibana-5.x]
+name=Kibana repository for 5.x packages
+baseurl=https://artifacts.elastic.co/packages/5.x/yum
 gpgcheck=1
-gpgkey=http://packages.elastic.co/GPG-KEY-elasticsearch
+gpgkey=https://artifacts.elastic.co/GPG-KEY-elasticsearch
 enabled=1
+autorefresh=1
+type=rpm-md

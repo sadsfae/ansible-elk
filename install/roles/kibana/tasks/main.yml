@@ -2,6 +2,8 @@
 #
 # Install/run kibana
 #
+# Note a lot of logstash/ES activity happens here too
+# Because of service ordering.
 
 - name: Copy kibana yum repo file
   copy:
@@ -12,20 +14,12 @@
     mode=0644
   become: true
 
-# We need to insert data to create an initial index, query if it exists
-- name: Check elasticsearch index for content
-  uri:
-    url=http://localhost:9200/_cat/indices
-    method=GET
-    return_content=yes
-  register: elasticsearch_index
-
-# Populate elasticsearch with local logs if using logstash
-- name: Populate elasticsearch index with local logs via logstash
-  shell: cat /var/log/messages | /opt/logstash/bin/logstash -f /etc/logstash/conf.d/10-syslog.conf
-  when: "'logstash-' not in elasticsearch_index.content"
-  ignore_errors: true
-  no_log: true
+- name: Install kibana rpms
+  yum: name={{ item }} state=present
+  become: true
+  with_items:
+    - kibana
+    - unzip
 
 - name: Install local rsyslogd for fluentd
   yum: name={{ item }} state=present
@@ -44,13 +38,6 @@
   command: systemctl restart rsyslog.service
   ignore_errors: true
   when: rsyslog_updated != 0
-
-- name: Install kibana rpms
-  yum: name={{ item }} state=present
-  become: true
-  with_items:
-    - kibana
-    - unzip
 
 - name: Check kibana filebeat dashboards
   stat: path=/tmp/filebeat-dashboards.zip
@@ -92,14 +79,20 @@
   become: true
 
 - name: Check Filebeat forwarder SSL certificate
-  stat: path=/etc/pki/tls/certs/filebeat-forwarder.crt
+  stat: path=/usr/share/logstash/filebeat-forwarder.crt
   ignore_errors: true
   register: filebeat_forwarder_ssl_exists
 
+- name: Create SSL structure for Fluentd installs
+  file:
+    path: /usr/share/logstash
+    state: directory
+  when: (logging_backend == 'fluentd')
+
 - name: Create client forwarder SSL certificate
   command: openssl req -subj '/CN={{ ansible_fqdn }}/' -config /etc/pki/tls/openssl_extras.cnf \
-    -x509 -days 3650 -batch -nodes -newkey rsa:2048 -keyout /etc/pki/tls/private/filebeat-forwarder.key \
-    -out /etc/pki/tls/certs/filebeat-forwarder.crt
+    -x509 -days 3650 -batch -nodes -newkey rsa:2048 -keyout /usr/share/logstash/filebeat-forwarder.key \
+    -out /usr/share/logstash/filebeat-forwarder.crt
   ignore_errors: true
   when: filebeat_forwarder_ssl_exists != 0
 
@@ -109,30 +102,96 @@
   register: filebeat_forwarder_ssl_client_copy_exists
 
 - name: Copy Filebeat forwarder SSL certificate
-  command: cp /etc/pki/tls/certs/filebeat-forwarder.crt /usr/share/nginx/html/filebeat-forwarder.crt
+  command: cp /usr/share/logstash/filebeat-forwarder.crt /usr/share/nginx/html/filebeat-forwarder.crt
   ignore_errors: true
   when: filebeat_forwarder_ssl_client_copy_exists != 0
 
-- name: Refresh logstash service
-  command: systemctl restart logstash.service
+- name: Copy Filebeat forwarder SSL certificate key
+  command: cp /usr/share/logstash/filebeat-forwarder.key /usr/share/nginx/html/filebeat-forwarder.key
   ignore_errors: true
+  when: filebeat_forwarder_ssl_client_copy_exists != 0
+
+- name: Set permissions on logstash certificate
+  file:
+    path: /usr/share/logstash/filebeat-forwarder.crt
+    owner: logstash
+    group: logstash
+    mode: 0600
   when: (logging_backend != 'fluentd')
+
+- name: Set permissions on logstash certificate key
+  file:
+    path: /usr/share/logstash/filebeat-forwarder.key
+    owner: logstash
+    group: logstash
+    mode: 0600
+  when: (logging_backend != 'fluentd')
+
+# We are in the kibana playbook but starting logstash here now
+# This is needed because perms should be set on certificates before
+# logstash references them for filebeat SSL connections.
+- name: Enable logstash service
+  service: name=logstash state=started enabled=true
   become: true
+  when: (logging_backend != 'fluentd')
+
+# We need to insert data to create an initial index, query if it exists
+- name: Check elasticsearch index for content
+  uri:
+    url=http://localhost:9200/_cat/indices
+    method=GET
+    return_content=yes
+  register: elasticsearch_index
+
+# Make sure TCP/5000 is up and listening for logstash
+# logstash 5.2.1 takes a long time to start for me
+# leaving this set to 7minutes before giving up
+- name: Check for TCP/5000 logstash listener port, this may take a while
+  wait_for:
+    host: localhost
+    port: 5000
+    delay: 10
+    connect_timeout: 5
+    timeout: 420
+    state: started
+  when: (logging_backend != 'fluentd')
+
+# Populate elasticsearch with local syslog data
+- name: Populate elasticsearch index with local syslog data
+  lineinfile: dest=/etc/rsyslog.conf \
+          line="*.* @localhost:{{ logstash_localsyslog_port }}"
+  when: (logging_backend != 'fluentd')
+  register: rsyslog_updated
+
+- name: Restart rsyslogd to populate elasticsearch index
+  command: systemctl restart rsyslog.service
+  ignore_errors: true
+  when: rsyslog_updated != 0
 
 - name: Refresh fluentd service
   command: systemctl restart td-agent.service
   when: (logging_backend == 'fluentd')
   become: true
 
-- name: Print SSL post-setup information
+- name: Print SSL certificate post-setup information
   debug: msg="Filebeat SSL Certificate available at http://{{ ansible_fqdn }}:{{ elk_server_ssl_cert_port }}/filebeat-forwarder.crt"
+  when: (logging_backend != 'fluentd')
+
+- name: Print SSL key post-setup information
+  debug: msg="Filebeat SSL Certificate key is located at http://{{ ansible_fqdn }}:{{ elk_server_ssl_cert_port }}/filebeat-forwarder.key"
   when: (logging_backend != 'fluentd')
 
 - name: Print post-setup URL
   debug: msg="*** ELK Services available at http://{{ ansible_fqdn }}:{{ nginx_kibana_port }} ***"
 
 - name: Print index creation instructions
-  debug: msg="** 1) Navigate to http://{{ ansible_fqdn }}:{{ nginx_kibana_port }} and login with admin/admin, click 'create' on the green index button ***"
+  debug: msg="*** 1) Navigate to http://{{ ansible_fqdn }}:{{ nginx_kibana_port }} and login with admin/admin ***"
+
+- name: Print Index creation more instructions
+  debug: msg="*** 2) Select '@timestamp' under 'Time-field name' and Click the blue CREATE button ***"
+
+- name: Print Navigation Instructions
+  debug: msg="*** 3) Click on Discover ***"
 
 - name: Print filebeat client setup instructions
-  debug: msg="** 2) Run ansible-playbook -i hosts install/elk-client.yml --extra-vars 'elk_server={{ ansible_default_ipv4.address }}' to setup clients ***"
+  debug: msg="*** 4) ansible-playbook -i hosts install/elk-client.yml --extra-vars 'elk_server={{ ansible_default_ipv4.address }}' to setup clients ***"
