@@ -6,6 +6,7 @@ Ansible Playbook for setting up the ELK/EFK Stack and Filebeat client on remote 
 
 **What does it do?**
    - Automated deployment of a full ELK or EFK stack (Elasticsearch, Logstash/Fluentd, Kibana)
+     * 5.2 and 2.4 ELK versions are maintained.
      * Uses Nginx as a reverse proxy for Kibana
      * Generates SSL certificates for Filebeat or Logstash-forwarder
      * Adds either iptables or firewalld rules if firewall is active
@@ -24,6 +25,7 @@ Ansible Playbook for setting up the ELK/EFK Stack and Filebeat client on remote 
    - Deployment tested on Ansible 1.9.4 and 2.0.2
 
 **Notes**
+   - Current ELK version is 5.2.1 but you can checkout the 2.4 branch if you want that series
    - Sets the nginx htpasswd to admin/admin initially
    - nginx ports default to 80/8080 for Kibana and SSL cert retrieval (configurable)
    - Uses OpenJDK for Java
@@ -96,6 +98,7 @@ ansible-playbook -i hosts install/elk-client.yml --extra-vars 'elk_server=X.X.X.
         │   ├── tasks
         │   │   └── main.yml
         │   └── templates
+        │       ├── openssl_extras.cnf.j2
         │       └── td-agent.conf.j2
         ├── kibana
         │   ├── files
@@ -106,17 +109,13 @@ ansible-playbook -i hosts install/elk-client.yml --extra-vars 'elk_server=X.X.X.
         │       └── main.yml
         ├── logstash
         │   ├── files
-        │   │   ├── 01-lumberjack-input.conf
-        │   │   ├── 10-syslog.conf
-        │   │   ├── 10-syslog-filter.conf
-        │   │   ├── 30-elasticsearch-output.conf
-        │   │   ├── 30-lumberjack-output.conf
         │   │   ├── filebeat-index-template.json
         │   │   └── logstash.repo
         │   ├── tasks
         │   │   └── main.yml
         │   └── templates
         │       ├── 02-beats-input.conf.j2
+        │       ├── logstash.conf.j2
         │       └── openssl_extras.cnf.j2
         └── nginx
             ├── tasks
@@ -125,5 +124,5 @@ ansible-playbook -i hosts install/elk-client.yml --extra-vars 'elk_server=X.X.X.
                 ├── kibana.conf.j2
                 └── nginx.conf.j2
 
-27 directories, 34 files
+27 directories, 31 files
 ```
