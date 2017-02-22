@@ -2,5 +2,5 @@
 #
 # Role to setup a 2.4 ELK/EFK stack on a server (CentOS/RHEL only)
 - src: https://github.com/sadsfae/ansible-elk
-  name: ansible-elk
+  name: ansible-elk-2.4
   version: 2.4
