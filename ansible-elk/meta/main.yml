@@ -1,0 +1,21 @@
+galaxy_info:
+  author: Will Foster (@sadsfae)
+  description: Playbook for setting up an ELK/EFK stack and clients.
+
+  issue_tracker_url: https://github.com/sadsfae/ansible-elk/issues
+  license: Apache
+  min_ansible_version: 1.9
+  platforms:
+  - name: Fedora
+    versions:
+    - all
+  - name: EL
+    versions:
+    - 7
+  galaxy_tags:
+    - elk
+    - efk
+    - elasticsearch
+    - logstash
+    - kibana
+dependencies: []
