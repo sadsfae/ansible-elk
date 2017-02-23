@@ -16,6 +16,7 @@ Ansible Playbook for setting up the ELK/EFK Stack and Filebeat client on remote 
        the same set of OpenStack-related logs in /var/log/*
      * All service ports can be modified in ```install/group_vars/all.yml```
      * Optionally install [curator](https://www.elastic.co/guide/en/elasticsearch/client/curator/current/index.html)
+     * This is also available on [Ansible Galaxy](https://galaxy.ansible.com/sadsfae/ansible-elk/)
 
 **Requirements**
    - RHEL7 or CentOS7+ server/client with no modifications
