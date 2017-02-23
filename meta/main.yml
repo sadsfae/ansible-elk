@@ -1,6 +1,6 @@
 galaxy_info:
   author: Will Foster (@sadsfae)
-  description: Playbook for setting up an 2.4 version of ELK/EFK stack and clients.
+  description: Playbook for setting up the older 2.4 version of ELK/EFK stack and clients.
 
   issue_tracker_url: https://github.com/sadsfae/ansible-elk/issues
   license: Apache
