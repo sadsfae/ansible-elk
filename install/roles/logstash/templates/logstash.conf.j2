@@ -24,7 +24,8 @@ filter {
 
 output {
 elasticsearch { hosts => ["localhost:{{es_local_port}}"] }
-  stdout { codec => rubydebug }
+# uncomment this for debug messages
+#  stdout { codec => rubydebug }
 }
 
 input {
