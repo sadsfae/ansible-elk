@@ -135,6 +135,17 @@
   become: true
   when: (logging_backend != 'fluentd')
 
+# For slower connections and to make sure ES is listening
+# we will wait for TCP/9200 to become available
+- name: Wait for elasticsearch index to be available
+  uri:
+    url: http://localhost:9200/_cat/indices
+    status_code: 200
+  register: es_service_result
+  until: es_service_result.status == 200
+  retries: 50
+  delay: 10
+
 # We need to insert data to create an initial index, query if it exists
 - name: Check elasticsearch index for content
   uri:
