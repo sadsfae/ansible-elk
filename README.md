@@ -50,10 +50,15 @@ sed -i 's/host-02/elkclient/' hosts
 ansible-playbook -i hosts install/elk.yml
 ```
    - (see playbook messages)
-   - Navigate to the server at http://yourelkhost
-   - Default login is admin/admin
+   - Navigate to the ELK at http://host-01:80
+   - Default login is:
+      - username: ```admin```
+      - password: ```admin```
+
 ![ELK](/image/elk-index-5.x-1.png?raw=true "Select @timestamp from drop-down.")
+
 ![ELK](/image/elk-index-5.x-2.png?raw=true "Click the blue create button.")
+
 ![ELK](/image/elk-index-5.x-3.png?raw=true "Click Discover")
 
 **ELK Client Instructions**
