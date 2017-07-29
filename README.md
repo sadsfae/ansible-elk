@@ -6,7 +6,7 @@ Ansible Playbook for setting up the ELK/EFK Stack and Filebeat client on remote 
 
 **What does it do?**
    - Automated deployment of a full ELK or EFK stack (Elasticsearch, Logstash/Fluentd, Kibana)
-     * 5.2 and 2.4 ELK versions are maintained.
+     * 5.5+ and 2.4 ELK versions are maintained.
      * Uses Nginx as a reverse proxy for Kibana
      * Generates SSL certificates for Filebeat or Logstash-forwarder
      * Adds either iptables or firewalld rules if firewall is active
@@ -20,13 +20,14 @@ Ansible Playbook for setting up the ELK/EFK Stack and Filebeat client on remote 
 
 **Requirements**
    - RHEL7 or CentOS7+ server/client with no modifications
+   - ELK/EFK server with at least 8G of memory (you can try with less but 5.x series is quite demanding - try 2.4 series if you have scarce resources).
      - Fedora 23 or higher needs to have ```yum python2 python2-dnf libselinux-python``` packages.
        * You can run this against Fedora clients prior to running Ansible ELK:
        - ```ansible fedora-client-01 -u root -m shell -i hosts -a "dnf install yum python2 libsemanage-python python2-dnf -y"```
    - Deployment tested on Ansible 1.9.4 and 2.0.2
 
 **Notes**
-   - Current ELK version is 5.2.1 but you can checkout the 2.4 branch if you want that series
+   - Current ELK version is 5.5.x but you can checkout the 2.4 branch if you want that series
    - Sets the nginx htpasswd to admin/admin initially
    - nginx ports default to 80/8080 for Kibana and SSL cert retrieval (configurable)
    - Uses OpenJDK for Java
@@ -48,17 +49,29 @@ sed -i 's/host-02/elkclient/' hosts
 ```
 ansible-playbook -i hosts install/elk.yml
 ```
-   - Navigate to the server at http://yourhost
+   - (see playbook messages)
+   - Navigate to the server at http://yourelkhost
    - Default login is admin/admin
-![ELK](/image/elk-index.png?raw=true "Click the green button.")
+![ELK](/image/elk-index-5.x-1.png?raw=true "Select @timestamp from drop-down.")
+![ELK](/image/elk-index-5.x-2.png?raw=true "Click the blue create button.")
+![ELK](/image/elk-index-5.x-3.png?raw=true "Click Discover")
 
 **ELK Client Instructions**
    - Run the client playbook against the generated ``elk_server`` variable
 ```
 ansible-playbook -i hosts install/elk-client.yml --extra-vars 'elk_server=X.X.X.X'
 ```
-   - You can view a deployment video here:
+   - Once this completes return to your ELK and you'll see log results come in from ELK/EFK clients via filebeat
+![ELK](/image/elk-index-5.x-4.png?raw=true "watch the magic")
 
+**2.4 ELK/EFK**
+   - The 2.4 series of ELK/EFK is also available, to use this just clone the 2.4 branch
+```
+git clone https://github.com/sadsfae/ansible-elk
+cd ansible-elk
+git checkout 2.4
+```
+   - You can view a deployment video here:
 
 [![Ansible Elk](http://img.youtube.com/vi/6is6Ecxc2zE/0.jpg)](http://www.youtube.com/watch?v=6is6Ecxc2zE "Deploying ELK with Ansible")
 
