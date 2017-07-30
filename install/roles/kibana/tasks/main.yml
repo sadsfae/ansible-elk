@@ -149,7 +149,9 @@
 
 # We will use a more generic check if x-pack is installed as it wraps everything
 # in additional authentication making it difficult to interpret HTTP status
-# codes via success/fail
+# codes via success/fail.  There is probably a better way to do this but even
+# using uri/url module it is the only X-Pack service that will hangs waiting
+# for password input.
 - name: Wait for elastic index to be available (X-Pack enabled only generic check)
   wait_for:
     host: localhost
@@ -161,7 +163,6 @@
   when: install_elasticsearch_xpack
 
 # We need to insert data to create an initial index, query if it exists
-# If X-Pack is enabled we will use another check below.
 - name: Check elasticsearch index for content
   uri:
     url=http://localhost:9200/_cat/indices
