@@ -4,7 +4,7 @@ Ansible Playbook for setting up the ELK/EFK Stack and Filebeat client on remote 
 
 ![ELK](/image/ansible-elk.png?raw=true)
 
-**What does it do?**
+## What does it do?
    - Automated deployment of a full ELK or EFK stack (Elasticsearch, Logstash/Fluentd, Kibana)
      * 5.5+ and 2.4 ELK versions are maintained.
      * Uses Nginx as a reverse proxy for Kibana
@@ -19,7 +19,7 @@ Ansible Playbook for setting up the ELK/EFK Stack and Filebeat client on remote 
      * Optionally install [Elastic X-Pack Suite](https://www.elastic.co/guide/en/x-pack/current/xpack-introduction.html)
      * This is also available on [Ansible Galaxy](https://galaxy.ansible.com/sadsfae/ansible-elk/)
 
-**Requirements**
+## Requirements
    - RHEL7 or CentOS7+ server/client with no modifications
    - ELK/EFK server with at least 8G of memory (you can try with less but 5.x series is quite demanding - try 2.4 series if you have scarce resources).
      - Fedora 23 or higher needs to have ```yum python2 python2-dnf libselinux-python``` packages.
@@ -32,7 +32,7 @@ echo "vm.swappiness=10" >> /etc/sysctl.conf
 sysctl -p
 ```
 
-**Notes**
+## Notes
    - Current ELK version is 5.5.x but you can checkout the 2.4 branch if you want that series
    - Sets the nginx htpasswd to admin/admin initially
    - nginx ports default to 80/8080 for Kibana and SSL cert retrieval (configurable)
@@ -47,7 +47,7 @@ sysctl -p
      - ```install_kibana_xpack: true```
      - ```install_logstash_xpack: true```
 
-**ELK Server Instructions**
+## ELK/EFK Server Instructions
    - Clone repo and setup your hosts file
 ```
 git clone https://github.com/sadsfae/ansible-elk
@@ -71,7 +71,7 @@ ansible-playbook -i hosts install/elk.yml
 
 ![ELK](/image/elk-index-5.x-3.png?raw=true "Click Discover")
 
-**ELK Client Instructions**
+## ELK Client Instructions
    - Run the client playbook against the generated ``elk_server`` variable
 ```
 ansible-playbook -i hosts install/elk-client.yml --extra-vars 'elk_server=X.X.X.X'
@@ -79,7 +79,7 @@ ansible-playbook -i hosts install/elk-client.yml --extra-vars 'elk_server=X.X.X.
    - Once this completes return to your ELK and you'll see log results come in from ELK/EFK clients via filebeat
 ![ELK](/image/elk-index-5.x-4.png?raw=true "watch the magic")
 
-**2.4 ELK/EFK**
+## 2.4 ELK/EFK (Deprecated)
    - The 2.4 series of ELK/EFK is also available, to use this just clone the 2.4 branch
 ```
 git clone https://github.com/sadsfae/ansible-elk
@@ -91,7 +91,7 @@ git checkout 2.4
 [![Ansible Elk](http://img.youtube.com/vi/6is6Ecxc2zE/0.jpg)](http://www.youtube.com/watch?v=6is6Ecxc2zE "Deploying ELK with Ansible")
 
 
-**File Hierarchy**
+## File Hierarchy
 ```
 .
 ├── hosts
@@ -132,11 +132,6 @@ git checkout 2.4
 │       ├── instructions
 │       │   └── tasks
 │       │       └── main.yml
-│       ├── journalbeat
-│       │   ├── files
-│       │   │   └── journalbeat.repo
-│       │   └── tasks
-│       │       └── main.yml
 │       ├── kibana
 │       │   ├── files
 │       │   │   ├── filebeat-dashboards.zip
@@ -166,5 +161,6 @@ git checkout 2.4
 └── meta
     └── main.yml
 
-35 directories, 36 files
+32 directories, 34 files
+
 ```
