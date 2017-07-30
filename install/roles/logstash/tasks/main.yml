@@ -62,6 +62,20 @@
     body_format: json
   ignore_errors: true
   become: true
+  when: not install_elasticsearch_xpack or not install_logstash_xpack or not install_kibana_xpack
+
+# X-Pack requires additional authentication
+- name: Load filebeat JSON index template (X-Pack enabled)
+  uri:
+    url: http://localhost:9200/_template/filebeat?pretty
+    method: POST
+    user: elastic
+    password: "{{xpack_elastic_user_password}}"
+    body: "{{ lookup('file', 'filebeat-index-template.json') }}"
+    body_format: json
+  ignore_errors: true
+  become: true
+  when: install_elasticsearch_xpack
 
 # we need TCP/80 and TCP/8080 open
 # determine firewall status and take action

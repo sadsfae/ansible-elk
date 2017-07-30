@@ -145,14 +145,30 @@
   until: es_service_result.status == 200
   retries: 50
   delay: 10
+  when: not install_elasticsearch_xpack
+
+# We will use a more generic check if x-pack is installed as it wraps everything
+# in additional authentication making it difficult to interpret HTTP status
+# codes via success/fail
+- name: Wait for elastic index to be available (X-Pack enabled only generic check)
+  wait_for:
+    host: localhost
+    port: 9200
+    delay: 10
+    connect_timeout: 5
+    timeout: 420
+    state: started
+  when: install_elasticsearch_xpack
 
 # We need to insert data to create an initial index, query if it exists
+# If X-Pack is enabled we will use another check below.
 - name: Check elasticsearch index for content
   uri:
     url=http://localhost:9200/_cat/indices
     method=GET
     return_content=yes
   register: elasticsearch_index
+  when: not install_elasticsearch_xpack
 
 # Make sure TCP/5000 is up and listening for logstash
 # logstash 5.x takes a long time to start for me

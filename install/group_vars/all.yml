@@ -63,6 +63,17 @@ install_curator_tool: false
 ## X-PACK
 # This installs an additional suite of tools from elastic
 # https://www.elastic.co/guide/en/x-pack/current/xpack-introduction.html
+# note: X-Pack will wrap ES with additional authentication, I do not
+# configure this for you, only install it.
+# most people will not need this for basic ELK usage.
+# default login/pass to Kibana for example is:
+# username: elastic
+# password: changeme
+# DO NOT CHANGE THIS UNLESS YOU CHANGE IT ON ES
+xpack_elastic_user_password: changeme
+# install elastic x-pack
 install_elasticsearch_xpack: false
+# install kibana x-pack
 install_kibana_xpack: false
+# install logstash x-pack
 install_logstash_xpack: false
