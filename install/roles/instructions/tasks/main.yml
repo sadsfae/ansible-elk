@@ -1,0 +1,28 @@
+
+---
+#
+# print informational messages
+#
+
+- name: Print SSL certificate post-setup information
+  debug: msg="Filebeat SSL Certificate available at http://{{ ansible_fqdn }}:{{ elk_server_ssl_cert_port }}/filebeat-forwarder.crt"
+  when: (logging_backend != 'fluentd')
+
+- name: Print SSL key post-setup information
+  debug: msg="Filebeat SSL Certificate key is located at http://{{ ansible_fqdn }}:{{ elk_server_ssl_cert_port }}/filebeat-forwarder.key"
+  when: (logging_backend != 'fluentd')
+
+- name: Print post-setup URL
+  debug: msg="*** ELK Services available at http://{{ ansible_fqdn }}:{{ nginx_kibana_port }} ***"
+
+- name: Print index creation instructions
+  debug: msg="*** 1) Navigate to http://{{ ansible_fqdn }}:{{ nginx_kibana_port }} and login with admin/admin ***"
+
+- name: Print Index creation more instructions
+  debug: msg="*** 2) Select '@timestamp' under 'Time-field name' and Click the blue CREATE button ***"
+
+- name: Print Navigation Instructions
+  debug: msg="*** 3) Click on Discover ***"
+
+- name: Print filebeat client setup instructions
+  debug: msg="*** 4) ansible-playbook -i hosts install/elk-client.yml --extra-vars 'elk_server={{ ansible_default_ipv4.address }}' to setup clients ***"

@@ -16,6 +16,7 @@ Ansible Playbook for setting up the ELK/EFK Stack and Filebeat client on remote 
        the same set of OpenStack-related logs in /var/log/*
      * All service ports can be modified in ```install/group_vars/all.yml```
      * Optionally install [curator](https://www.elastic.co/guide/en/elasticsearch/client/curator/current/index.html)
+     * Optionally install [Elastic X-Pack Suite](https://www.elastic.co/guide/en/x-pack/current/xpack-introduction.html)
      * This is also available on [Ansible Galaxy](https://galaxy.ansible.com/sadsfae/ansible-elk/)
 
 **Requirements**
@@ -24,7 +25,12 @@ Ansible Playbook for setting up the ELK/EFK Stack and Filebeat client on remote 
      - Fedora 23 or higher needs to have ```yum python2 python2-dnf libselinux-python``` packages.
        * You can run this against Fedora clients prior to running Ansible ELK:
        - ```ansible fedora-client-01 -u root -m shell -i hosts -a "dnf install yum python2 libsemanage-python python2-dnf -y"```
-   - Deployment tested on Ansible 1.9.4 and 2.0.2
+   - You may want to modify ```vm.swappiness``` as ELK/EFK is demanding and swapping kills the responsiveness.
+     - I am leaving this up to your judgement.
+```
+echo "vm.swappiness=10" >> /etc/sysctl.conf
+sysctl -p
+```
 
 **Notes**
    - Current ELK version is 5.5.x but you can checkout the 2.4 branch if you want that series
@@ -36,6 +42,10 @@ Ansible Playbook for setting up the ELK/EFK Stack and Filebeat client on remote 
    - Fluentd can be substituted for the default Logstash
      - Set ```logging_backend: fluentd``` in ```group_vars/all.yml```
    - Install curator by setting ```install_curator_tool: true``` in ```install/group_vars/all.yml```
+   - Install [Elastic X-Pack Suite](https://www.elastic.co/guide/en/x-pack/current/xpack-introduction.html) for Elasticsearch, LogStash or Kibana via:
+     - ```install_elasticsearch_xpack: true```
+     - ```install_kibana_xpack: true```
+     - ```install_logstash_xpack: true```
 
 **ELK Server Instructions**
    - Clone repo and setup your hosts file
@@ -85,63 +95,76 @@ git checkout 2.4
 ```
 .
 ├── hosts
-└── install
-    ├── elk-client.yml
-    ├── elk.yml
-    ├── group_vars
-    │   └── all.yml
-    └── roles
-        ├── curator
-        │   ├── files
-        │   │   └── curator.repo
-        │   └── tasks
-        │       └── main.yml
-        ├── elasticsearch
-        │   ├── files
-        │   │   ├── elasticsearch.in.sh
-        │   │   └── elasticsearch.repo
-        │   └── tasks
-        │       └── main.yml
-        ├── filebeat
-        │   ├── files
-        │   │   └── filebeat.repo
-        │   ├── tasks
-        │   │   └── main.yml
-        │   └── templates
-        │       ├── filebeat.yml.j2
-        │       └── rsyslog-openstack.conf.j2
-        ├── fluentd
-        │   ├── files
-        │   │   ├── filebeat-index-template.json
-        │   │   └── fluentd.repo
-        │   ├── tasks
-        │   │   └── main.yml
-        │   └── templates
-        │       ├── openssl_extras.cnf.j2
-        │       └── td-agent.conf.j2
-        ├── kibana
-        │   ├── files
-        │   │   ├── filebeat-dashboards.zip
-        │   │   ├── kibana.repo
-        │   │   └── logstash.repo
-        │   └── tasks
-        │       └── main.yml
-        ├── logstash
-        │   ├── files
-        │   │   ├── filebeat-index-template.json
-        │   │   └── logstash.repo
-        │   ├── tasks
-        │   │   └── main.yml
-        │   └── templates
-        │       ├── 02-beats-input.conf.j2
-        │       ├── logstash.conf.j2
-        │       └── openssl_extras.cnf.j2
-        └── nginx
-            ├── tasks
-            │   └── main.yml
-            └── templates
-                ├── kibana.conf.j2
-                └── nginx.conf.j2
+├── install
+│   ├── elk-client.yml
+│   ├── elk.yml
+│   ├── group_vars
+│   │   └── all.yml
+│   └── roles
+│       ├── curator
+│       │   ├── files
+│       │   │   └── curator.repo
+│       │   └── tasks
+│       │       └── main.yml
+│       ├── elasticsearch
+│       │   ├── files
+│       │   │   ├── elasticsearch.in.sh
+│       │   │   └── elasticsearch.repo
+│       │   └── tasks
+│       │       └── main.yml
+│       ├── filebeat
+│       │   ├── files
+│       │   │   └── filebeat.repo
+│       │   ├── tasks
+│       │   │   └── main.yml
+│       │   └── templates
+│       │       ├── filebeat.yml.j2
+│       │       └── rsyslog-openstack.conf.j2
+│       ├── fluentd
+│       │   ├── files
+│       │   │   ├── filebeat-index-template.json
+│       │   │   └── fluentd.repo
+│       │   ├── tasks
+│       │   │   └── main.yml
+│       │   └── templates
+│       │       ├── openssl_extras.cnf.j2
+│       │       └── td-agent.conf.j2
+│       ├── instructions
+│       │   └── tasks
+│       │       └── main.yml
+│       ├── journalbeat
+│       │   ├── files
+│       │   │   └── journalbeat.repo
+│       │   └── tasks
+│       │       └── main.yml
+│       ├── kibana
+│       │   ├── files
+│       │   │   ├── filebeat-dashboards.zip
+│       │   │   ├── kibana.repo
+│       │   │   └── logstash.repo
+│       │   └── tasks
+│       │       └── main.yml
+│       ├── logstash
+│       │   ├── files
+│       │   │   ├── filebeat-index-template.json
+│       │   │   └── logstash.repo
+│       │   ├── tasks
+│       │   │   └── main.yml
+│       │   └── templates
+│       │       ├── 02-beats-input.conf.j2
+│       │       ├── logstash.conf.j2
+│       │       └── openssl_extras.cnf.j2
+│       ├── nginx
+│       │   ├── tasks
+│       │   │   └── main.yml
+│       │   └── templates
+│       │       ├── kibana.conf.j2
+│       │       └── nginx.conf.j2
+│       └── xpack
+│           └── tasks
+│               └── main.yml
+└── meta
+    └── main.yml
 
-27 directories, 31 files
+35 directories, 36 files
 ```

@@ -60,3 +60,9 @@ es_listen_external: false
 # default is no (set to blank) or false
 # set the below variable to 'true' to activate
 install_curator_tool: false
+## X-PACK
+# This installs an additional suite of tools from elastic
+# https://www.elastic.co/guide/en/x-pack/current/xpack-introduction.html
+install_elasticsearch_xpack: false
+install_kibana_xpack: false
+install_logstash_xpack: false

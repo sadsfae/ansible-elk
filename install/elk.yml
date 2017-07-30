@@ -12,3 +12,5 @@
     - { role: nginx }
     - { role: curator, when: install_curator_tool }
     - { role: kibana }
+    - { role: xpack, when: ((install_elasticsearch_xpack) or (install_kibana_xpack) or (install_logstash_xpack)) }
+    - { role: instructions }
