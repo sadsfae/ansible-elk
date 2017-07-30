@@ -46,6 +46,7 @@ sysctl -p
      - ```install_elasticsearch_xpack: true```
      - ```install_kibana_xpack: true```
      - ```install_logstash_xpack: true```
+     - Note: Deploying X-Pack will wrap your ES with additional authentication and security, Kibana for example will have it's own credentials now - the default is username: ```elastic``` and password: ```changeme```
 
 ## ELK/EFK Server Instructions
    - Clone repo and setup your hosts file

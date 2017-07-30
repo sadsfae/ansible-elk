@@ -155,12 +155,25 @@
   register: elasticsearch_index
 
 # Make sure TCP/5000 is up and listening for logstash
-# logstash 5.2.1 takes a long time to start for me
+# logstash 5.x takes a long time to start for me
 # leaving this set to 7minutes before giving up
 - name: Check for TCP/5000 logstash listener port, this may take a while
   wait_for:
     host: localhost
     port: 5000
+    delay: 10
+    connect_timeout: 5
+    timeout: 420
+    state: started
+  when: (logging_backend != 'fluentd')
+
+# Make sure TCP/5044 is up and listening for logstash
+# logstash 5.x takes a long time to start for me
+# leaving this set to 7minutes before giving up
+- name: Check for TCP/5044 logstash listener port, this may take a while
+  wait_for:
+    host: localhost
+    port: 5044
     delay: 10
     connect_timeout: 5
     timeout: 420
