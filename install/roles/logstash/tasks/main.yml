@@ -60,7 +60,11 @@
     method: POST
     body: "{{ lookup('file', 'filebeat-index-template.json') }}"
     body_format: json
-  ignore_errors: true
+    return_content: yes
+  register: filebeatJSON_output
+  until: '"json" in filebeatJSON_output and filebeatJSON_output.json.acknowledged == true'
+  retries: 30
+  delay: 10
   become: true
   when: not install_elasticsearch_xpack or not install_logstash_xpack or not install_kibana_xpack
 
@@ -73,7 +77,11 @@
     password: "{{xpack_elastic_user_password}}"
     body: "{{ lookup('file', 'filebeat-index-template.json') }}"
     body_format: json
-  ignore_errors: true
+    return_content: yes
+  register: filebeatJSON_output
+  until: '"json" in filebeatJSON_output and filebeatJSON_output.json.acknowledged == true'
+  retries: 30
+  delay: 10
   become: true
   when: install_elasticsearch_xpack
 
