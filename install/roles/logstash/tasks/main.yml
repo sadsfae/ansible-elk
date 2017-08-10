@@ -91,13 +91,19 @@
     backup: yes
   when: subjectAltName_exists.stdout|int == 0
 
+# Elasticsearch may still be starting at this point (depending on your system speed)
+# if we can't connect, wait a few seconds then try again
 - name: Load filebeat JSON index template
   uri:
     url: http://localhost:9200/_template/filebeat?pretty
     method: POST
     body: "{{ lookup('file', 'filebeat-index-template.json') }}"
     body_format: json
-  ignore_errors: true
+    return_content: yes
+  register: filebeatJSON_output
+  until: '"json" in filebeatJSON_output and filebeatJSON_output.json.acknowledged == true'
+  retries: 30
+  delay: 10
   become: true
 
 - name: Enable logstash service
