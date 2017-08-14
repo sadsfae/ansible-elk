@@ -22,6 +22,19 @@ filter {
   }
 }
 
+filter {
+  if [type] == "syslog" {
+    grok {
+      match => { "message" => "\A%{LOGLEVEL:log-level}%{SPACE}%{TIME:time}%{SPACE}%{NOTSPACE}%{SPACE}%{SYSLOG5424SD:server}%{GREEDYDATA:error`}" }
+      add_field => [ "received_at", "%{@timestamp}" ]
+      add_field => [ "received_from", "%{host}" ]
+    }
+    date {
+      match => [ "time", "MMM  d HH:mm:ss", "MMM dd HH:mm:ss" ]
+    }
+  }
+}
+
 output {
 elasticsearch { hosts => ["localhost:{{es_local_port}}"] }
 # uncomment this for debug messages
