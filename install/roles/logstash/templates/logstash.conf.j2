@@ -23,7 +23,7 @@ filter {
 }
 
 filter {
-  if [type] == "syslog" {
+  if [type] == "log" {
     grok {
       match => { "message" => "\A%{LOGLEVEL:log-level}%{SPACE}%{TIME:time}%{SPACE}%{NOTSPACE}%{SPACE}%{SYSLOG5424SD:server}%{GREEDYDATA:error`}" }
       add_field => [ "received_at", "%{@timestamp}" ]
