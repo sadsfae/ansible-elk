@@ -6,7 +6,7 @@
 - name: Check for libselinux-python installed
   yum: name=libselinux-python*
   become: true
-  register: libselinux-python_installed
+  register: libselinuxpython_installed
 
 - name: Copy elasticsearch yum repo file
   copy:
@@ -15,7 +15,7 @@
     owner=root
     group=root
     mode=0644
-  when: libselinux-python_installed
+  when: libselinuxpython_installed
   become: true
 
 - name: Install elasticsearch and openjdk
