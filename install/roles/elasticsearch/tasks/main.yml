@@ -5,7 +5,6 @@
 
 - name: Check for libselinux-python installed
   yum: name=libselinux-python*
-    state: latest
   become: true
   register: libselinux-python_installed
 
