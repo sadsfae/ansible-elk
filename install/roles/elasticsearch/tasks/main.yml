@@ -2,7 +2,6 @@
 #
 # Install/run elasticsearch
 #
-
 - name: Check for libselinux-python package
   yum: name=libselinux-python*
   state: latest
