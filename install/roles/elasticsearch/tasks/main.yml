@@ -19,6 +19,16 @@
     - elasticsearch
     - java-openjdk-headless
 
+- name: Copy templated elasticsearch.yml
+  template:
+    src=elasticsearch.yml.j2
+    dest=/etc/elasticsearch/elasticsearch.yml
+    owner=root
+    group=elasticsearch
+    mode=0660
+  become: true
+  ignore_errors: true
+
 - name: Check if system memory is greater than 64G
   debug: msg="System memory is {{ansible_memory_mb.real.total | int}} so setting heapsize to 32G upper limit"
   when: ansible_memory_mb.real.total|int >= 65536
