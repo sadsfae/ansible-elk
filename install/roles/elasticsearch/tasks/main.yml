@@ -3,6 +3,12 @@
 # Install/run elasticsearch
 #
 
+- name: Install libsemanage-python and dependencies
+  yum: name={{ item }} state=present
+  become: true
+  with_items:
+    - libsemanage-python
+
 - name: Copy elasticsearch yum repo file
   copy:
     src=elasticsearch.repo
