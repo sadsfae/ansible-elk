@@ -7,14 +7,13 @@
   yum: name={{epel_repo}}
       state=present
 
-- name: Install nginx, httpd-tools, httplib2, libsemanage-python
+- name: Install nginx, httpd-tools, httplib2
   yum: name={{ item }} state=present
   become: true
   with_items:
     - nginx
     - httpd-tools
     - python-httplib2
-    - libsemanage-python
 
 # SELinux boolean for nginx
 - name: Apply SELinux boolean httpd_can_network_connect
