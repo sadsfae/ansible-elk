@@ -5,12 +5,16 @@
 
 - hosts: elk
   remote_user: root
+  vars_files:
+    - group_vars/elk.yml
   roles:
+    - { role: yum }
+    #- { role: log-dir-mount }
     - { role: elasticsearch }
-    - { role: fluentd, when: (logging_backend == 'fluentd') }
     - { role: logstash, when: ((logging_backend is none) or (logging_backend == 'logstash')) }
     - { role: nginx }
     - { role: curator, when: install_curator_tool }
     - { role: kibana }
     - { role: xpack, when: ((install_elasticsearch_xpack) or (install_kibana_xpack) or (install_logstash_xpack)) }
     - { role: instructions }
+    - { roles: heartbeat }
