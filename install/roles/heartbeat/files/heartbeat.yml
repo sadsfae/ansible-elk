@@ -1,0 +1,16 @@
+heartbeat.monitors:
+- type: icmp
+  schedule: '*/5 * * * * * *'
+  hosts: ["host, host2, host3"]
+
+- type: http
+  schedule: '@every 5s'
+  urls: ["http://localhost:80/service/status"]
+  check.response.status: 200
+
+heartbeat.scheduler:
+  limit: 10
+
+
+output.logstash:
+  hosts: ["localhost:5044"]
