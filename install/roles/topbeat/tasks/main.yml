@@ -18,7 +18,7 @@
 - name: Generate filebeat configuration template
   template:
     src=topbeat.yml.j2
-    dest=/etc/filebeat/topbeat.yml
+    dest=/etc/topbeat/topbeat.yml
     owner=root
     group=root
     mode=0644

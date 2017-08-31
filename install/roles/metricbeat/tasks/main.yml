@@ -18,7 +18,7 @@
 - name: Generate metricbeat configuration template
   template:
     src=metricbeat.yml.j2
-    dest=/etc/filebeat/metricbeat.yml
+    dest=/etc/metricbeat/metricbeat.yml
     owner=root
     group=root
     mode=0644
