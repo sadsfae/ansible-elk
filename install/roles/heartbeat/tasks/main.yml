@@ -13,22 +13,22 @@
 
 - name: Generate filebeat configuration template
   template:
-    src=topbeat.yml.j2
-    dest=/etc/topbeat/topbeat.yml
+    src=heartbeat.yml.j2
+    dest=/etc/heartbeat/heartbeat.yml
     owner=root
     group=root
     mode=0644
   become: true
   when: (logging_backend != 'fluentd')
-  register: topbeat_needs_restart
+  register: heartbeat_needs_restart
 
-- name: Start topbeat service
-  command: systemctl start topbeat.service
+- name: Start heartbeat service
+  command: systemctl start heartbeat.service
   ignore_errors: true
   become: true
-  when: ((topbeat_needs_restart != 0) and (logging_backend != 'fluentd'))
+  when: ((heartbeat_needs_restart != 0) and (logging_backend != 'fluentd'))
 
-- name: Setup topbeat service
-  service: name=topbeat state=started enabled=true
+- name: Setup heartbeat service
+  service: name=heartbeat state=started enabled=true
   become: true
   when: (logging_backend != 'fluentd')
