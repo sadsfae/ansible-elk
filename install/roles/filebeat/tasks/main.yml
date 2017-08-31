@@ -2,22 +2,11 @@
 #
 # install/run filebeat elk client
 #
-
-- name: Copy filebeat yum repo file
-  copy:
-    src=filebeat.repo
-    dest=/etc/yum.repos.d/filebeat.repo
-    owner=root
-    group=root
-    mode=0644
-  when: (logging_backend != 'fluentd')
+- name: Check for libselinux-python installed
+  yum: name=libselinux-python*
   become: true
-
-- name: Import Filebeat GPG Key
-  rpm_key: key=http://packages.elastic.co/GPG-KEY-elasticsearch
-    state=present
-  when: (logging_backend != 'fluentd')
-
+  register: libselinuxpython_installed
+  
 - name: Install filebeat rpms
   yum: name={{ item }} state=present
   become: true
@@ -66,32 +55,3 @@
   service: name=filebeat state=started enabled=true
   become: true
   when: (logging_backend != 'fluentd')
-
-- name: Install rsyslogd for fluentd
-  yum: name={{ item }} state=present
-  become: true
-  with_items:
-    - rsyslog
-  when: (logging_backend == 'fluentd')
-
-- name: Setup rsyslogd for fluentd
-  lineinfile: dest=/etc/rsyslog.conf \
-          line="*.* @{{ elk_server }}:{{ fluentd_syslog_port }}"
-  when: (logging_backend == 'fluentd')
-  register: rsyslog_updated
-
-- name: Setup common OpenStack rsyslog logging
-  template:
-    src=rsyslog-openstack.conf.j2
-    dest=/etc/rsyslog.d/openstack-logs.conf
-    owner=root
-    group=root
-    mode=0644
-  become: true
-  register: rsyslog_updated
-  when: (logging_backend == 'fluentd')
-
-- name: Restarting rsyslog for fluentd
-  command: systemctl restart rsyslog.service
-  ignore_errors: true
-  when: rsyslog_updated != 0
