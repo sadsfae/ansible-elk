@@ -20,10 +20,10 @@
     state=present
 
 
-#- name: Check ELK server SSL client certificate
-#  stat: path=/etc/elk/beat-forwarder.crt
-#  ignore_errors: true
-#  register: elk_client_ssl_cert_exists
+- name: Check ELK server SSL client certificate
+  stat: path=/etc/elk/beat-forwarder.crt
+  ignore_errors: true
+  register: elk_client_ssl_cert_exists
 
 
 - name: Install ELK server SSL client certificate
@@ -31,11 +31,11 @@
     url=http://{{ elk_server }}:{{ elk_server_ssl_cert_port }}/beat-forwarder.crt
     dest=/etc/elk/beat-forwarder.crt
   become: true
- # when: (elk_client_ssl_cert_exists != 0)
+  when: (elk_client_ssl_cert_exists != 0)
 
 - name: Install ELK server SSL client certificate
   get_url:
     url=http://{{ elk_server }}:{{ elk_server_ssl_cert_port }}/beat-forwarder.key
     dest=/etc/elk/beat-forwarder.key
   become: true
-  #when: (elk_client_ssl_cert_exists != 0)
+  when: (elk_client_ssl_cert_exists != 0)
