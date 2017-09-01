@@ -22,8 +22,14 @@
   register: beat_needs_restart
   when: (logging_backend != 'fluentd')
 
+- name: check /etc/beats exists
+  file:
+    path: /etc/{{beat}}
+    state: directory
+    mode: 0755
+
 - name: Check ELK server SSL client certificate
-  stat: path=/etc/pki/tls/certs/beat-forwarder.crt
+  stat: path=/etc/beat/beat-forwarder.crt
   ignore_errors: true
   register: elk_client_ssl_cert_exists
   when: (logging_backend != 'fluentd')
