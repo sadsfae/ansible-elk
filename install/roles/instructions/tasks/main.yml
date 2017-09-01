@@ -28,5 +28,5 @@
 - name: Print Navigation Instructions
   debug: msg="*** 3) Click on Discover ***"
 
-- name: Print filebeat client setup instructions
+- name: Print Beats client setup instructions
   debug: msg="*** 4) ansible-playbook -i hosts install/elk-client.yml --extra-vars 'elk_server={{ ansible_default_ipv4.address }}' to setup clients ***"

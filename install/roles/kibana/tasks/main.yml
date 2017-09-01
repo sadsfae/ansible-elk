@@ -81,7 +81,7 @@
 - name: Check Filebeat forwarder SSL certificate
   stat: path=/usr/share/logstash/beat-forwarder.crt
   ignore_errors: true
-  register: filebeat_forwarder_ssl_exists
+  register: beat_forwarder_ssl_exists
 
 - name: Create SSL structure for Fluentd installs
   file:
@@ -94,22 +94,22 @@
     -x509 -days 3650 -batch -nodes -newkey rsa:2048 -keyout /usr/share/logstash/beat-forwarder.key \
     -out /usr/share/logstash/beat-forwarder.crt
   ignore_errors: true
-  when: filebeat_forwarder_ssl_exists != 0
+  when: beat_forwarder_ssl_exists != 0
 
 - name: Check Filebeat forwarder SSL certificate copy
   stat: path=/usr/share/nginx/html/beat-forwarder.crt
   ignore_errors: true
-  register: filebeat_forwarder_ssl_client_copy_exists
+  register: beat_forwarder_ssl_client_copy_exists
 
 - name: Copy Filebeat forwarder SSL certificate
   command: cp /usr/share/logstash/beat-forwarder.crt /usr/share/nginx/html/beat-forwarder.crt
   ignore_errors: true
-  when: filebeat_forwarder_ssl_client_copy_exists != 0
+  when: beat_forwarder_ssl_client_copy_exists != 0
 
 - name: Copy Filebeat forwarder SSL certificate key
   command: cp /usr/share/logstash/beat-forwarder.key /usr/share/nginx/html/beat-forwarder.key
   ignore_errors: true
-  when: filebeat_forwarder_ssl_client_copy_exists != 0
+  when: beat_forwarder_ssl_client_copy_exists != 0
 
 - name: Set permissions on logstash certificate
   file:
