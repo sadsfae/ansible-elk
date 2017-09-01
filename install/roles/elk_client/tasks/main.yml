@@ -20,7 +20,7 @@
 
 
 - name: Check ELK server SSL client certificate
-  stat: path=/etc/pki/tls/certs/filebeat-forwarder.crt
+  stat: path=/etc/pki/tls/certs/beat-forwarder.crt
   ignore_errors: true
   register: elk_client_ssl_cert_exists
 
