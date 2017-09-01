@@ -13,26 +13,75 @@
 - name: Generate filebeat configuration template
   template:
     src={{ beat }}.yml.j2
-    dest=/etc/filebeat/{{ beat }}.yml
+    dest=/etc/{{ beat }}/{{ beat }}.yml
     owner=root
     group=root
     mode=0644
   become: true
   register: beat_needs_restart
 
+- name: Check ELK server SSL client certificate
+  stat: path=/etc/pki/tls/certs/beat-forwarder.crt
+  ignore_errors: true
+  register: elk_client_ssl_cert_exists
+  when: (logging_backend != 'fluentd')
+
+- name: Install ELK server SSL client certificate
+  get_url:
+    url=http://{{ elk_server }}:{{ elk_server_ssl_cert_port }}/beat-forwarder.crt
+    dest=/etc/beat/beat-forwarder.crt
+  become: true
+  when: ((elk_client_ssl_cert_exists != 0) and (logging_backend != 'fluentd'))
+
+- name: Install ELK server SSL client certificate
+  get_url:
+    url=http://{{ elk_server }}:{{ elk_server_ssl_cert_port }}/beat-forwarder.key
+    dest=/etc/beat/beat-forwarder.key
+  become: true
+  when: ((elk_client_ssl_cert_exists != 0) and (logging_backend != 'fluentd'))
+
 - name: Enable {{ beat }} service (CentOS 6)
   command: chkconfig --add {{ beat }}
   ignore_errors: true
   become: true
-  when: ((beat_needs_restart != 0) and (ansible_distribution == 'CentOS' and ansible_distribution_version == '6.*'))
+  when: ((beat_needs_restart != 0) and (ansible_distribution == 'CentOS' and ansible_distribution_version == '6.*') and (logging_backend != 'fluentd'))
 
 - name: Start {{beat}} service (CentOS 6)
   command: service start {{ beat }}
   ignore_errors: true
   become: true
-  when: ((beat_needs_restart != 0) and (ansible_distribution == 'CentOS' and ansible_distribution_version == '6.*'))
+  when: ((beat_needs_restart != 0) and (ansible_distribution == 'CentOS' and ansible_distribution_version == '6.*') and (logging_backend != 'fluentd'))
 
 - name: Setup {{ beat }} service (CentOS 7)
   service: name={{ beat }} state=started enabled=true
   become: true
-  when: ((beat_needs_restart != 0) and (ansible_distribution == 'CentOS' and ansible_distribution_version == '7.*'))
+  when: ((beat_needs_restart != 0) and (ansible_distribution == 'CentOS' and ansible_distribution_version == '7.*') and (logging_backend != 'fluentd'))
+
+- name: Install rsyslogd for fluentd
+  yum: name={{ item }} state=present
+  become: true
+  with_items:
+    - rsyslog
+  when: ((logging_backend == 'fluentd') and (beat == 'filebeat'))
+
+- name: Setup rsyslogd for fluentd
+  lineinfile: dest=/etc/rsyslog.conf \
+          line="*.* @{{ elk_server }}:{{ fluentd_syslog_port }}"
+  when: ((logging_backend == 'fluentd')  and (beat == 'filebeat'))
+  register: rsyslog_updated
+
+- name: Setup common OpenStack rsyslog logging
+  template:
+    src=rsyslog-openstack.conf.j2
+    dest=/etc/rsyslog.d/openstack-logs.conf
+    owner=root
+    group=root
+    mode=0644
+  become: true
+  register: rsyslog_updated
+  when: ((logging_backend == 'fluentd') and (beat == 'filebeat'))
+
+- name: Restarting rsyslog for fluentd
+  command: systemctl restart rsyslog.service
+  ignore_errors: true
+  when: ((rsyslog_updated != 0)  and (beat == 'filebeat'))
