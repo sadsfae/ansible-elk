@@ -9,6 +9,7 @@
   with_items:
     - "{{ beat }}"
     - libselinuxpython_installed
+  when: (logging_backend != 'fluentd')
 
 - name: Generate filebeat configuration template
   template:
@@ -19,6 +20,7 @@
     mode=0644
   become: true
   register: beat_needs_restart
+  when: (logging_backend != 'fluentd')
 
 - name: Check ELK server SSL client certificate
   stat: path=/etc/pki/tls/certs/beat-forwarder.crt
@@ -84,4 +86,4 @@
 - name: Restarting rsyslog for fluentd
   command: systemctl restart rsyslog.service
   ignore_errors: true
-  when: ((rsyslog_updated != 0)  and (beat == 'filebeat'))
+  when: ((rsyslog_updated != 0)  and (beat == 'filebeat') and (logging_backend == 'fluentd'))
