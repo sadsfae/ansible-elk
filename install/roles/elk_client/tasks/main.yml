@@ -1,0 +1,40 @@
+---
+
+- name: Copy ElasticSearch yum repo file
+  copy:
+    src=elk.repo
+    dest=/etc/yum.repos.d/elk.repo
+    owner=root
+    group=root
+    mode=0644
+  become: true
+
+- file:
+    path: /etc/elk
+    state: directory
+    mode: 0755
+
+- name: Import ElasticSearch GPG Key
+  rpm_key: key=http://packages.elastic.co/GPG-KEY-elasticsearch
+    state=present
+
+
+- name: Check ELK server SSL client certificate
+  stat: path=/etc/pki/tls/certs/beat-forwarder.crt
+  ignore_errors: true
+  register: elk_client_ssl_cert_exists
+
+
+- name: Install ELK server SSL client certificate
+  get_url:
+    url=http://{{ elk_server }}:{{ elk_server_ssl_cert_port }}/beat-forwarder.crt
+    dest=/etc/elk/beat-forwarder.crt
+  become: true
+  when: (elk_client_ssl_cert_exists != 0)
+
+- name: Install ELK server SSL client certificate
+  get_url:
+    url=http://{{ elk_server }}:{{ elk_server_ssl_cert_port }}/filebeat-forwarder.key
+    dest=/etc/elk/beat-forwarder.key
+  become: true
+  when: (elk_client_ssl_cert_exists != 0)

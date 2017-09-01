@@ -7,3 +7,6 @@
   remote_user: root
   roles:
     - { role: filebeat }
+    - { role: topbeat }
+    - { role: metricbeat }
+    - { role: packetbeat }

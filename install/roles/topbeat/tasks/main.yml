@@ -1,0 +1,38 @@
+---
+#
+# install/run topbeat elk client
+#
+
+- name: Check for libselinux-python installed
+  yum: name=libselinux-python*
+  become: true
+  register: libselinuxpython_installed
+  
+- name: Install topbeat rpms
+  yum: name={{ item }} state=present
+  become: true
+  with_items:
+    - topbeat
+  when: (logging_backend != 'fluentd')
+
+- name: Generate filebeat configuration template
+  template:
+    src=topbeat.yml.j2
+    dest=/etc/topbeat/topbeat.yml
+    owner=root
+    group=root
+    mode=0644
+  become: true
+  when: (logging_backend != 'fluentd')
+  register: topbeat_needs_restart
+
+- name: Start topbeat service
+  command: systemctl start topbeat.service
+  ignore_errors: true
+  become: true
+  when: ((topbeat_needs_restart != 0) and (logging_backend != 'fluentd'))
+
+- name: Setup topbeat service
+  service: name=topbeat state=started enabled=true
+  become: true
+  when: (logging_backend != 'fluentd')
