@@ -22,9 +22,9 @@
   register: beat_needs_restart
   when: (logging_backend != 'fluentd')
 
-- name: check /etc/beats exists
+- name: check /etc/beat exists
   file:
-    path: /etc/{{beat}}
+    path: /etc/beat
     state: directory
     mode: 0755
 
