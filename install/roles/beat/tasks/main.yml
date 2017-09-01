@@ -52,18 +52,18 @@
   command: chkconfig --add {{ beat }}
   ignore_errors: true
   become: true
-  when: ((beat_needs_restart != 0) and (ansible_distribution == 'CentOS' and ansible_distribution_version == '6.*') and (logging_backend != 'fluentd'))
+  when: ((beat_needs_restart != 0) and (ansible_distribution == 'CentOS' and ansible_distribution_version == '6') and (logging_backend != 'fluentd'))
 
 - name: Start {{beat}} service (CentOS 6)
   command: service start {{ beat }}
   ignore_errors: true
   become: true
-  when: ((beat_needs_restart != 0) and (ansible_distribution == 'CentOS' and ansible_distribution_version == '6.*') and (logging_backend != 'fluentd'))
+  when: ((beat_needs_restart != 0) and (ansible_distribution == 'CentOS' and ansible_distribution_version == '6') and (logging_backend != 'fluentd'))
 
 - name: Setup {{ beat }} service (CentOS 7)
   service: name={{ beat }} state=started enabled=true
   become: true
-  when: ((beat_needs_restart != 0) and (ansible_distribution == 'CentOS' and ansible_distribution_version == '7.*') and (logging_backend != 'fluentd'))
+  when: ((beat_needs_restart != 0) and (ansible_distribution == 'CentOS' and ansible_distribution_version == '7') and (logging_backend != 'fluentd'))
 
 - name: Install rsyslogd for fluentd
   yum: name={{ item }} state=present
