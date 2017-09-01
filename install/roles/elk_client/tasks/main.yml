@@ -7,8 +7,12 @@
     owner=root
     group=root
     mode=0644
-
   become: true
+
+- file:
+    path: /etc/elk
+    state: directory
+    mode: 0755
 
 - name: Import ElasticSearch GPG Key
   rpm_key: key=http://packages.elastic.co/GPG-KEY-elasticsearch
@@ -23,14 +27,14 @@
 
 - name: Install ELK server SSL client certificate
   get_url:
-    url=http://{{ elk_server }}:{{ elk_server_ssl_cert_port }}/filebeat-forwarder.crt
-    dest=/etc/filebeat/filebeat-forwarder.crt
+    url=http://{{ elk_server }}:{{ elk_server_ssl_cert_port }}/beat-forwarder.crt
+    dest=/etc/elk/beat-forwarder.crt
   become: true
   when: (elk_client_ssl_cert_exists != 0)
 
 - name: Install ELK server SSL client certificate
   get_url:
     url=http://{{ elk_server }}:{{ elk_server_ssl_cert_port }}/filebeat-forwarder.key
-    dest=/etc/filebeat/filebeat-forwarder.key
+    dest=/etc/elk/beat-forwarder.key
   become: true
   when: (elk_client_ssl_cert_exists != 0)
