@@ -1,0 +1,91 @@
+metricbeat.modules:
+- module: system
+  metricsets:
+    #Per CPU Stats
+    - cpu
+    #Per FileSystem Stats
+    #- filesystem
+    #Memory Stats
+    - memory
+    #Network Statistics
+    #- network
+    #Per Process Statistics
+    #- process
+    # IO stats
+    #- diskio
+  enabled: true
+  period: 10s
+  processes: ['.*']
+  cpu_ticks: false
+
+
+
+output:
+
+  ### Elasticsearch as output
+  #elasticsearch:
+  logstash:
+    # Array of hosts to connect to.
+    # Scheme and port can be left out and will be set to the default (http and 9200)
+    # In case you specify and additional path, the scheme is required: http://localhost:9200/path
+    # IPv6 addresses should always be defined as: https://[2001:db8::1]:9200
+    hosts: ["{{ elk_server }}:{{ logstash_beats_port }}"]
+    bulk_max_size: 1024
+
+    template.name: "metricbeat"
+    template.path: "metricbeat.template.json"
+    template.overwrite: false
+
+    index: "metricbeat"
+
+############################# Shipper #########################################
+
+shipper:
+  # The name of the shipper that publishes the network data. It can be used to group
+  # all the transactions sent by a single shipper in the web interface.
+  # If this options is not defined, the hostname is used.
+  #name:
+
+  # The tags of the shipper are included in their own field with each
+  # transaction published. Tags make it easy to group servers by different
+  # logical properties.
+  #tags: ["service-X", "web-tier"]
+
+  # Uncomment the following if you want to ignore transactions created
+  # by the server on which the shipper is installed. This option is useful
+  # to remove duplicates if shippers are installed on multiple servers.
+  #ignore_outgoing: true
+
+  # How often (in seconds) shippers are publishing their IPs to the topology map.
+  # The default is 10 seconds.
+  #refresh_topology_freq: 10
+
+  # Expiration time (in seconds) of the IPs published by a shipper to the topology map.
+  # All the IPs will be deleted afterwards. Note, that the value must be higher than
+  # refresh_topology_freq. The default is 15 seconds.
+  #topology_expire: 15
+
+  # Configure local GeoIP database support.
+  # If no paths are not configured geoip is disabled.
+  #geoip:
+    #paths:
+    #  - "/usr/share/GeoIP/GeoLiteCity.dat"
+    #  - "/usr/local/var/GeoIP/GeoLiteCity.dat"
+
+
+#================================ Logging =====================================
+
+# Sets log level. The default log level is info.
+# Available log levels are: critical, error, warning, info, debug
+#logging.level: debug
+
+# At debug level, you can selectively enable logging only for some components.
+# To enable all selectors use ["*"]. Examples of other selectors are "beat",
+# "publish", "service".
+#logging.selectors: ["*"]
+
+logging.to_files: true
+logging.files:
+  path: /var/log/mybeat
+  name: metricbeat.log
+  keepfiles: 7

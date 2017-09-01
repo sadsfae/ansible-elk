@@ -1,0 +1,38 @@
+---
+#
+# install/run filebeat elk client
+#
+  
+- name: Install filebeat and libsellinux-python rpms
+  yum: name={{ item }} state=present
+  become: true
+  with_items:
+    - "{{ beat }}"
+    - libselinuxpython_installed
+
+- name: Generate filebeat configuration template
+  template:
+    src={{ beat }}.yml.j2
+    dest=/etc/filebeat/{{ beat }}.yml
+    owner=root
+    group=root
+    mode=0644
+  become: true
+  register: beat_needs_restart
+
+- name: Enable {{ beat }} service (CentOS 6)
+  command: chkconfig --add {{ beat }}
+  ignore_errors: true
+  become: true
+  when: ((beat_needs_restart != 0) and (ansible_distribution == 'CentOS' and ansible_distribution_version == '6.*'))
+
+- name: Start {{beat}} service (CentOS 6)
+  command: service start {{ beat }}
+  ignore_errors: true
+  become: true
+  when: ((beat_needs_restart != 0) and (ansible_distribution == 'CentOS' and ansible_distribution_version == '6.*'))
+
+- name: Setup {{ beat }} service (CentOS 7)
+  service: name={{ beat }} state=started enabled=true
+  become: true
+  when: ((beat_needs_restart != 0) and (ansible_distribution == 'CentOS' and ansible_distribution_version == '7.*'))
