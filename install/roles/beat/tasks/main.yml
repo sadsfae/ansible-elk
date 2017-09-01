@@ -8,7 +8,7 @@
   become: true
   with_items:
     - "{{ beat }}"
-    - libselinuxpython_installed
+    - libselinux-python
   when: (logging_backend != 'fluentd')
 
 - name: Generate Beat configuration template
