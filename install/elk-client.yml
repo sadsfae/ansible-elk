@@ -1,9 +1,12 @@
 ---
 #
-# Playbook to install the ELK stack
+# Playbook to install the beats requested
 #
 
 - hosts: elk-client
   remote_user: root
+  vars_files:
+    - group_vars/elk.yml
   roles:
-    - { role: filebeat }
+    - { role: yum, when: (ansible_distribution == 'CentOS') }
+    - { role: beat }

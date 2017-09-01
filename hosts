@@ -1,6 +1,12 @@
 [elk]
 host-01
 
+[elk-client:children]
+metricbeat
+packetbeat
+filebeat
+heartbeat
+
 #For servers that need metricbeat installed (measures CPU, memory, network usage, etc.).
 [metricbeat]
 host-02
