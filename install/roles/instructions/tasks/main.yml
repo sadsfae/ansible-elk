@@ -5,11 +5,11 @@
 #
 
 - name: Print SSL certificate post-setup information
-  debug: msg="Filebeat SSL Certificate available at http://{{ ansible_fqdn }}:{{ elk_server_ssl_cert_port }}/filebeat-forwarder.crt"
+  debug: msg="Beats SSL Certificate available at http://{{ ansible_fqdn }}:{{ elk_server_ssl_cert_port }}/beat-forwarder.crt"
   when: (logging_backend != 'fluentd')
 
 - name: Print SSL key post-setup information
-  debug: msg="Filebeat SSL Certificate key is located at http://{{ ansible_fqdn }}:{{ elk_server_ssl_cert_port }}/filebeat-forwarder.key"
+  debug: msg="Beats SSL Certificate key is located at http://{{ ansible_fqdn }}:{{ elk_server_ssl_cert_port }}/beat-forwarder.key"
   when: (logging_backend != 'fluentd')
 
 - name: Print post-setup URL
@@ -28,5 +28,5 @@
 - name: Print Navigation Instructions
   debug: msg="*** 3) Click on Discover ***"
 
-- name: Print filebeat client setup instructions
+- name: Print Beats client setup instructions
   debug: msg="*** 4) ansible-playbook -i hosts install/elk-client.yml --extra-vars 'elk_server={{ ansible_default_ipv4.address }}' to setup clients ***"

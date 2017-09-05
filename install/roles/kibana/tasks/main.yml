@@ -79,9 +79,9 @@
   become: true
 
 - name: Check Filebeat forwarder SSL certificate
-  stat: path=/usr/share/logstash/filebeat-forwarder.crt
+  stat: path=/usr/share/logstash/beat-forwarder.crt
   ignore_errors: true
-  register: filebeat_forwarder_ssl_exists
+  register: beat_forwarder_ssl_exists
 
 - name: Create SSL structure for Fluentd installs
   file:
@@ -91,29 +91,29 @@
 
 - name: Create client forwarder SSL certificate
   command: openssl req -subj '/CN={{ ansible_fqdn }}/' -config /etc/pki/tls/openssl_extras.cnf \
-    -x509 -days 3650 -batch -nodes -newkey rsa:2048 -keyout /usr/share/logstash/filebeat-forwarder.key \
-    -out /usr/share/logstash/filebeat-forwarder.crt
+    -x509 -days 3650 -batch -nodes -newkey rsa:2048 -keyout /usr/share/logstash/beat-forwarder.key \
+    -out /usr/share/logstash/beat-forwarder.crt
   ignore_errors: true
-  when: filebeat_forwarder_ssl_exists != 0
+  when: beat_forwarder_ssl_exists != 0
 
 - name: Check Filebeat forwarder SSL certificate copy
-  stat: path=/usr/share/nginx/html/filebeat-forwarder.crt
+  stat: path=/usr/share/nginx/html/beat-forwarder.crt
   ignore_errors: true
-  register: filebeat_forwarder_ssl_client_copy_exists
+  register: beat_forwarder_ssl_client_copy_exists
 
 - name: Copy Filebeat forwarder SSL certificate
-  command: cp /usr/share/logstash/filebeat-forwarder.crt /usr/share/nginx/html/filebeat-forwarder.crt
+  command: cp /usr/share/logstash/beat-forwarder.crt /usr/share/nginx/html/beat-forwarder.crt
   ignore_errors: true
-  when: filebeat_forwarder_ssl_client_copy_exists != 0
+  when: beat_forwarder_ssl_client_copy_exists != 0
 
 - name: Copy Filebeat forwarder SSL certificate key
-  command: cp /usr/share/logstash/filebeat-forwarder.key /usr/share/nginx/html/filebeat-forwarder.key
+  command: cp /usr/share/logstash/beat-forwarder.key /usr/share/nginx/html/beat-forwarder.key
   ignore_errors: true
-  when: filebeat_forwarder_ssl_client_copy_exists != 0
+  when: beat_forwarder_ssl_client_copy_exists != 0
 
 - name: Set permissions on logstash certificate
   file:
-    path: /usr/share/logstash/filebeat-forwarder.crt
+    path: /usr/share/logstash/beat-forwarder.crt
     owner: logstash
     group: logstash
     mode: 0600
@@ -121,7 +121,7 @@
 
 - name: Set permissions on logstash certificate key
   file:
-    path: /usr/share/logstash/filebeat-forwarder.key
+    path: /usr/share/logstash/beat-forwarder.key
     owner: logstash
     group: logstash
     mode: 0600

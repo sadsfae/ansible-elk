@@ -2,10 +2,15 @@
 #
 # Install/run nginx
 #
+- name: Check/Install EPEL Repo for nginx
+  yum: name={{epel_repo_6}}
+      state=present
+  when: ((ansible_distribution == 'CentOS' and ansible_distribution_version == '6'))
 
 - name: Check/Install EPEL Repo for nginx
-  yum: name={{epel_repo}}
+  yum: name={{epel_repo_7}}
       state=present
+  when: ((ansible_distribution == 'CentOS' and ansible_distribution_version > '6'))
 
 - name: Install nginx, httpd-tools, httplib2
   yum: name={{ item }} state=present
