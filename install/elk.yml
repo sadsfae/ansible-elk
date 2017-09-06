@@ -5,6 +5,8 @@
 
 - hosts: elk
   remote_user: root
+  vars_files:
+    - group_vars/all.yml
   roles:
     - { role: elasticsearch }
     - { role: fluentd, when: (logging_backend == 'fluentd') }
