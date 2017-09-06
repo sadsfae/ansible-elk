@@ -1,38 +1,13 @@
 ---
 #
-# Playbook to install the ELK Beats
+# Playbook to install the ELK client utilities
 #
 
-- hosts: metricbeat
+- hosts: elk-client
   remote_user: root
   vars_files:
-    - group_vars/elk.yml
+    - group_vars/all.yml
   roles:
-  #  - { role: yum, when: (ansible_distribution == 'CentOS') }
-    - { role: beat }
-
-- hosts: heartbeat
-  remote_user: root
-  vars_files:
-    - group_vars/elk.yml
-  roles:
-  #  - { role: yum, when: (ansible_distribution == 'CentOS') }
-    - { role: beat }
-
-
-- hosts: filebeat
-  remote_user: root
-  vars_files:
-    - group_vars/elk.yml
-  roles:
-  #  - { role: yum, when: (ansible_distribution == 'CentOS') }
-    - { role: beat }
-
-
-- hosts: packetbeat
-  remote_user: root
-  vars_files:
-    - group_vars/elk.yml
-  roles:
-  #  - { role: yum, when: (ansible_distribution == 'CentOS') }
-    - { role: beat }
+    - { role: filebeat, when: (install_filebeat)}
+    - { role: metricbeat, when: (install_metricbeat)}
+    - { role: packetbeat, when: (install_packetbeat)}
