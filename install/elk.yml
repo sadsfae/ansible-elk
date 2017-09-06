@@ -5,6 +5,8 @@
 
 - hosts: elk
   remote_user: root
+  vars_files:
+    - group_vars/all.yml
   roles:
     - { role: elasticsearch }
     - { role: fluentd, when: (logging_backend == 'fluentd') }
@@ -14,3 +16,4 @@
     - { role: kibana }
     - { role: xpack, when: ((install_elasticsearch_xpack) or (install_kibana_xpack) or (install_logstash_xpack)) }
     - { role: instructions }
+    - { role: heartbeat, when: (install_heartbeat)}
