@@ -1,10 +1,7 @@
 ---
 
-
 # EPEL Repository for extra packages
-epel_repo_7: https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
-
-epel_repo_6: https://dl.fedoraproject.org/pub/epel/epel-release-latest-6.noarch.rpm
+epel_repo: https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
 
 ########################################
 # ELK Server Variables
@@ -41,7 +38,6 @@ logging_backend:
 ### logstash options ###
 logstash_syslog_port: 5044
 logstash_localsyslog_port: 5000
-logstash_beats_port: 10200
 ### rsyslog options
 # set this to true if you want to accept
 # external syslog traffic
@@ -81,3 +77,14 @@ install_elasticsearch_xpack: false
 install_kibana_xpack: false
 # install logstash x-pack
 install_logstash_xpack: false
+
+#Install Metricbeat
+install_metricbeat: false
+#Install Packetbeat
+install_packetbeat: false
+#Install Filebeat
+install_filebeat: false
+
+#This should be installed on only one server in your environment.
+#Install Heartbeat
+install_heartbeat: false

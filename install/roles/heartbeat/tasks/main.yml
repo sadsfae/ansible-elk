@@ -1,0 +1,32 @@
+---
+#
+# install/run heartbeatbeat elk client
+#
+- name: Install heartbeat rpms
+  yum: name={{ item }} state=present
+  become: true
+  with_items:
+    - heartbeat
+  when: (logging_backend != 'fluentd')
+
+- name: Generate heartbeat configuration template
+  template:
+    src=heartbeat.yml.j2
+    dest=/etc/heartbeat/heartbeat.yml
+    owner=root
+    group=root
+    mode=0644
+  become: true
+  when: (logging_backend != 'fluentd')
+  register: heartbeat_needs_restart
+
+- name: Start heartbeat service
+  command: systemctl start heartbeat.service
+  ignore_errors: true
+  become: true
+  when: ((heartbeat_needs_restart != 0) and (logging_backend != 'fluentd'))
+
+- name: Setup heartbeat service
+  service: name=heartbeat state=started enabled=true
+  become: true
+  when: (logging_backend != 'fluentd')

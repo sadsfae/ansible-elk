@@ -1,36 +1,5 @@
 [elk]
 host-01
 
-[elk-client:children]
-metricbeat
-packetbeat
-filebeat
-heartbeat
-
-#For servers that need metricbeat installed (measures CPU, memory, network usage, etc.).
-[metricbeat]
+[elk-client]
 host-02
-
-[metricbeat:vars]
-beat=metricbeat
-
-#For servers that need packetbeat installed (Measures usage of protocols on interfaces).
-[packetbeat]
-host-02
-
-[packetbeat:vars]
-beat=packetbeat
-
-#For servers that need filebeat installed (grabs input from files).
-[filebeat]
-host-02
-
-[filebeat:vars]
-beat=filebeat
-
-#For servers that need heartbeat installed (checks uptime of urls or servers).
-[heartbeat]
-host-02
-
-[heartbeat:vars]
-beat=heartbeat

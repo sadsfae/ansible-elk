@@ -1,0 +1,61 @@
+---
+#
+# install/run filebeat elk client
+#
+- name: Install filebeat rpms
+  yum: name={{ item }} state=present
+  become: true
+  with_items:
+    - filebeat
+  when: (logging_backend != 'fluentd')
+
+- name: Generate filebeat configuration template
+  template:
+    src=filebeat.yml.j2
+    dest=/etc/filebeat/filebeat.yml
+    owner=root
+    group=root
+    mode=0644
+  become: true
+  when: (logging_backend != 'fluentd')
+  register: filebeat_needs_restart
+
+- name: Start filebeat service
+  command: systemctl start filebeat.service
+  ignore_errors: true
+  become: true
+  when: ((filebeat_needs_restart != 0) and (logging_backend != 'fluentd'))
+
+- name: Setup filebeat service
+  service: name=filebeat state=started enabled=true
+  become: true
+  when: (logging_backend != 'fluentd')
+
+- name: Install rsyslogd for fluentd
+  yum: name={{ item }} state=present
+  become: true
+  with_items:
+    - rsyslog
+  when: (logging_backend == 'fluentd')
+
+- name: Setup rsyslogd for fluentd
+  lineinfile: dest=/etc/rsyslog.conf \
+          line="*.* @{{ elk_server }}:{{ fluentd_syslog_port }}"
+  when: (logging_backend == 'fluentd')
+  register: rsyslog_updated
+
+- name: Setup common OpenStack rsyslog logging
+  template:
+    src=rsyslog-openstack.conf.j2
+    dest=/etc/rsyslog.d/openstack-logs.conf
+    owner=root
+    group=root
+    mode=0644
+  become: true
+  register: rsyslog_updated
+  when: (logging_backend == 'fluentd')
+
+- name: Restarting rsyslog for fluentd
+  command: systemctl restart rsyslog.service
+  ignore_errors: true
+  when: rsyslog_updated != 0
