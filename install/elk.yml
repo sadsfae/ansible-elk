@@ -16,4 +16,3 @@
     - { role: kibana }
     - { role: xpack, when: ((install_elasticsearch_xpack) or (install_kibana_xpack) or (install_logstash_xpack)) }
     - { role: instructions }
-    - { role: heartbeat, when: (install_heartbeat)}
