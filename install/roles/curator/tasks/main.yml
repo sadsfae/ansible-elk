@@ -26,3 +26,34 @@
     - python-elasticsearch-curator
     - python-setuptools
   when: install_curator_tool
+
+- name: Setup curator config
+  template:
+    src=curator-config.yml.j2
+    dest=/tmp/curator-config.yml
+    owner=root
+    group=root
+    mode=0644
+  become: true
+  when: install_curator_tool
+
+- name: Setup curator template file
+  template:
+    src=curator-action.yml.j2
+    dest=/tmp/curator-action.yml
+    owner=root
+    group=root
+    mode=0644
+  become: true
+  when: install_curator_tool
+
+#Runs cron job to cleanup indices every weekday.
+- cron:
+    name: Curator run
+    weekday: *
+    minute: 0
+    hour: 12
+    user: root
+    job: "/usr/local/bin/curator --config /tmp/curator-config.yml /tmp/curator-action.yml >> /tmp/curator.log 2>&1"
+    cron_file: curator-daily-cleanup
+  when: install_curator_tool
