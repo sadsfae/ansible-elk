@@ -82,8 +82,6 @@ install_logstash_xpack: false
 install_metricbeat: false
 #Install Packetbeat
 install_packetbeat: false
-#Install Filebeat
-install_filebeat: false
 
 #This should be installed on only one server in your environment.
 #Install Heartbeat
