@@ -217,13 +217,13 @@ output:
     # tls configuration. By default is off.
     ssl:
       # List of root certificates for HTTPS server verifications
-      certificate_authorities: [/etc/filebeat/filebeat-forwarder.crt]
+      certificate_authorities: [/etc/beat/beat-forwarder.crt]
 
       # Certificate for TLS client authentication
-      certificate: "/etc/filebeat/filebeat-forwarder.crt"
+      certificate: "/etc/beat/beat-forwarder.crt"
 
       # Client Certificate Key
-      key: "/etc/filebeat/filebeat-forwarder.key"
+      key: "/etc/beat/beat-forwarder.key"
 
       # Controls whether the client verifies server certificates and host name.
       # If insecure is set to true, all server host names and certificates will be

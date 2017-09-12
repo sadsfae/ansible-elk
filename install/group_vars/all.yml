@@ -77,3 +77,12 @@ install_elasticsearch_xpack: false
 install_kibana_xpack: false
 # install logstash x-pack
 install_logstash_xpack: false
+
+#Install Metricbeat
+install_metricbeat: false
+#Install Packetbeat
+install_packetbeat: false
+
+#This should be installed on only one server in your environment.
+#Install Heartbeat
+install_heartbeat: false
