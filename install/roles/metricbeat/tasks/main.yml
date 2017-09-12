@@ -1,0 +1,32 @@
+---
+#
+# install/run packetbeat elk client
+#
+- name: Install metricbeat rpms
+  yum: name={{ item }} state=present
+  become: true
+  with_items:
+    - metricbeat
+  when: (logging_backend != 'fluentd')
+
+- name: Generate metricbeat configuration template
+  template:
+    src=metricbeat.yml.j2
+    dest=/etc/metricbeat/metricbeat.yml
+    owner=root
+    group=root
+    mode=0644
+  become: true
+  when: (logging_backend != 'fluentd')
+  register: metricbeat_needs_restart
+
+- name: Start metricbeat service
+  command: systemctl start metricbeat.service
+  ignore_errors: true
+  become: true
+  when: ((metricbeat_needs_restart != 0) and (logging_backend != 'fluentd'))
+
+- name: Setup metricbeat service
+  service: name=metricbeat state=started enabled=true
+  become: true
+  when: (logging_backend != 'fluentd')

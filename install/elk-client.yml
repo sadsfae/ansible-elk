@@ -9,3 +9,6 @@
     - group_vars/all.yml
   roles:
     - { role: filebeat }
+    - { role: metricbeat, when: (install_metricbeat)}
+    - { role: packetbeat, when: (install_packetbeat)}
+    - { role: heartbeat, when: (install_heartbeat)}
