@@ -1,12 +1,12 @@
-ansible-elk
+Ansible-Elk
 ===========
-Ansible Playbook for setting up the ELK/EFK Stack and Filebeat client on remote hosts
+Ansible Playbook for setting up the ELK/EFK Stack on Master Node and Beats on Clients.
 
 ![ELK](/image/ansible-elk.png?raw=true)
 
 ## What does it do?
    - Automated deployment of a full ELK or EFK stack (Elasticsearch, Logstash/Fluentd, Kibana)
-     * 5.5+ and 2.4 ELK versions are maintained.
+     * 5+ and 2.4 ELK versions are maintained.
      * Uses Nginx as a reverse proxy for Kibana
      * Generates SSL certificates for Filebeat or Logstash-forwarder
      * Adds either iptables or firewalld rules if firewall is active
@@ -17,6 +17,7 @@ Ansible Playbook for setting up the ELK/EFK Stack and Filebeat client on remote 
      * All service ports can be modified in ```install/group_vars/all.yml```
      * Optionally install [curator](https://www.elastic.co/guide/en/elasticsearch/client/curator/current/index.html)
      * Optionally install [Elastic X-Pack Suite](https://www.elastic.co/guide/en/x-pack/current/xpack-introduction.html)
+     * Optionally install [Beats](https://www.elastic.co/products/beats)
      * This is also available on [Ansible Galaxy](https://galaxy.ansible.com/sadsfae/ansible-elk/)
 
 ## Requirements
@@ -33,7 +34,7 @@ sysctl -p
 ```
 
 ## Notes
-   - Current ELK version is 5.5.x but you can checkout the 2.4 branch if you want that series
+   - Current ELK version is 5.6.X but you can checkout the 2.4 branch if you want that series
    - Sets the nginx htpasswd to admin/admin initially
    - nginx ports default to 80/8080 for Kibana and SSL cert retrieval (configurable)
    - Uses OpenJDK for Java
