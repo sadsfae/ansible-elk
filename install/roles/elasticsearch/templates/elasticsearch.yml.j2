@@ -14,7 +14,12 @@
 #
 # Use a descriptive name for your cluster:
 #
+{% if cluster %}
 cluster.name: {{ elasticsearch_cluster }}
+{% endif %}
+{% if not cluster %}
+#cluster.name: {{ elasticsearch_cluster }}
+{% endif %}
 #
 # ------------------------------------ Node ------------------------------------
 #
