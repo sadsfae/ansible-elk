@@ -1,5 +1,15 @@
-[elk]
-host-01
+[elasticsearch-servers]
+elk-host-01
+elk-host-02
+elk-host-03
+
+[logging-servers]
+elk-host-01
+elk-host-02
+elk-host-03
+
+[kibana-servers]
+elk-host-01
 
 [elk-client]
 host-02
