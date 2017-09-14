@@ -7,7 +7,7 @@ Ansible Playbook for setting up the ELK/EFK Stack and Filebeat client on remote 
 ## What does it do?
    - Automated deployment of a full ELK or EFK stack (Elasticsearch, Logstash/Fluentd, Kibana)
      * 5.5+ and 2.4 ELK versions are maintained.
-     * Can do single machine, or clustered ElasticSearch
+     * Can do single machine, or clustered ElasticSearch - all configs expand dynamically to support the correct number of hosts
      * Uses Nginx as a reverse proxy for Kibana
      * Generates SSL certificates for Filebeat or Logstash-forwarder
      * Adds either iptables or firewalld rules if firewall is active
