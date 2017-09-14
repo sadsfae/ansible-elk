@@ -126,7 +126,7 @@ output:
   ### Logstash as output
   logstash:
     # The Logstash hosts
-    hosts: ["{{ elk_server }}:{{ logstash_syslog_port }}"]
+    hosts: ["{{ groups['logging_servers'][0] }}:{{ logstash_syslog_port }}"]
     bulk_max_size: 1024
     # Number of workers per Logstash host.
     #worker: 1

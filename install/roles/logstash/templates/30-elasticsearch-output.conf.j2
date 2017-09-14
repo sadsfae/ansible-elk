@@ -1,6 +1,6 @@
 output {
 {% if cluster %}
-elasticsearch { hosts => ["{{ elasticsearch_host_1 }}:{{es_port}}", "{{ elasticsearch_host_2 }}:{{es_port}}", "{{ elasticsearch_host_3 }}:{{es_port}}"] }
+elasticsearch { hosts => ["{{ groups['elasticsearch_servers'][0] }}:{{es_port}}", "{{ groups['elasticsearch_servers'][1] }}:{{es_port}}", "{{ groups['elasticsearch_servers'][2] }}:{{es_port}}"] }
 {% endif %}
 {% if not cluster %}
 elasticsearch { hosts => ["localhost:{{es_port}}"] }
