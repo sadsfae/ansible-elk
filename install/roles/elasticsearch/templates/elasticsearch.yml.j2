@@ -15,18 +15,22 @@
 # Use a descriptive name for your cluster:
 #
 {% if cluster %}
-cluster.name: {{ elasticsearch_cluster }}
+cluster.name: {{ elasticsearch_clustername }}
 {% endif %}
 {% if not cluster %}
-#cluster.name: {{ elasticsearch_cluster }}
+#cluster.name: {{ elasticsearch_clustername }}
 {% endif %}
 #
 # ------------------------------------ Node ------------------------------------
 #
 # Use a descriptive name for the node:
 #
-#node.name: node-1
-#
+{% if cluster %}
+node.name: ${HOSTNAME}
+{% endif %}
+{% if not cluster %}
+#node.name: ${HOSTNAME}
+{% endif %}
 # Add custom attributes to the node:
 #
 #node.attr.rack: r1
@@ -75,7 +79,12 @@ network.host: 0.0.0.0
 # Pass an initial list of hosts to perform discovery when new node is started:
 # The default list of hosts is ["127.0.0.1", "[::1]"]
 #
+{% if cluster %}
+discovery.zen.ping.unicast.hosts: ["{{ elasticsearch_host_1 }}", "{{ elasticsearch_host_2 }}", "{{ elasticsearch_host_3 }}"]
+{% endif %}
+{% if not cluster %}
 #discovery.zen.ping.unicast.hosts: ["host1", "host2"]
+{% endif %}
 #
 # Prevent the "split brain" by configuring the majority of nodes (total number of master-eligible nodes / 2 + 1):
 #
