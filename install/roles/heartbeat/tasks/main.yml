@@ -3,7 +3,7 @@
 # install/run heartbeat elk client
 #
 
-#CentOS Installation of Heartbeat
+#CentOS Installation of heartbeat
 - name: Install heartbeat rpms
   yum: name={{ item }} state=present
   become: true
@@ -14,8 +14,9 @@
     - ansible_distribution == 'CentOS'
     - (ansible_distribution_major_version == "6") or (ansible_distribution_major_version == "7")
 
-#Debian/Ubuntu Installation of Heartbeat
-- name: Install Heartbeat package
+#Debian/Ubuntu Installation of heartbeat
+
+- name: Install heartbeat package
   apt: name={{ item }} 
   state: present
   become: true
@@ -37,30 +38,19 @@
   register: heartbeat_needs_restart
 
 #Centos Service Configuration
-- name: Start heartbeat service (CentOS)
-  command: systemctl start heartbeat.service
-  ignore_errors: true
-  become: true
-  when: 
-    - heartbeat_needs_restart != 0
-    - logging_backend != 'fluentd'
-    - ansible_distribution == 'CentOS'
-    - (ansible_distribution_major_version == "6") or (ansible_distribution_major_version == "7")
+#- name: Start heartbeat service (CentOS)
+##  command: systemctl start heartbeat.service
+#  ignore_errors: true
+#  become: true
+#  when: 
+#    - heartbeat_needs_restart != 0
+#    - logging_backend != 'fluentd'
+#    - ansible_distribution == 'CentOS'
+#    - (ansible_distribution_major_version == "6") or (ansible_distribution_major_version == "7")
 
-- name: Setup heartbeat service (CentOS)
+- name: Setup heartbeat service (Systemd)
   service: name=heartbeat state=started enabled=true
   become: true
   when:
-    - logging_backend != 'fluentd'
-    - ansible_distribution == 'CentOS'
-    - (ansible_distribution_major_version == "6") or (ansible_distribution_major_version == "7")
-
-#Debian/Ubuntu Service Setup
-- name: Enable Heartbeat Service to Start on Boot Debian/Ubuntu
-  command: update-rc.d heartbeat defaults 95 10
-  ignore_errors: true
-  become: true
-  when: 
-    - heartbeat_needs_restart != 0 
-    - logging_backend != 'fluentd'
-    - (ansible_distribution == 'Debian') or (ansible_distribution == 'Ubuntu')
+    - logging_backend != 'fluentd'.
+    - heartbeat_needs_restart != 0
