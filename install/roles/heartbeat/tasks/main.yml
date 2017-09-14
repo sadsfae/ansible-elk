@@ -17,8 +17,9 @@
 #Debian/Ubuntu Installation of heartbeat
 
 - name: Install heartbeat package
-  apt: name={{ item }} 
-  state: present
+  apt: 
+    name: "{{ item }}" 
+    state: present
   become: true
   with_items:
     - heartbeat
