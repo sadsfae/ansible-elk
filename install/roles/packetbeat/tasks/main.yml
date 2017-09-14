@@ -1,32 +1,67 @@
 ---
 #
-# install/run packetbeat elk client
+# install/run metricbeat elk client
 #
-- name: Install packetbeat rpms
+
+#CentOS Installation of metricbeat
+- name: Install metricbeat rpms
   yum: name={{ item }} state=present
   become: true
   with_items:
-    - packetbeat
-  when: (logging_backend != 'fluentd')
+    - metricbeat
+  when: 
+    - logging_backend != 'fluentd'
+    - ansible_distribution == 'CentOS'
+    - (ansible_distribution_major_version == "6") or (ansible_distribution_major_version == "7")
 
-- name: Generate packetbeat configuration template
+#Debian/Ubuntu Installation of metricbeat
+
+- name: Install metricbeat package
+  apt: name={{ item }} 
+  state: present
+  become: true
+  with_items:
+    - metricbeat
+  when:
+    - logging_backend != 'fluentd'
+    - (ansible_distribution == 'Debian') or (ansible_distribution == 'Ubuntu')
+
+- name: Generate metricbeat configuration template
   template:
-    src=packetbeat.yml.j2
-    dest=/etc/packetbeat/packetbeat.yml
+    src=metricbeat.yml.j2
+    dest=/etc/metricbeat/metricbeat.yml
     owner=root
     group=root
     mode=0644
   become: true
   when: (logging_backend != 'fluentd')
-  register: packetbeat_needs_restart
+  register: metricbeat_needs_restart
 
-- name: Start packetbeat service
-  command: systemctl start packetbeat.service
+#Centos Service Configuration
+- name: Start metricbeat service (CentOS)
+  command: systemctl start metricbeat.service
   ignore_errors: true
   become: true
-  when: ((packetbeat_needs_restart != 0) and (logging_backend != 'fluentd'))
+  when: 
+    - metricbeat_needs_restart != 0
+    - logging_backend != 'fluentd'
+    - ansible_distribution == 'CentOS'
+    - (ansible_distribution_major_version == "6") or (ansible_distribution_major_version == "7")
 
-- name: Setup packetbeat service
-  service: name=packetbeat state=started enabled=true
+- name: Setup metricbeat service (CentOS)
+  service: name=metricbeat state=started enabled=true
   become: true
-  when: (logging_backend != 'fluentd')
+  when:
+    - logging_backend != 'fluentd'
+    - ansible_distribution == 'CentOS'
+    - (ansible_distribution_major_version == "6") or (ansible_distribution_major_version == "7")
+
+#Debian/Ubuntu Service Setup
+- name: Enable metricbeat Service to Start on Boot Debian/Ubuntu
+  command: update-rc.d metricbeat defaults 95 10
+  ignore_errors: true
+  become: true
+  when: 
+    - metricbeat_needs_restart != 0 
+    - logging_backend != 'fluentd'
+    - (ansible_distribution == 'Debian') or (ansible_distribution == 'Ubuntu')
