@@ -81,37 +81,6 @@
     backup: yes
   when: subjectAltName_exists.stdout|int == 0
 
-- name: Load filebeat JSON index template
-  uri:
-    url: http://localhost:9200/_template/filebeat?pretty
-    method: POST
-    body: "{{ lookup('file', 'filebeat-index-template.json') }}"
-    body_format: json
-    return_content: yes
-  register: filebeatJSON_output
-  until: '"json" in filebeatJSON_output and filebeatJSON_output.json.acknowledged == true'
-  retries: 30
-  delay: 10
-  become: true
-  when: not install_logstash_xpack
-
-# X-Pack requires additional authentication
-- name: Load filebeat JSON index template (X-Pack enabled)
-  uri:
-    url: http://localhost:9200/_template/filebeat?pretty
-    method: POST
-    user: elastic
-    password: "{{xpack_elastic_user_password}}"
-    body: "{{ lookup('file', 'filebeat-index-template.json') }}"
-    body_format: json
-    return_content: yes
-  register: filebeatJSON_output
-  until: '"json" in filebeatJSON_output and filebeatJSON_output.json.acknowledged == true'
-  retries: 30
-  delay: 10
-  become: true
-  when: install_elasticsearch_xpack
-
 # we need TCP/80 and TCP/8080 open
 # determine firewall status and take action
 # 1) use firewall-cmd if firewalld is utilized
