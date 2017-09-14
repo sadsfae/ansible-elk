@@ -1,0 +1,14 @@
+---
+
+#
+# install xpack suite for kibana services
+#
+
+- name: Check if kibana xpack is installed
+  stat: path=/usr/share/kibana/plugins/x-pack
+  register: check_kibana_xpack_path
+
+- name: Install xpack for kibana, this might take a while
+  command: /usr/share/kibana/bin/kibana-plugin install x-pack
+  when: install_kibana_xpack and check_kibana_xpack_path.stat.exists == False
+  ignore_errors: true
