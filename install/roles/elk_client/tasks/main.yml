@@ -1,5 +1,7 @@
 ---
 
+
+#CentOS Installation
 - name: Copy ElasticSearch yum repo file
   copy:
     src=elk.repo
@@ -8,18 +10,55 @@
     group=root
     mode=0644
   become: true
+  when:
+    - ansible_distribution == 'CentOS'
+    - (ansible_distribution_major_version == "6") or (ansible_distribution_major_version == "7")
 
 - name: Creates ELK Cert Directory
   file:
     path: /etc/beat
     state: directory
     mode: 0755
+  when:
+    - ansible_distribution == 'CentOS'
+    - (ansible_distribution_major_version == "6") or (ansible_distribution_major_version == "7")
 
 - name: Import ElasticSearch GPG Key
   rpm_key: key=http://packages.elastic.co/GPG-KEY-elasticsearch
     state=present
+  when:
+    - ansible_distribution == 'CentOS'
+    - (ansible_distribution_major_version == "6") or (ansible_distribution_major_version == "7")
 
+#Debian/Ubuntu Installation
+- name: Install apt-transport-https
+  apt:
+    name: apt-transport-https
+    state: present
+  when: 
+    - ansible_distribution == 'Debian'
 
+- name: Add ElasticSearch Apt Signing Key
+  apt_key:
+    url: https://artifacts.elastic.co/GPG-KEY-elasticsearch
+    state: present
+  when:
+    - (ansible_distribution == 'Debian') or (ansible_distribution == 'Ubuntu')
+
+- name: Add ElasticSearch Repository
+  apt_repository:
+    repo: deb https://artifacts.elastic.co/packages/5.x/apt stable main
+    state: present
+  when:
+    - (ansible_distribution == 'Debian') or (ansible_distribution == 'Ubuntu')
+
+- name: Run the equivalent of "apt-get update"
+  apt:
+    update_cache: yes
+  when:
+    - (ansible_distribution == 'Debian') or (ansible_distribution == 'Ubuntu')
+  
+#SSL Certificate Steps
 - name: Check ELK server SSL client certificate
   stat: path=/etc/beat/beat-forwarder.crt
   ignore_errors: true
