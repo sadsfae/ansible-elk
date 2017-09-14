@@ -80,7 +80,7 @@ network.host: 0.0.0.0
 # The default list of hosts is ["127.0.0.1", "[::1]"]
 #
 {% if cluster %}
-discovery.zen.ping.unicast.hosts: {{ groups['elasticsearch-servers'] | to_json }}
+discovery.zen.ping.unicast.hosts: [ {{ groups['elasticsearch-servers'] | to_json }} ]
 {% endif %}
 {% if not cluster %}
 #discovery.zen.ping.unicast.hosts: ["host1", "host2"]
