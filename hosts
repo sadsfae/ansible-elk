@@ -3,6 +3,8 @@ elk-host-01
 elk-host-02
 elk-host-03
 
+
+#Note: Logging server and Kibana server must be the same. It is not supported to run multiple logstash servers yet.
 [logging-servers]
 elk-host-01
 
