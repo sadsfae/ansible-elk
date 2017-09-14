@@ -70,8 +70,9 @@ fluentd_debug_port: 24230
 # outside of localhost, if you want to apply firewall rules
 # to allow external connections to elasticsearch change the below setting
 # to true
+# In order for clustering to work es_listen_external must be set to true.
 # we will set this to false by default
-es_local_port: 9200
+es_port: 9200
 es_listen_external: false
 ### install curator tool ###
 # curator is the recommended tool for managing elasticsearch indexes
