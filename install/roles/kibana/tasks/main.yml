@@ -26,18 +26,25 @@
   become: true
   with_items:
     - rsyslog
-  when: (logging_backend == 'fluentd')
+  when: 
+    - logging_backend == 'fluentd'
+    - cluster == false
 
 - name: Setup local rsyslogd for fluentd
   lineinfile: dest=/etc/rsyslog.conf \
-          line="*.* @localhost:{{ fluentd_syslog_port }}"
-  when: (logging_backend == 'fluentd')
+          line="*.* @{{ groups['logging_servers'][0] }}:{{ fluentd_syslog_port }}"
+  when: 
+    - logging_backend == 'fluentd'
+    - cluster == false 
   register: rsyslog_updated
 
 - name: Populate elasticsearch index with local logs via fluentd
   command: systemctl restart rsyslog.service
   ignore_errors: true
-  when: rsyslog_updated != 0
+  when: 
+    - rsyslog_updated != 0
+    - logging_backend == 'fluentd'
+    - cluster == false 
 
 - name: Check kibana filebeat dashboards
   stat: path=/tmp/filebeat-dashboards.zip
@@ -87,7 +94,9 @@
   file:
     path: /usr/share/logstash
     state: directory
-  when: (logging_backend == 'fluentd')
+  when: 
+    - logging_backend == 'fluentd'
+    - cluster == false 
 
 - name: Create client forwarder SSL certificate
   command: openssl req -subj '/CN={{ ansible_fqdn }}/' -config /etc/pki/tls/openssl_extras.cnf \
@@ -117,7 +126,9 @@
     owner: logstash
     group: logstash
     mode: 0600
-  when: (logging_backend != 'fluentd')
+  when: 
+    - logging_backend != 'fluentd'
+
 
 - name: Set permissions on logstash certificate key
   file:
@@ -139,7 +150,7 @@
 # we will wait for TCP/9200 to become available
 - name: Wait for elasticsearch index to be available
   uri:
-    url: http://localhost:9200/_cat/indices
+    url: http://{{ groups[elasticsearch_servers][0] }}:9200/_cat/indices
     status_code: 200
   register: es_service_result
   until: es_service_result.status == 200
@@ -165,7 +176,7 @@
 # We need to insert data to create an initial index, query if it exists
 - name: Check elasticsearch index for content
   uri:
-    url=http://localhost:9200/_cat/indices
+    url=http://{{groups[elasitcsearch_servers][0]}}:9200/_cat/indices
     method=GET
     return_content=yes
   register: elasticsearch_index
@@ -176,7 +187,7 @@
 # leaving this set to 7minutes before giving up
 - name: Check for TCP/5000 logstash listener port, this may take a while
   wait_for:
-    host: localhost
+    host: "{{ groups[logging_servers][0] }}"
     port: 5000
     delay: 10
     connect_timeout: 5
@@ -189,7 +200,7 @@
 # leaving this set to 7minutes before giving up
 - name: Check for TCP/5044 logstash listener port, this may take a while
   wait_for:
-    host: localhost
+    host: "{{ groups[logging_servers][0] }}"
     port: 5044
     delay: 10
     connect_timeout: 5
@@ -200,7 +211,7 @@
 # Populate elasticsearch with local syslog data
 - name: Populate elasticsearch index with local syslog data
   lineinfile: dest=/etc/rsyslog.conf \
-          line="*.* @localhost:{{ logstash_localsyslog_port }}"
+          line="*.* @{{ groups[logging_servers][0] }}:{{ logstash_localsyslog_port }}"
   when: (logging_backend != 'fluentd')
   register: rsyslog_updated
 
@@ -211,5 +222,7 @@
 
 - name: Refresh fluentd service
   command: systemctl restart td-agent.service
-  when: (logging_backend == 'fluentd')
+  when: 
+    - logging_backend == 'fluentd'
+    - clsuter == false
   become: true
