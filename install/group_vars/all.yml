@@ -6,8 +6,6 @@
 # EPEL Repository for extra packages
 epel_repo: https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
 
-#This is used for naming of the cluster and logstash, etc. The default is development
-environment: development
 
 
 ########################################
@@ -85,6 +83,9 @@ install_curator_tool: false
 # This will determine all setting of cluster variables
 # Default is set to false.
 cluster: false
+
+#This is used for naming of the cluster and logstash, etc. The default is development
+environment: development
 
 # Clustername variable
 elasticsearch_clustername: my-company-elasticsearch-{{ environment }}
