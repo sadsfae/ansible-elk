@@ -1,13 +1,31 @@
 ---
 #
-# install/run packetbeat elk client
+# install/run metricbeat elk client
 #
+
+#CentOS Installation of metricbeat
 - name: Install metricbeat rpms
   yum: name={{ item }} state=present
   become: true
   with_items:
     - metricbeat
-  when: (logging_backend != 'fluentd')
+  when: 
+    - logging_backend != 'fluentd'
+    - ansible_distribution == 'CentOS'
+    - (ansible_distribution_major_version == "6") or (ansible_distribution_major_version == "7")
+
+#Debian/Ubuntu Installation of metricbeat
+
+- name: Install metricbeat package
+  apt: 
+    name: "{{ item }}" 
+    state: present
+  become: true
+  with_items:
+    - metricbeat
+  when:
+    - logging_backend != 'fluentd'
+    - (ansible_distribution == 'Debian') or (ansible_distribution == 'Ubuntu')
 
 - name: Generate metricbeat configuration template
   template:
@@ -20,13 +38,20 @@
   when: (logging_backend != 'fluentd')
   register: metricbeat_needs_restart
 
-- name: Start metricbeat service
-  command: systemctl start metricbeat.service
-  ignore_errors: true
-  become: true
-  when: ((metricbeat_needs_restart != 0) and (logging_backend != 'fluentd'))
+#Centos Service Configuration
+#- name: Start metricbeat service (CentOS)
+##  command: systemctl start metricbeat.service
+#  ignore_errors: true
+#  become: true
+#  when: 
+#    - metricbeat_needs_restart != 0
+#    - logging_backend != 'fluentd'
+#    - ansible_distribution == 'CentOS'
+#    - (ansible_distribution_major_version == "6") or (ansible_distribution_major_version == "7")
 
-- name: Setup metricbeat service
+- name: Setup metricbeat service (Systemd)
   service: name=metricbeat state=started enabled=true
   become: true
-  when: (logging_backend != 'fluentd')
+  when:
+    - logging_backend != 'fluentd'.
+    - metricbeat_needs_restart != 0

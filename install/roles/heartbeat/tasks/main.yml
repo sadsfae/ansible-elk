@@ -1,13 +1,31 @@
 ---
 #
-# install/run heartbeatbeat elk client
+# install/run heartbeat elk client
 #
+
+#CentOS Installation of heartbeat
 - name: Install heartbeat rpms
   yum: name={{ item }} state=present
   become: true
   with_items:
     - heartbeat
-  when: (logging_backend != 'fluentd')
+  when: 
+    - logging_backend != 'fluentd'
+    - ansible_distribution == 'CentOS'
+    - (ansible_distribution_major_version == "6") or (ansible_distribution_major_version == "7")
+
+#Debian/Ubuntu Installation of heartbeat
+
+- name: Install heartbeat package
+  apt: 
+    name: "{{ item }}" 
+    state: present
+  become: true
+  with_items:
+    - heartbeat
+  when:
+    - logging_backend != 'fluentd'
+    - (ansible_distribution == 'Debian') or (ansible_distribution == 'Ubuntu')
 
 - name: Generate heartbeat configuration template
   template:
@@ -20,13 +38,20 @@
   when: (logging_backend != 'fluentd')
   register: heartbeat_needs_restart
 
-- name: Start heartbeat service
-  command: systemctl start heartbeat.service
-  ignore_errors: true
-  become: true
-  when: ((heartbeat_needs_restart != 0) and (logging_backend != 'fluentd'))
+#Centos Service Configuration
+#- name: Start heartbeat service (CentOS)
+##  command: systemctl start heartbeat.service
+#  ignore_errors: true
+#  become: true
+#  when: 
+#    - heartbeat_needs_restart != 0
+#    - logging_backend != 'fluentd'
+#    - ansible_distribution == 'CentOS'
+#    - (ansible_distribution_major_version == "6") or (ansible_distribution_major_version == "7")
 
-- name: Setup heartbeat service
+- name: Setup heartbeat service (Systemd)
   service: name=heartbeat state=started enabled=true
   become: true
-  when: (logging_backend != 'fluentd')
+  when:
+    - logging_backend != 'fluentd'.
+    - heartbeat_needs_restart != 0
