@@ -1,6 +1,6 @@
 ---
 #
-# install/run heartbeatbeat elk client
+# install/run heartbeat elk client
 #
 
 #CentOS Installation of Heartbeat
@@ -15,7 +15,6 @@
     - (ansible_distribution_major_version == "6") or (ansible_distribution_major_version == "7")
 
 #Debian/Ubuntu Installation of Heartbeat
-#Debian/Ubuntu Installation of Filebeat
 - name: Install Heartbeat package
   apt: name={{ item }} 
   state: present
@@ -62,6 +61,6 @@
   ignore_errors: true
   become: true
   when: 
-    - filebeat_needs_restart != 0 
+    - heartbeat_needs_restart != 0 
     - logging_backend != 'fluentd'
     - (ansible_distribution == 'Debian') or (ansible_distribution == 'Ubuntu')
