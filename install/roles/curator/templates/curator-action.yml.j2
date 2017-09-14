@@ -1,0 +1,32 @@
+actions:
+#Closes indicies after 14 days to save on RAM
+  1:
+    action: close
+    description: close indices
+    options:
+      delete_aliases: False
+      timeout_override:
+      continue_if_exception: True
+      disable_action: False
+    filters:
+    -
+      filtertype: age
+      source: name
+      direction: older
+      timestring: '%Y.%m.%d'
+      unit: days
+      unit_count: 14
+      exclude:
+#Deletes indicies after 30 days to clean up storage space.
+  2:
+    action: delete_indices
+    description: delete indices
+    filters:
+    -
+      filtertype: age
+      source: name
+      direction: older
+      timestring: '%Y.%m.%d'
+      unit: days
+      unit_count: 30
+      exclude:
