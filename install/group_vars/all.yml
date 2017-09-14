@@ -1,11 +1,17 @@
 ---
+########################################
+# Global Variables
+########################################
 
 # EPEL Repository for extra packages
 epel_repo: https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
 
+
+
 ########################################
-# ELK Server Variables
+# Kibana Server Variables
 ########################################
+
 ### nginx ###
 # add nonstandard port here for undercloud usage
 # note: you should use nonstandard ports for both here
@@ -25,6 +31,11 @@ elk_server_ssl_cert_port: 8080
 # change this to affect nginx-wrapped htpasswd authentication
 kibana_user: admin
 kibana_password: admin
+
+
+########################################
+# Logging Server Variables
+########################################
 
 ### logging backend ###
 # you can pick between logstash or fluentd
@@ -46,13 +57,20 @@ syslog_listen_external: false
 fluentd_syslog_port: 42185
 fluentd_http_port: 9919
 fluentd_debug_port: 24230
+
+########################################
+# Elastic Search Server Variables
+########################################
+
+
 ## elasticsearch local port listener
 # general usage will not need elasticsearch listening
 # outside of localhost, if you want to apply firewall rules
 # to allow external connections to elasticsearch change the below setting
 # to true
+# In order for clustering to work es_listen_external must be set to true.
 # we will set this to false by default
-es_local_port: 9200
+es_port: 9200
 es_listen_external: false
 ### install curator tool ###
 # curator is the recommended tool for managing elasticsearch indexes
@@ -60,7 +78,26 @@ es_listen_external: false
 # default is no (set to blank) or false
 # set the below variable to 'true' to activate
 install_curator_tool: false
-## X-PACK
+
+### configures clustering of ElasticSearch
+# This will determine all setting of cluster variables
+# Default is set to false.
+cluster: false
+
+#This is used for naming of the cluster and logstash, etc. The default is development
+environment: development
+
+# Clustername variable
+elasticsearch_clustername: my-company-elasticsearch-{{ environment }}
+#ElasticSearch Hosts. These must be configured in order for clustering to work properly. It cannot dynamically pull from the inventory file. 
+# It is currently configured to use 3 hosts (minimum recommended.
+# However if you want to add more you need to add them to the hosts file, create a new elasticsearch_host_# variable and add them to the elasticsearch.yml file under elasticsearch/templates.
+
+
+########################################
+# X-PACK Installation Variables
+########################################
+
 # This installs an additional suite of tools from elastic
 # https://www.elastic.co/guide/en/x-pack/current/xpack-introduction.html
 # note: X-Pack will wrap ES with additional authentication, I do not
@@ -78,6 +115,10 @@ install_kibana_xpack: false
 # install logstash x-pack
 install_logstash_xpack: false
 
+
+
+
+#################### Beats Installation Variables ##########################
 #Install Metricbeat
 install_metricbeat: false
 #Install Packetbeat

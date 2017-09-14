@@ -96,43 +96,43 @@
   no_log: true
   when: es_listen_external
 
-- name: Determine if TCP/{{es_local_port}} is already active
-  shell: firewall-cmd --list-ports | egrep -q "^{{es_local_port}}/tcp"
+- name: Determine if TCP/{{es_port}} is already active
+  shell: firewall-cmd --list-ports | egrep -q "^{{es_port}}/tcp"
   ignore_errors: true
-  register: firewalld_es_local_port_exists
+  register: firewalld_es_port_exists
   no_log: true
   when: es_listen_external
 
 # add firewall rule via firewall-cmd
-- name: Add firewall rule for TCP/{{es_local_port}} (firewalld)
+- name: Add firewall rule for TCP/{{es_port}} (firewalld)
   command: "{{ item }}"
   with_items:
-    - firewall-cmd --zone=public --add-port={{es_local_port}}/tcp --permanent
+    - firewall-cmd --zone=public --add-port={{es_port}}/tcp --permanent
     - firewall-cmd --reload
   ignore_errors: true
   become: true
-  when: es_listen_external and firewalld_in_use.rc == 0 and firewalld_is_active.rc == 0 and firewalld_es_local_port_exists.rc != 0
+  when: es_listen_external and firewalld_in_use.rc == 0 and firewalld_is_active.rc == 0 and firewalld_es_port_exists.rc != 0
 
 # iptables-services
-- name: check firewall rules for TCP/{{es_local_port}} (iptables-services)
-  shell: grep "dport {{es_local_port}} \-j ACCEPT" /etc/sysconfig/iptables | wc -l
+- name: check firewall rules for TCP/{{es_port}} (iptables-services)
+  shell: grep "dport {{es_port}} \-j ACCEPT" /etc/sysconfig/iptables | wc -l
   ignore_errors: true
-  register: iptables_es_local_port_exists
-  failed_when: iptables_es_local_port_exists == 127
+  register: iptables_es_port_exists
+  failed_when: iptables_es_port_exists == 127
   no_log: true
   when: es_listen_external
 
-- name: Add firewall rule for TCP/{{es_local_port}} (iptables-services)
+- name: Add firewall rule for TCP/{{es_port}} (iptables-services)
   lineinfile:
     dest: /etc/sysconfig/iptables
-    line: '-A INPUT -p tcp -m tcp --dport {{es_local_port}} -j ACCEPT'
+    line: '-A INPUT -p tcp -m tcp --dport {{es_port}} -j ACCEPT'
     regexp: '^INPUT -i lo -j ACCEPT'
     insertbefore: '-A INPUT -i lo -j ACCEPT'
     backup: yes
-  when: es_listen_external and firewalld_in_use.rc != 0 and firewalld_is_active.rc != 0 and iptables_es_local_port_exists.stdout|int == 0
+  when: es_listen_external and firewalld_in_use.rc != 0 and firewalld_is_active.rc != 0 and iptables_es_port_exists.stdout|int == 0
   register: iptables_needs_restart
 
-- name: Restart iptables-services for TCP/{{es_local_port}} (iptables-services)
+- name: Restart iptables-services for TCP/{{es_port}} (iptables-services)
   shell: systemctl restart iptables.service
   ignore_errors: true
   when: es_listen_external and iptables_needs_restart != 0 and firewalld_in_use.rc != 0 and firewalld_is_active.rc != 0
@@ -211,3 +211,34 @@
 - name: Setup elasticsearch service
   service: name=elasticsearch state=started enabled=true
   become: true
+
+- name: Load filebeat JSON index template
+  uri:
+    url: http://localhost:9200/_template/filebeat?pretty
+    method: POST
+    body: "{{ lookup('file', 'filebeat-index-template.json') }}"
+    body_format: json
+    return_content: yes
+  register: filebeatJSON_output
+  until: '"json" in filebeatJSON_output and filebeatJSON_output.json.acknowledged == true'
+  retries: 30
+  delay: 10
+  become: true
+  when: not install_elasticsearch_xpack or not install_logstash_xpack or not install_kibana_xpack
+
+# X-Pack requires additional authentication
+- name: Load filebeat JSON index template (X-Pack enabled)
+  uri:
+    url: http://localhost:9200/_template/filebeat?pretty
+    method: POST
+    user: elastic
+    password: "{{xpack_elastic_user_password}}"
+    body: "{{ lookup('file', 'filebeat-index-template.json') }}"
+    body_format: json
+    return_content: yes
+  register: filebeatJSON_output
+  until: '"json" in filebeatJSON_output and filebeatJSON_output.json.acknowledged == true'
+  retries: 30
+  delay: 10
+  become: true
+  when: install_elasticsearch_xpack

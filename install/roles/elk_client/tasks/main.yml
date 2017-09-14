@@ -67,14 +67,14 @@
 
 - name: Install ELK server SSL client certificate
   get_url:
-    url=http://{{ elk_server }}:{{ elk_server_ssl_cert_port }}/beat-forwarder.crt
+    url=http://{{ groups['logging_servers'][0] }}:{{ elk_server_ssl_cert_port }}/beat-forwarder.crt
     dest=/etc/beat/beat-forwarder.crt
   become: true
   when: (elk_client_ssl_cert_exists != 0)
 
 - name: Install ELK server SSL client certificate
   get_url:
-    url=http://{{ elk_server }}:{{ elk_server_ssl_cert_port }}/beat-forwarder.key
+    url=http://{{ groups['logging_servers'][0] }}:{{ elk_server_ssl_cert_port }}/beat-forwarder.key
     dest=/etc/beat/beat-forwarder.key
   become: true
   when: (elk_client_ssl_cert_exists != 0)
