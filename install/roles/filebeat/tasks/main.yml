@@ -40,36 +40,12 @@
     - logging_backend != 'fluentd'
   register: filebeat_needs_restart
 
-
-#Centos Start Filebeat Service
-- name: Start filebeat service
-  command: systemctl start filebeat.service
-  ignore_errors: true
-  become: true
-  when: 
-    - filebeat_needs_restart != 0
-    - logging_backend != 'fluentd'
-    - ansible_distribution == 'CentOS'
-    - (ansible_distribution_major_version == "6") or (ansible_distribution_major_version == "7")
-
 - name: Setup filebeat service
   service: name=filebeat state=started enabled=true
   become: true
   when: 
     - logging_backend != 'fluentd'
-    - ansible_distribution == 'CentOS'
-    - (ansible_distribution_major_version == "6") or (ansible_distribution_major_version == "7")
 
-
-#Debian/Ubuntu Service Setup
-- name: Enable Filebeat Service to Start on Boot Debian/Ubuntu
-  command: update-rc.d filebeat defaults 95 10
-  ignore_errors: true
-  become: true
-  when: 
-    - filebeat_needs_restart != 0 
-    - logging_backend != 'fluentd'
-    - (ansible_distribution == 'Debian') or (ansible_distribution == 'Ubuntu')
 
 ###################################### RSYSLOG for Fluentd Setup ##################################################
 - name: Install rsyslogd for fluentd
