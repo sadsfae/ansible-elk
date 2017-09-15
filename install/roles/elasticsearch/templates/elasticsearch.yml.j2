@@ -80,7 +80,7 @@ network.host: [{{ ansible_default_ipv4.address }}, _local_]
 # The default list of hosts is ["127.0.0.1", "[::1]"]
 #
 {% if cluster %}
-discovery.zen.ping.unicast.hosts: [ {{ groups['elasticsearch_servers'] | to_json }} ]
+discovery.zen.ping.unicast.hosts:  {{ groups['elasticsearch_servers'] | to_json }} 
 {% endif %}
 {% if not cluster %}
 #discovery.zen.ping.unicast.hosts: ["host1", "host2"]
@@ -89,10 +89,10 @@ discovery.zen.ping.unicast.hosts: [ {{ groups['elasticsearch_servers'] | to_json
 # Prevent the "split brain" by configuring the majority of nodes (total number of master-eligible nodes / 2 + 1):
 #
 {% if cluster %}
-discovery.zen.minimum_master_nodes: {{ groups['elasticsearch_servers'] | length/2 + 1 }}
+discovery.zen.minimum_master_nodes: {{ groups['elasticsearch_servers'] | length % 2 + 1 }}
 {% endif %}
 {% if not cluster %}
-# discovery.zen.minimum_master_nodes: {{ groups['elasticsearch_servers'] | length/2 + 1 }}
+# discovery.zen.minimum_master_nodes: {{ groups['elasticsearch_servers'] | length % 2 + 1 }}
 {% endif %}
 #
 #
