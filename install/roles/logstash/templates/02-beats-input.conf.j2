@@ -2,8 +2,8 @@ input {
   beats {
     port => {{logstash_syslog_port}}
     ssl => true
-    ssl_certificate => /usr/share/logstash/beat-forwarder.crt
-    ssl_key => /usr/share/logstash/beat-forwarder.key
+    ssl_certificate => ["/usr/share/logstash/beat-forwarder.crt"]
+    ssl_key => ["/usr/share/logstash/beat-forwarder.key"]
     ssl_verify_mode => none
   }
 }

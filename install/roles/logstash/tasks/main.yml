@@ -26,6 +26,7 @@
     group=logstash
     mode=0644
   become: true
+  register: logstash_restart
 
 - name: Copy TCP/UDP input configuration
   template:
@@ -35,6 +36,7 @@
     group=logstash
     mode=0644
   become: true
+  register: logstash_restart
 
 - name: Copy 10-syslog-filter configuration
   template:
@@ -44,6 +46,7 @@
     group=logstash
     mode=0644
   become: true
+  register: logstash_restart
 
 - name: Copy 30-elasticsearch-output configuration
   template:
@@ -53,7 +56,8 @@
     group=logstash
     mode=0644
   become: true
-
+  register: logstash_restart
+  
 - name: Load OpenSSL CA Extended Configuration
   template:
     src=openssl_extras.cnf.j2
