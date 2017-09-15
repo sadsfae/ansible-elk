@@ -89,9 +89,6 @@ environment: development
 
 # Clustername variable
 elasticsearch_clustername: my-company-elasticsearch-{{ environment }}
-#ElasticSearch Hosts. These must be configured in order for clustering to work properly. It cannot dynamically pull from the inventory file. 
-# It is currently configured to use 3 hosts (minimum recommended.
-# However if you want to add more you need to add them to the hosts file, create a new elasticsearch_host_# variable and add them to the elasticsearch.yml file under elasticsearch/templates.
 
 
 ########################################
