@@ -88,7 +88,7 @@ cluster: false
 es_environment: development
 
 # Clustername variable
-elasticsearch_clustername: my-company-elasticsearch-{{ environment }}
+elasticsearch_clustername: my-company-elasticsearch-{{ es_environment }}
 
 
 ########################################
