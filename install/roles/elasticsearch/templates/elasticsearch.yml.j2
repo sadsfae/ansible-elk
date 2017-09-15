@@ -62,7 +62,7 @@ node.name: ${HOSTNAME}
 # Set the bind address to a specific IP (IPv4 or IPv6):
 #
 {% if es_listen_external %}
-network.host: 0.0.0.0 
+network.host: [{{ ansible_default_ipv4.address }}, _local_]
 {% endif %}
 {% if not es_listen_external %}
 #network.host: {{ ansible_default_ipv4.address }}
