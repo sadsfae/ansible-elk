@@ -85,7 +85,7 @@ install_curator_tool: false
 cluster: false
 
 #This is used for naming of the cluster and logstash, etc. The default is development
-environment: development
+es_environment: development
 
 # Clustername variable
 elasticsearch_clustername: my-company-elasticsearch-{{ environment }}
