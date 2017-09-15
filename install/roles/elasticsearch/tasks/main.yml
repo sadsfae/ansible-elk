@@ -34,6 +34,7 @@
     mode=0660
   become: true
   ignore_errors: true
+  register: es_restart
 
 - name: Check if system memory is greater than 64G
   debug: msg="System memory is {{ansible_memory_mb.real.total | int}} so setting heapsize to 32G upper limit"
@@ -203,14 +204,14 @@
 
 ## end firewall rules ##
 
-- name: Start elasticsearch service
-  command: systemctl start elasticsearch.service
-  ignore_errors: true
-  when: elasticsearch_updated != 0
-
 - name: Setup elasticsearch service
   service: name=elasticsearch state=started enabled=true
   become: true
+
+- name: Restart elasticsearch service if config changed
+  service: name=elasticsearch state=restarted enabled=true
+  become: true
+  when: es_restart.changed
 
 - name: Load filebeat JSON index template
   uri:
