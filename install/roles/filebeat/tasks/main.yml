@@ -55,7 +55,7 @@
   with_items:
     - rsyslog
   when:
-    - logging_backend = 'fluentd'
+    - logging_backend == 'fluentd'
     - ansible_distribution == 'CentOS'
     - (ansible_distribution_major_version == "6") or (ansible_distribution_major_version == "7")
 
@@ -63,7 +63,7 @@
   lineinfile: dest=/etc/rsyslog.conf \
           line="*.* @{{ groups['logging_servers'][0] }}:{{ fluentd_syslog_port }}"
   when:
-    - logging_backend = 'fluentd'
+    - logging_backend == 'fluentd'
     - ansible_distribution == 'CentOS'
     - (ansible_distribution_major_version == "6") or (ansible_distribution_major_version == "7")
   register: rsyslog_updated
@@ -78,7 +78,7 @@
   become: true
   register: rsyslog_updated
   when:
-    - logging_backend = 'fluentd'
+    - logging_backend == 'fluentd'
     - ansible_distribution == 'CentOS'
     - (ansible_distribution_major_version == "6") or (ansible_distribution_major_version == "7")
 
@@ -87,6 +87,6 @@
   ignore_errors: true
   when: 
     - rsyslog_updated != 0
-    - logging_backend = 'fluentd'
+    - logging_backend == 'fluentd'
     - ansible_distribution == 'CentOS'
     - (ansible_distribution_major_version == "6") or (ansible_distribution_major_version == "7")
