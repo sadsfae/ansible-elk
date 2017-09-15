@@ -208,11 +208,11 @@
   service: name=elasticsearch state=started enabled=true
   become: true
 
-- name: Setup elasticsearch service
+- name: Restart elasticsearch service if config changed
   service: name=elasticsearch state=restarted enabled=true
   become: true
   when: es_restart.changed
-  
+
 - name: Load filebeat JSON index template
   uri:
     url: http://localhost:9200/_template/filebeat?pretty

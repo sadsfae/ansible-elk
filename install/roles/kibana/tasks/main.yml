@@ -32,7 +32,7 @@
 
 - name: Setup local rsyslogd for fluentd
   lineinfile: dest=/etc/rsyslog.conf \
-          line="*.* @{{ groups['logging_servers'][0] }}:{{ fluentd_syslog_port }}"
+          line="*.* @localhost:{{ fluentd_syslog_port }}"
   when: 
     - logging_backend == 'fluentd'
     - cluster == false 
@@ -150,7 +150,7 @@
 # we will wait for TCP/9200 to become available
 - name: Wait for elasticsearch index to be available
   uri:
-    url: http://{{ groups[elasticsearch_servers][0] }}:9200/_cat/indices
+    url: http://localhost:9200/_cat/indices
     status_code: 200
   register: es_service_result
   until: es_service_result.status == 200
@@ -176,7 +176,7 @@
 # We need to insert data to create an initial index, query if it exists
 - name: Check elasticsearch index for content
   uri:
-    url=http://{{groups[elasticsearch_servers][0]}}:9200/_cat/indices
+    url=http://localhost:9200/_cat/indices
     method=GET
     return_content=yes
   register: elasticsearch_index
@@ -187,7 +187,7 @@
 # leaving this set to 7minutes before giving up
 - name: Check for TCP/5000 logstash listener port, this may take a while
   wait_for:
-    host: "{{ groups[logging_servers][0] }}"
+    host: "localhost"
     port: 5000
     delay: 10
     connect_timeout: 5
@@ -200,7 +200,7 @@
 # leaving this set to 7minutes before giving up
 - name: Check for TCP/5044 logstash listener port, this may take a while
   wait_for:
-    host: "{{ groups[logging_servers][0] }}"
+    host: "localhost"
     port: 5044
     delay: 10
     connect_timeout: 5
@@ -211,7 +211,7 @@
 # Populate elasticsearch with local syslog data
 - name: Populate elasticsearch index with local syslog data
   lineinfile: dest=/etc/rsyslog.conf \
-          line="*.* @{{ groups[logging_servers][0] }}:{{ logstash_localsyslog_port }}"
+          line="*.* @localhost:{{ logstash_localsyslog_port }}"
   when: (logging_backend != 'fluentd')
   register: rsyslog_updated
 
