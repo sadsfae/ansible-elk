@@ -1,0 +1,14 @@
+output {
+{% if cluster %}
+    elasticsearch { 
+        hosts => ["{{("\":%s" % es_port + "\",").join(groups['elasticsearch_servers']) + ":" + es_port}}"]
+    } 
+{% endif %}
+{% if not cluster %}
+    elasticsearch { 
+        hosts => ["localhost:{{ es_port }}"]
+    }
+{% endif %}
+# uncomment this for debug messages
+#  stdout { codec => rubydebug }
+}

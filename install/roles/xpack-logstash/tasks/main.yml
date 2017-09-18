@@ -1,0 +1,19 @@
+---
+#
+# install xpack suite for logstash
+#
+
+
+- name: Check if logstash xpack is installed
+  shell: /usr/share/logstash/bin/logstash-plugin list | grep x-pack
+  register: check_logstash_xpack_installed
+  failed_when: check_logstash_xpack_installed.rc == 2
+  ignore_errors: true
+  changed_when: false
+
+
+
+- name: Install xpack for logstash
+  command: /usr/share/logstash/bin/logstash-plugin install x-pack -b
+  when: install_logstash_xpack and check_logstash_xpack_installed.stdout == ""
+  ignore_errors: true

@@ -18,15 +18,46 @@
   with_items:
     - logstash
 
-- name: Copy logstash filter configuration
+- name: Copy beats input configuration
   template:
-    src=logstash.conf.j2
-    dest=/etc/logstash/conf.d/logstash.conf
+    src=02-beats-input.conf.j2
+    dest=/etc/logstash/conf.d/02-beats-input.conf
     owner=logstash
     group=logstash
     mode=0644
   become: true
+  register: logstash_restart
 
+- name: Copy TCP/UDP input configuration
+  template:
+    src=03-tcp-input.conf.j2
+    dest=/etc/logstash/conf.d/03-tcp-input.conf
+    owner=logstash
+    group=logstash
+    mode=0644
+  become: true
+  register: logstash_restart
+
+- name: Copy 10-syslog-filter configuration
+  template:
+    src=10-syslog-filter.conf.j2
+    dest=/etc/logstash/conf.d/10-syslog-filter.conf
+    owner=logstash
+    group=logstash
+    mode=0644
+  become: true
+  register: logstash_restart
+
+- name: Copy 30-elasticsearch-output configuration
+  template:
+    src=30-elasticsearch-output.conf.j2
+    dest=/etc/logstash/conf.d/30-elasticsearch-output.conf
+    owner=logstash
+    group=logstash
+    mode=0644
+  become: true
+  register: logstash_restart
+  
 - name: Load OpenSSL CA Extended Configuration
   template:
     src=openssl_extras.cnf.j2
@@ -53,37 +84,6 @@
     insertbefore: '# Extensions for a typical CA'
     backup: yes
   when: subjectAltName_exists.stdout|int == 0
-
-- name: Load filebeat JSON index template
-  uri:
-    url: http://localhost:9200/_template/filebeat?pretty
-    method: POST
-    body: "{{ lookup('file', 'filebeat-index-template.json') }}"
-    body_format: json
-    return_content: yes
-  register: filebeatJSON_output
-  until: '"json" in filebeatJSON_output and filebeatJSON_output.json.acknowledged == true'
-  retries: 30
-  delay: 10
-  become: true
-  when: not install_elasticsearch_xpack or not install_logstash_xpack or not install_kibana_xpack
-
-# X-Pack requires additional authentication
-- name: Load filebeat JSON index template (X-Pack enabled)
-  uri:
-    url: http://localhost:9200/_template/filebeat?pretty
-    method: POST
-    user: elastic
-    password: "{{xpack_elastic_user_password}}"
-    body: "{{ lookup('file', 'filebeat-index-template.json') }}"
-    body_format: json
-    return_content: yes
-  register: filebeatJSON_output
-  until: '"json" in filebeatJSON_output and filebeatJSON_output.json.acknowledged == true'
-  retries: 30
-  delay: 10
-  become: true
-  when: install_elasticsearch_xpack
 
 # we need TCP/80 and TCP/8080 open
 # determine firewall status and take action

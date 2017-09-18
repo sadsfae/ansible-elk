@@ -2,12 +2,30 @@
 #
 # install/run packetbeat elk client
 #
+
+#CentOS Installation of packetbeat
 - name: Install packetbeat rpms
   yum: name={{ item }} state=present
   become: true
   with_items:
     - packetbeat
-  when: (logging_backend != 'fluentd')
+  when: 
+    - logging_backend != 'fluentd'
+    - ansible_distribution == 'CentOS'
+    - (ansible_distribution_major_version == "6") or (ansible_distribution_major_version == "7")
+
+#Debian/Ubuntu Installation of packetbeat
+
+- name: Install packetbeat package
+  apt: 
+    name: "{{ item }}" 
+    state: present
+  become: true
+  with_items:
+    - packetbeat
+  when:
+    - logging_backend != 'fluentd'
+    - (ansible_distribution == 'Debian') or (ansible_distribution == 'Ubuntu')
 
 - name: Generate packetbeat configuration template
   template:
@@ -20,13 +38,10 @@
   when: (logging_backend != 'fluentd')
   register: packetbeat_needs_restart
 
-- name: Start packetbeat service
-  command: systemctl start packetbeat.service
-  ignore_errors: true
-  become: true
-  when: ((packetbeat_needs_restart != 0) and (logging_backend != 'fluentd'))
 
-- name: Setup packetbeat service
+- name: Setup packetbeat service (Systemd)
   service: name=packetbeat state=started enabled=true
   become: true
-  when: (logging_backend != 'fluentd')
+  when:
+    - logging_backend != 'fluentd'.
+    - packetbeat_needs_restart != 0
