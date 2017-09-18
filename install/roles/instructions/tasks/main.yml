@@ -29,4 +29,4 @@
   debug: msg="*** 3) Click on Discover ***"
 
 - name: Print Beat client setup instructions
-  debug: msg="*** 4) ansible-playbook -i hosts install/elk-client.yml' to setup clients ***"
+  debug: msg="*** 4) ansible-playbook -i hosts install/elk-client.yml --extra-vars 'logging_servers=X.X.X.X' to setup clients ***"
