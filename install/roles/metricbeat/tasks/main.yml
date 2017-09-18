@@ -38,17 +38,6 @@
   when: (logging_backend != 'fluentd')
   register: metricbeat_needs_restart
 
-#Centos Service Configuration
-#- name: Start metricbeat service (CentOS)
-##  command: systemctl start metricbeat.service
-#  ignore_errors: true
-#  become: true
-#  when: 
-#    - metricbeat_needs_restart != 0
-#    - logging_backend != 'fluentd'
-#    - ansible_distribution == 'CentOS'
-#    - (ansible_distribution_major_version == "6") or (ansible_distribution_major_version == "7")
-
 - name: Setup metricbeat service (Systemd)
   service: name=metricbeat state=started enabled=true
   become: true
