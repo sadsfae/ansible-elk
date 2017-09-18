@@ -77,9 +77,9 @@ ansible-playbook -i hosts install/elk.yml
 ![ELK](/image/elk-index-5.x-3.png?raw=true "Click Discover")
 
 ## ELK Client Instructions
-   - Run the client playbook against the generated ``elk_server`` variable
+   - Run the client playbook against the generated ``logging_servers`` variable
 ```
-ansible-playbook -i hosts install/elk-client.yml
+ansible-playbook -i hosts install/elk-client.yml --extra-vars "logging_servers=X.X.X.X"
 ```
    - Once this completes return to your ELK and you'll see log results come in from ELK/EFK clients via filebeat
 ![ELK](/image/elk-index-5.x-4.png?raw=true "watch the magic")
