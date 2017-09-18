@@ -61,7 +61,7 @@
 
 - name: Setup rsyslogd for fluentd
   lineinfile: dest=/etc/rsyslog.conf \
-          line="*.* @{{ elk_server }}:{{ fluentd_syslog_port }}"
+          line="*.* @{{ logging_servers }}:{{ fluentd_syslog_port }}"
   when:
     - logging_backend == 'fluentd'
     - ansible_distribution == 'CentOS'
