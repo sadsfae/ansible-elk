@@ -2,30 +2,17 @@
 #
 # Playbook to install the ELK stack
 #
-- hosts: elasticsearch_servers
+
+- hosts: elk
   remote_user: root
   vars_files:
     - group_vars/all.yml
   roles:
     - { role: elasticsearch }
-    - { role: curator, when: install_curator_tool }
-    - { role: xpack-elasticsearch, when: (install_elasticsearch_xpack) }
-
-- hosts: logging_servers
-  remote_user: root
-  vars_files:
-    - group_vars/all.yml
-  roles:
     - { role: fluentd, when: (logging_backend == 'fluentd') }
     - { role: logstash, when: ((logging_backend is none) or (logging_backend == 'logstash')) }
-    - { role: xpack-logstash, when: (install_logstash_xpack) and ((logging_backend is none) or (logging_backend == 'logstash')) }
-
-- hosts: kibana_servers
-  remote_user: root
-  vars_files:
-    - group_vars/all.yml
-  roles:
     - { role: nginx }
+    - { role: curator, when: install_curator_tool }
     - { role: kibana }
-    - { role: xpack-kibana, when: (install_kibana_xpack) }
+    - { role: xpack, when: ((install_elasticsearch_xpack) or (install_kibana_xpack) or (install_logstash_xpack)) }
     - { role: instructions }

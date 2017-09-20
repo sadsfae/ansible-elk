@@ -74,13 +74,11 @@ output:
 
   ### Elasticsearch as output
   #elasticsearch:
-  logstash:
     # Array of hosts to connect to.
     # Scheme and port can be left out and will be set to the default (http and 9200)
     # In case you specify and additional path, the scheme is required: http://localhost:9200/path
     # IPv6 addresses should always be defined as: https://[2001:db8::1]:9200
-    hosts: ["{{ groups['logging_servers'][0] }}:{{ logstash_syslog_port }}"]
-    bulk_max_size: 1024
+
     # Optional protocol and basic auth credentials. These are deprecated.
     #protocol: "https"
     #username: "admin"
@@ -158,7 +156,7 @@ output:
   ### Logstash as output
   logstash:
     # The Logstash hosts
-    hosts: ["{{ groups['logging_servers'][0] }}:{{ logstash_syslog_port }}"]
+    hosts: ["{{ elk_server }}:{{ logstash_syslog_port }}"]
     bulk_max_size: 1024
     # Number of workers per Logstash host.
     #worker: 1

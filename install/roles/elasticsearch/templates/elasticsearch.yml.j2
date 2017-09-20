@@ -14,23 +14,14 @@
 #
 # Use a descriptive name for your cluster:
 #
-{% if cluster %}
-cluster.name: {{ elasticsearch_clustername }}
-{% endif %}
-{% if not cluster %}
-#cluster.name: {{ elasticsearch_clustername }}
-{% endif %}
+#cluster.name: my-application
 #
 # ------------------------------------ Node ------------------------------------
 #
 # Use a descriptive name for the node:
 #
-{% if cluster %}
-node.name: ${HOSTNAME}
-{% endif %}
-{% if not cluster %}
-#node.name: ${HOSTNAME}
-{% endif %}
+#node.name: node-1
+#
 # Add custom attributes to the node:
 #
 #node.attr.rack: r1
@@ -62,7 +53,7 @@ node.name: ${HOSTNAME}
 # Set the bind address to a specific IP (IPv4 or IPv6):
 #
 {% if es_listen_external %}
-network.host: [{{ ansible_default_ipv4.address }}, _local_]
+network.host: 0.0.0.0 
 {% endif %}
 {% if not es_listen_external %}
 #network.host: {{ ansible_default_ipv4.address }}
@@ -79,22 +70,11 @@ network.host: [{{ ansible_default_ipv4.address }}, _local_]
 # Pass an initial list of hosts to perform discovery when new node is started:
 # The default list of hosts is ["127.0.0.1", "[::1]"]
 #
-{% if cluster %}
-discovery.zen.ping.unicast.hosts:  {{ groups['elasticsearch_servers'] | to_json }} 
-{% endif %}
-{% if not cluster %}
 #discovery.zen.ping.unicast.hosts: ["host1", "host2"]
-{% endif %}
 #
 # Prevent the "split brain" by configuring the majority of nodes (total number of master-eligible nodes / 2 + 1):
 #
-{% if cluster %}
-discovery.zen.minimum_master_nodes: {{ groups['elasticsearch_servers'] | length % 2 + 1 }}
-{% endif %}
-{% if not cluster %}
-# discovery.zen.minimum_master_nodes: {{ groups['elasticsearch_servers'] | length % 2 + 1 }}
-{% endif %}
-#
+#discovery.zen.minimum_master_nodes: 3
 #
 # For more information, consult the zen discovery module documentation.
 #
@@ -102,13 +82,7 @@ discovery.zen.minimum_master_nodes: {{ groups['elasticsearch_servers'] | length 
 #
 # Block initial recovery after a full cluster restart until N nodes are started:
 #
-{% if cluster %}
-gateway.recover_after_nodes: 2
-{% endif %}
-{% if not cluster %}
 #gateway.recover_after_nodes: 3
-{% endif %}
-#
 #
 # For more information, consult the gateway module documentation.
 #

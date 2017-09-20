@@ -1,7 +1,7 @@
 ---
-########################################
-# Logstash Installation
-########################################
+#
+# Install/run logstash
+#
 
 - name: Copy logstash yum repo file
   copy:
@@ -18,54 +18,15 @@
   with_items:
     - logstash
 
-########################################
-# Logstash Configuration
-########################################
-
-- name: Copy beats input configuration
+- name: Copy logstash filter configuration
   template:
-    src=02-beats-input.conf.j2
-    dest=/etc/logstash/conf.d/02-beats-input.conf
+    src=logstash.conf.j2
+    dest=/etc/logstash/conf.d/logstash.conf
     owner=logstash
     group=logstash
     mode=0644
   become: true
-  register: logstash_restart
 
-- name: Copy TCP/UDP input configuration
-  template:
-    src=03-tcp-input.conf.j2
-    dest=/etc/logstash/conf.d/03-tcp-input.conf
-    owner=logstash
-    group=logstash
-    mode=0644
-  become: true
-  register: logstash_restart
-
-- name: Copy 10-syslog-filter configuration
-  template:
-    src=10-syslog-filter.conf.j2
-    dest=/etc/logstash/conf.d/10-syslog-filter.conf
-    owner=logstash
-    group=logstash
-    mode=0644
-  become: true
-  register: logstash_restart
-
-- name: Copy 30-elasticsearch-output configuration
-  template:
-    src=30-elasticsearch-output.conf.j2
-    dest=/etc/logstash/conf.d/30-elasticsearch-output.conf
-    owner=logstash
-    group=logstash
-    mode=0644
-  become: true
-  register: logstash_restart
-
-########################################
-# OpenSSL Configuration
-########################################
-  
 - name: Load OpenSSL CA Extended Configuration
   template:
     src=openssl_extras.cnf.j2
@@ -93,43 +54,36 @@
     backup: yes
   when: subjectAltName_exists.stdout|int == 0
 
-########################################
-# Cert and Key Generation
-########################################
+- name: Load filebeat JSON index template
+  uri:
+    url: http://localhost:9200/_template/filebeat?pretty
+    method: POST
+    body: "{{ lookup('file', 'filebeat-index-template.json') }}"
+    body_format: json
+    return_content: yes
+  register: filebeatJSON_output
+  until: '"json" in filebeatJSON_output and filebeatJSON_output.json.acknowledged == true'
+  retries: 30
+  delay: 10
+  become: true
+  when: not install_elasticsearch_xpack or not install_logstash_xpack or not install_kibana_xpack
 
-- name: Check Beat forwarder SSL certificate
-  stat: path=/usr/share/logstash/beat-forwarder.crt
-  ignore_errors: true
-  register: beat_forwarder_ssl_exists
-
-- name: Create client forwarder SSL certificate
-  command: openssl req -subj '/CN={{ ansible_fqdn }}/' -config /etc/pki/tls/openssl_extras.cnf \
-    -x509 -days 3650 -batch -nodes -newkey rsa:2048 -keyout /usr/share/logstash/beat-forwarder.key \
-    -out /usr/share/logstash/beat-forwarder.crt
-  ignore_errors: true
-  when: beat_forwarder_ssl_exists != 0
-- name: Set permissions on logstash certificate
-  file:
-    path: /usr/share/logstash/beat-forwarder.crt
-    owner: logstash
-    group: logstash
-    mode: 0600
-  when: 
-    - logging_backend != 'fluentd'
-
-- name: Set permissions on logstash certificate key
-  file:
-    path: /usr/share/logstash/beat-forwarder.key
-    owner: logstash
-    group: logstash
-    mode: 0600
-  when: (logging_backend != 'fluentd')
-
-
-########################################
-# Firewall and Ip Tables Generation
-########################################
-
+# X-Pack requires additional authentication
+- name: Load filebeat JSON index template (X-Pack enabled)
+  uri:
+    url: http://localhost:9200/_template/filebeat?pretty
+    method: POST
+    user: elastic
+    password: "{{xpack_elastic_user_password}}"
+    body: "{{ lookup('file', 'filebeat-index-template.json') }}"
+    body_format: json
+    return_content: yes
+  register: filebeatJSON_output
+  until: '"json" in filebeatJSON_output and filebeatJSON_output.json.acknowledged == true'
+  retries: 30
+  delay: 10
+  become: true
+  when: install_elasticsearch_xpack
 
 # we need TCP/80 and TCP/8080 open
 # determine firewall status and take action
@@ -203,12 +157,3 @@
     # Skip ANSIBLE0013 Use shell only when shell functionality is required
     # No systemctl module available in current stable release (Ansible 2.1)
     - skip_ansible_lint
-
-########################################
-# Enable Logstash Service
-########################################
-
-- name: Enable logstash service
-  service: name=logstash state=started enabled=true
-  become: true
-  when: (logging_backend != 'fluentd')

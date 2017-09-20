@@ -5,18 +5,18 @@
 #
 
 - name: Print SSL certificate post-setup information
-  debug: msg="Filebeat SSL Certificate available at http://{{ groups['kibana_servers'][0] }}:{{ elk_server_ssl_cert_port }}/beat-forwarder.crt"
+  debug: msg="Filebeat SSL Certificate available at http://{{ ansible_fqdn }}:{{ elk_server_ssl_cert_port }}/beat-forwarder.crt"
   when: (logging_backend != 'fluentd')
 
 - name: Print SSL key post-setup information
-  debug: msg="Filebeat SSL Certificate key is located at http://{{ groups['kibana_servers'][0] }}:{{ elk_server_ssl_cert_port }}/beat-forwarder.key"
+  debug: msg="Filebeat SSL Certificate key is located at http://{{ ansible_fqdn }}:{{ elk_server_ssl_cert_port }}/beat-forwarder.key"
   when: (logging_backend != 'fluentd')
 
 - name: Print post-setup URL
-  debug: msg="*** ELK Services available at http://{{ groups['kibana_servers'][0] }}:{{ nginx_kibana_port }} ***"
+  debug: msg="*** ELK Services available at http://{{ ansible_fqdn }}:{{ nginx_kibana_port }} ***"
 
 - name: Print index creation instructions
-  debug: msg="*** 1) Navigate to http://{{ groups['kibana_servers'][0] }}:{{ nginx_kibana_port }} and login with {{kibana_user}}/{{kibana_password}} ***"
+  debug: msg="*** 1) Navigate to http://{{ ansible_fqdn }}:{{ nginx_kibana_port }} and login with {{kibana_user}}/{{kibana_password}} ***"
 
 - name: Print X-Pack instructions
   debug: msg="*** 1A) (X-Pack only) Kibana account credentials login with elastic/{{xpack_elastic_user_password}} ***"
@@ -28,5 +28,5 @@
 - name: Print Navigation Instructions
   debug: msg="*** 3) Click on Discover ***"
 
-- name: Print Beat client setup instructions
-  debug: msg="*** 4) ansible-playbook -i hosts install/elk-client.yml' to setup clients ***"
+- name: Print filebeat client setup instructions
+  debug: msg="*** 4) ansible-playbook -i hosts install/elk-client.yml --extra-vars 'elk_server={{ ansible_default_ipv4.address }}' to setup clients ***"

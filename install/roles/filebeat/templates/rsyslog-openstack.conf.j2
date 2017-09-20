@@ -160,4 +160,4 @@ $InputFileFacility local7
 $InputRunFileMonitor
 
 # send to elk_server
-*.* @{{ groups['logging_servers'][0] }}:{{ fluentd_syslog_port }}
+*.* @{{ elk_server }}:{{ fluentd_syslog_port }}

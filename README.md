@@ -7,7 +7,6 @@ Ansible Playbook for setting up the ELK/EFK Stack and Filebeat client on remote 
 ## What does it do?
    - Automated deployment of a full ELK or EFK stack (Elasticsearch, Logstash/Fluentd, Kibana)
      * 5.5+ and 2.4 ELK versions are maintained.
-     * Can do single machine, or clustered ElasticSearch - all configs expand dynamically to support the correct number of hosts
      * Uses Nginx as a reverse proxy for Kibana
      * Generates SSL certificates for Filebeat or Logstash-forwarder
      * Adds either iptables or firewalld rules if firewall is active
@@ -21,8 +20,7 @@ Ansible Playbook for setting up the ELK/EFK Stack and Filebeat client on remote 
      * This is also available on [Ansible Galaxy](https://galaxy.ansible.com/sadsfae/ansible-elk/)
 
 ## Requirements
-   - RHEL7 or CentOS7+ server with no modifications
-   - RHEL, Centos, Ubuntu/Debian clients
+   - RHEL7 or CentOS7+ server/client with no modifications
    - ELK/EFK server with at least 8G of memory (you can try with less but 5.x series is quite demanding - try 2.4 series if you have scarce resources).
      - Fedora 23 or higher needs to have ```yum python2 python2-dnf libselinux-python``` packages.
        * You can run this against Fedora clients prior to running Ansible ELK:
@@ -49,8 +47,6 @@ sysctl -p
      - ```install_kibana_xpack: true```
      - ```install_logstash_xpack: true```
      - Note: Deploying X-Pack will wrap your ES with additional authentication and security, Kibana for example will have it's own credentials now - the default is username: ```elastic``` and password: ```changeme```
-   - Deploy clustered setup by changing cluster to true in group_vars/all.yml
-     - If deploying clustered environment, Logstash and Kibana Server must be the same. Multiple logstash servers are not yet supported.
 
 ## ELK/EFK Server Instructions
    - Clone repo and setup your hosts file
@@ -77,9 +73,9 @@ ansible-playbook -i hosts install/elk.yml
 ![ELK](/image/elk-index-5.x-3.png?raw=true "Click Discover")
 
 ## ELK Client Instructions
-   - Run the client playbook against the generated ``logging_servers`` variable
+   - Run the client playbook against the generated ``elk_server`` variable
 ```
-ansible-playbook -i hosts install/elk-client.yml --extra-vars "logging_servers=X.X.X.X"
+ansible-playbook -i hosts install/elk-client.yml --extra-vars 'elk_server=X.X.X.X'
 ```
    - Once this completes return to your ELK and you'll see log results come in from ELK/EFK clients via filebeat
 ![ELK](/image/elk-index-5.x-4.png?raw=true "watch the magic")
