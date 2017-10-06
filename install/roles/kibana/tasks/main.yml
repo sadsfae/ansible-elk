@@ -155,7 +155,7 @@
 - name: Wait for elastic index to be available (X-Pack enabled only generic check)
   wait_for:
     host: localhost
-    port: 9200
+    port: '{{ es_local_port }}'
     delay: 10
     connect_timeout: 5
     timeout: 420
@@ -177,7 +177,7 @@
 - name: Check for TCP/5000 logstash listener port, this may take a while
   wait_for:
     host: localhost
-    port: 5000
+    port: '{{ logstash_localsyslog_port }}'
     delay: 10
     connect_timeout: 5
     timeout: 420
@@ -190,7 +190,7 @@
 - name: Check for TCP/5044 logstash listener port, this may take a while
   wait_for:
     host: localhost
-    port: 5044
+    port: '{{ logstash_syslog_port }}'
     delay: 10
     connect_timeout: 5
     timeout: 420
