@@ -7,6 +7,7 @@
   become: true
   with_items:
     - packetbeat
+    - libpcap
   when: (logging_backend != 'fluentd')
 
 - name: Generate packetbeat configuration template
