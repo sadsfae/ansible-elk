@@ -6,6 +6,21 @@ epel_repo: https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rp
 ########################################
 # ELK Server Variables
 ########################################
+### FIREWALL MANAGEMENT ###
+# By default we will enable firewall management, this
+# will ensure if you're using either firewalld or iptables-services
+# that the proper service rules are applied and any existing rulesets
+# are saved.
+# DEFAULT: true
+# TO DISABLE: set to empty or false
+# NOTE: if you disable this you'll need to make sure you open up
+# equivalent firewall ports below or turn it off entirely (not recommended)
+# even if you leave firewall rules off you can safely leave this enabled
+# as the current firewall code will detect this and leave it alone.
+# if you really, really want to disable checking/applying service firewall rules
+# then change to 'false' or empty
+manage_firewall: true
+
 ### nginx ###
 # add nonstandard port here for undercloud usage
 # note: you should use nonstandard ports for both here

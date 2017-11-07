@@ -174,7 +174,7 @@
 # Make sure TCP/5000 is up and listening for logstash
 # logstash 5.x takes a long time to start for me
 # leaving this set to 7minutes before giving up
-- name: Check for TCP/{{ logstash_localsyslog_port }} logstash listener port, this may take a while
+- name: Check for TCP/{{ logstash_localsyslog_port }} logstash internal listener port, this may take a while
   wait_for:
     host: localhost
     port: '{{ logstash_localsyslog_port }}'
@@ -187,7 +187,7 @@
 # Make sure TCP/5044 is up and listening for logstash
 # logstash 5.x takes a long time to start for me
 # leaving this set to 7minutes before giving up
-- name: Check for TCP/{{ logstash_syslog_port }} logstash listener port, this may take a while
+- name: Check for TCP/{{ logstash_syslog_port }} logstash external listener port, this may take a while
   wait_for:
     host: localhost
     port: '{{ logstash_syslog_port }}'
