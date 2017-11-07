@@ -85,7 +85,7 @@
 - name: Add OpenSSL SANs (SubjectAltName) entry for CA
   lineinfile:
     dest: /etc/pki/tls/openssl.cnf
-    line: 'subjectAltName = "{{ ansible_default_ipv4.address }}"'
+    line: 'subjectAltName = "IP: {{ ansible_default_ipv4.address }}"'
     regexp: '^ Extensions for a typical CA'
     insertbefore: '# Extensions for a typical CA'
     backup: yes
