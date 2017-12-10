@@ -38,16 +38,19 @@
 - name: Check if system memory is greater than 64G
   debug: msg="System memory is {{ansible_memory_mb.real.total | int}} so setting heapsize to 32G upper limit"
   when: ansible_memory_mb.real.total|int >= 65536
+  become: true
 
 - name: Apply heapsize tuning for systems with greater than 64G memory
   lineinfile: dest=/usr/share/elasticsearch/bin/elasticsearch.in.sh \
           line="ES_HEAP_SIZE=32g" insertafter="^ES_CLASSPATH="
   when: ansible_memory_mb.real.total|int >= 65536
   register: elasticsearch_updated
+  become: true
 
 - name: Print extended documentation for heapsize tuning
   debug: msg="Refer to https://www.elastic.co/guide/en/elasticsearch/guide/current/_limiting_memory_usage.html"
   when: ansible_memory_mb.real.total|int >= 65536
+  become: true
 
 - name: Update elasticsearch startup with heap size
   become: true
@@ -58,22 +61,26 @@
 
 - name: Apply workaround for java listening port
   raw: setcap 'cap_net_bind_service=+ep' /usr/lib/jvm/java-1.8.*openjdk-*/jre/bin/java
+  become: true
 
 # https://www.centos.org/forums/viewtopic.php?t=16398
 - name: Obtain exact version of JRE for libjli.so workaround
   shell: "ls /usr/lib/jvm/ | grep java | grep openjdk-1"
   register: libjli_location
+  become: true
 
 - name: Apply EL symlink workaround for libjli.so
   file:
     src='/usr/lib/jvm/{{libjli_location.stdout}}/jre/lib/amd64/jli/libjli.so'
     dest='/lib64/libjli.so'
     state=link
+  become: true
 
 - name: Start elasticsearch service
   command: systemctl start elasticsearch.service
   ignore_errors: true
   when: elasticsearch_updated != 0
+  become: true
 
 - name: Setup elasticsearch service
   service: name=elasticsearch state=started enabled=true

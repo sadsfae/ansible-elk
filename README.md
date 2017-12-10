@@ -56,6 +56,12 @@ cd ansible-elk
 sed -i 's/host-01/elkserver/' hosts
 sed -i 's/host-02/elkclient/' hosts
 ```
+   - If you're using a non-root user for Ansible, e.g. AWS EC2 likes to use ec2-user then set the follow below, default is root.
+
+```
+ansible_system_user: ec2-user
+``` 
+
    - Run the playbook
 ```
 ansible-playbook -i hosts install/elk.yml

@@ -33,16 +33,19 @@
           line="*.* @localhost:{{ fluentd_syslog_port }}"
   when: (logging_backend == 'fluentd')
   register: rsyslog_updated
+  become: true
 
 - name: Populate elasticsearch index with local logs via fluentd
   command: systemctl restart rsyslog.service
   ignore_errors: true
   when: rsyslog_updated != 0
+  become: true
 
 - name: Check kibana filebeat dashboards
   stat: path=/tmp/filebeat-dashboards.zip
   ignore_errors: true
   register: kibana_dashboards_present
+  become: true
 
 - name: Copy kibana filebeat dashboards
   copy:
@@ -59,20 +62,24 @@
   unarchive: src=/tmp/filebeat-dashboards.zip dest=/tmp/ copy=no
   ignore_errors: true
   when: kibana_dashboards_present != 0
+  become: true
 
 - name: Configure kibana filebeat dashboards
   shell: sh /tmp/beats-dashboards-master/load.sh -url "http://localhost:9200" -user "{{kibana_user}}:{{kibana_password}}"
   ignore_errors: true
+  become: true
 
 - name: Check kibana users
   stat: path=/etc/nginx/htpasswd.users
   ignore_errors: true
   register: kibana_user_pwfile_exists
+  become: true
 
 - name: Create kibana admin user
   command: htpasswd -b -c /etc/nginx/htpasswd.users {{kibana_user}} {{kibana_password}}
   ignore_errors: true
   when: kibana_user_pwfile_exists != 0
+  become: true
 
 - name: Setup kibana service
   service: name=kibana state=started enabled=true
@@ -82,12 +89,14 @@
   stat: path=/usr/share/logstash/beat-forwarder.crt
   ignore_errors: true
   register: filebeat_forwarder_ssl_exists
+  become: true
 
 - name: Create SSL structure for Fluentd installs
   file:
     path: /usr/share/logstash
     state: directory
   when: (logging_backend == 'fluentd')
+  become: true
 
 - name: Create client forwarder SSL certificate
   command: openssl req -subj '/CN={{ ansible_fqdn }}/' -config /etc/pki/tls/openssl_extras.cnf \
@@ -95,21 +104,25 @@
     -out /usr/share/logstash/beat-forwarder.crt
   ignore_errors: true
   when: filebeat_forwarder_ssl_exists != 0
+  become: true
 
 - name: Check Filebeat forwarder SSL certificate copy
   stat: path=/usr/share/nginx/html/beat-forwarder.crt
   ignore_errors: true
   register: filebeat_forwarder_ssl_client_copy_exists
+  become: true
 
 - name: Copy Filebeat forwarder SSL certificate
   command: cp /usr/share/logstash/beat-forwarder.crt /usr/share/nginx/html/beat-forwarder.crt
   ignore_errors: true
   when: filebeat_forwarder_ssl_client_copy_exists != 0
+  become: true
 
 - name: Copy Filebeat forwarder SSL certificate key
   command: cp /usr/share/logstash/beat-forwarder.key /usr/share/nginx/html/beat-forwarder.key
   ignore_errors: true
   when: filebeat_forwarder_ssl_client_copy_exists != 0
+  become: true
 
 - name: Set permissions on logstash certificate
   file:
@@ -118,6 +131,7 @@
     group: logstash
     mode: 0600
   when: (logging_backend != 'fluentd')
+  become: true
 
 - name: Set permissions on logstash certificate key
   file:
@@ -126,6 +140,7 @@
     group: logstash
     mode: 0600
   when: (logging_backend != 'fluentd')
+  become: true
 
 # We are in the kibana playbook but starting logstash here now
 # This is needed because perms should be set on certificates before
@@ -146,6 +161,7 @@
   retries: 50
   delay: 10
   when: not install_elasticsearch_xpack
+  become: true
 
 # We will use a more generic check if x-pack is installed as it wraps everything
 # in additional authentication making it difficult to interpret HTTP status
@@ -161,6 +177,7 @@
     timeout: 420
     state: started
   when: install_elasticsearch_xpack
+  become: true
 
 # We need to insert data to create an initial index, query if it exists
 - name: Check elasticsearch index for content
@@ -170,6 +187,7 @@
     return_content=yes
   register: elasticsearch_index
   when: not install_elasticsearch_xpack
+  become: true
 
 # Make sure TCP/5000 is up and listening for logstash
 # logstash 5.x takes a long time to start for me
@@ -183,6 +201,7 @@
     timeout: 420
     state: started
   when: (logging_backend != 'fluentd')
+  become: true
 
 # Make sure TCP/5044 is up and listening for logstash
 # logstash 5.x takes a long time to start for me
@@ -196,6 +215,7 @@
     timeout: 420
     state: started
   when: (logging_backend != 'fluentd')
+  become: true
 
 # Populate elasticsearch with local syslog data
 - name: Populate elasticsearch index with local syslog data
@@ -203,11 +223,13 @@
           line="*.* @localhost:{{ logstash_localsyslog_port }}"
   when: (logging_backend != 'fluentd')
   register: rsyslog_updated
+  become: true
 
 - name: Restart rsyslogd to populate elasticsearch index
   command: systemctl restart rsyslog.service
   ignore_errors: true
   when: rsyslog_updated != 0
+  become: true
 
 - name: Refresh fluentd service
   command: systemctl restart td-agent.service

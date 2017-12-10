@@ -44,6 +44,7 @@
     # Skip ANSIBLE0012 Commands should not change things if nothing needs doing
     # Need to understand if an entry exists
     - skip_ansible_lint
+  become: true
 
 - name: Add OpenSSL SANs (SubjectAltName) entry for CA
   lineinfile:
@@ -53,6 +54,7 @@
     insertbefore: '# Extensions for a typical CA'
     backup: yes
   when: subjectAltName_exists.stdout|int == 0
+  become: true
 
 - name: Load filebeat JSON index template
   uri:

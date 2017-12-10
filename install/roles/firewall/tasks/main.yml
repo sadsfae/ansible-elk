@@ -22,6 +22,7 @@
   register: firewalld_in_use
   no_log: true
   when: es_listen_external
+  become: true
 
 - name: Determine if firewalld is active
   shell: systemctl is-active firewalld.service | grep -vq inactive
@@ -29,6 +30,7 @@
   register: firewalld_is_active
   no_log: true
   when: es_listen_external
+  become: true
 
 - name: Determine if TCP/{{es_local_port}} is already active
   shell: firewall-cmd --list-ports | egrep -q "^{{es_local_port}}/tcp"
@@ -36,6 +38,7 @@
   register: firewalld_es_local_port_exists
   no_log: true
   when: es_listen_external
+  become: true
 
 # add firewall rule via firewall-cmd
 - name: Add firewall rule for TCP/{{es_local_port}} (firewalld)
@@ -55,6 +58,7 @@
   failed_when: iptables_es_local_port_exists == 127
   no_log: true
   when: es_listen_external
+  become: true
 
 - name: Add firewall rule for TCP/{{es_local_port}} (iptables-services)
   lineinfile:
@@ -65,6 +69,7 @@
     backup: yes
   when: es_listen_external and firewalld_in_use.rc != 0 and firewalld_is_active.rc != 0 and iptables_es_local_port_exists.stdout|int == 0
   register: iptables_needs_restart
+  become: true
 
 - name: Restart iptables-services for TCP/{{es_local_port}} (iptables-services)
   shell: systemctl restart iptables.service
@@ -74,6 +79,7 @@
     # Skip ANSIBLE0013 Use shell only when shell functionality is required
     # No systemctl module available in current stable release (Ansible 2.1)
     - skip_ansible_lint
+  become: true
 
 # Firewalld
 - name: Determine if firewalld is in use
@@ -82,6 +88,7 @@
   register: firewalld_in_use
   no_log: true
   when: syslog_listen_external
+  become: true
 
 - name: Determine if firewalld is active
   shell: systemctl is-active firewalld.service | grep -vq inactive
@@ -89,6 +96,7 @@
   register: firewalld_is_active
   no_log: true
   when: syslog_listen_external
+  become: true
 
 - name: Determine if TCP/{{logstash_localsyslog_port}} is already active
   shell: firewall-cmd --list-ports | egrep -q "^{{logstash_localsyslog_port}}/tcp"
@@ -96,6 +104,7 @@
   register: firewalld_logstash_localsyslog_port_exists
   no_log: true
   when: syslog_listen_external
+  become: true
 
 # add firewall rule via firewall-cmd
 - name: Add firewall rule for TCP/{{logstash_localsyslog_port}} (firewalld)
@@ -115,6 +124,7 @@
   failed_when: iptables_logstash_localsyslog_port_exists == 127
   no_log: true
   when: syslog_listen_external
+  become: true
 
 - name: Add firewall rule for TCP/{{logstash_localsyslog_port}} (iptables-services)
   lineinfile:
@@ -125,6 +135,7 @@
     backup: yes
   when: syslog_listen_external and firewalld_in_use.rc != 0 and firewalld_is_active.rc != 0 and iptables_logstash_localsyslog_port_exists.stdout|int == 0
   register: iptables_needs_restart
+  become: true
 
 - name: Restart iptables-services for TCP/{{logstash_localsyslog_port}} (iptables-services)
   shell: systemctl restart iptables.service
@@ -134,9 +145,9 @@
     # Skip ANSIBLE0013 Use shell only when shell functionality is required
     # No systemctl module available in current stable release (Ansible 2.1)
     - skip_ansible_lint
+  become: true
 
 ## End elasticsearch rules ##
-
 
 ####### BEGIN logstash firewall rules #########
 
@@ -154,6 +165,7 @@
     # Skip ANSIBLE0012 Commands should not change things if nothing needs doing
     # Check if firewall is enabled
     - skip_ansible_lint
+  become: true
 
 - name: Determine if firewalld is active
   shell: systemctl is-active firewalld.service | grep -vq inactive
@@ -163,6 +175,7 @@
     # Skip ANSIBLE0012 Commands should not change things if nothing needs doing
     # Check if firewall is active
     - skip_ansible_lint
+  become: true
 
 - name: Determine if TCP/{{logstash_syslog_port}} is already active
   shell: firewall-cmd --list-ports | egrep -q "^{{logstash_syslog_port}}/tcp"
@@ -172,6 +185,7 @@
     # Skip ANSIBLE0012 Commands should not change things if nothing needs doing
     # Need to validate if port already configured
     - skip_ansible_lint
+  become: true
 
 # add firewall rule via firewall-cmd
 - name: Add firewall rule for TCP/{{logstash_syslog_port}} (firewalld)
@@ -193,6 +207,7 @@
     # Skip ANSIBLE0012 Commands should not change things if nothing needs doing
     # Need to validate if port already configured
     - skip_ansible_lint
+  become: true
 
 - name: Add firewall rule for TCP/{{logstash_syslog_port}} (iptables-services)
   lineinfile:
@@ -203,6 +218,7 @@
     backup: yes
   when: firewalld_in_use.rc != 0 and firewalld_is_active.rc != 0 and iptables_logstash_syslog_port_exists.stdout|int == 0
   register: iptables_needs_restart
+  become: true
 
 - name: Restart iptables-services for TCP/{{logstash_syslog_port}} (iptables-services)
   shell: systemctl restart iptables.service
@@ -212,6 +228,7 @@
     # Skip ANSIBLE0013 Use shell only when shell functionality is required
     # No systemctl module available in current stable release (Ansible 2.1)
     - skip_ansible_lint
+  become: true
 
 ## END Logstash firewall rules ##
 
@@ -232,6 +249,7 @@
     # Skip ANSIBLE0012 Commands should not change things if nothing needs doing
     # Need to check if firewall is active
     - skip_ansible_lint
+  become: true
 
 - name: Determine if firewalld is active
   shell: systemctl is-active firewalld.service | grep -vq inactive
@@ -242,6 +260,7 @@
     # Skip ANSIBLE0012 Commands should not change things if nothing needs doing
     # Need to check if firewall is active
     - skip_ansible_lint
+  become: true
 
 - name: Determine if TCP/{{nginx_kibana_port}} is already active
   shell: firewall-cmd --list-ports | egrep -q "^{{nginx_kibana_port}}/tcp"
@@ -252,6 +271,7 @@
     # Skip ANSIBLE0012 Commands should not change things if nothing needs doing
     # Need to check if firewall rule already exists
     - skip_ansible_lint
+  become: true
 
 # add firewall rule via firewall-cmd
 - name: Add firewall rule for TCP/{{nginx_kibana_port}} (firewalld)
@@ -274,6 +294,7 @@
     # Skip ANSIBLE0012 Commands should not change things if nothing needs doing
     # Need to check if firewall rule already exists
     - skip_ansible_lint
+  become: true
 
 - name: Add firewall rule for TCP/{{nginx_kibana_port}} (iptables-services)
   lineinfile:
@@ -284,6 +305,7 @@
     backup: yes
   when: firewalld_in_use.rc != 0 and firewalld_is_active.rc != 0 and iptables_kibana_port_exists.stdout|int == 0
   register: iptables_needs_restart
+  become: true
 
 - name: Restart iptables-services for TCP/{{nginx_kibana_port}} (iptables-services)
   shell: systemctl restart iptables.service
@@ -293,6 +315,7 @@
     # Skip ANSIBLE0013 Use shell only when shell functionality is required
     # No systemctl module available in current stable release (Ansible 2.1)
     - skip_ansible_lint
+  become: true
 
 # Firewalld
 - name: Determine if firewalld is in use
@@ -304,6 +327,7 @@
     # Skip ANSIBLE0012 Commands should not change things if nothing needs doing
     # Need to check if firewall is active
     - skip_ansible_lint
+  become: true
 
 - name: Determine if firewalld is active
   shell: systemctl is-active firewalld.service | grep -vq inactive
@@ -314,6 +338,7 @@
     # Skip ANSIBLE0012 Commands should not change things if nothing needs doing
     # Need to check if firewall is active
     - skip_ansible_lint
+  become: true
 
 - name: Determine if TCP/{{elk_server_ssl_cert_port}} is already active
   shell: firewall-cmd --list-ports | egrep -q "^{{elk_server_ssl_cert_port}}/tcp"
@@ -324,6 +349,7 @@
     # Skip ANSIBLE0012 Commands should not change things if nothing needs doing
     # Need to check if firewall rule already exists
     - skip_ansible_lint
+  become: true
 
 # add firewall rule via firewall-cmd
 - name: Add firewall rule for TCP/{{elk_server_ssl_cert_port}} (firewalld)
@@ -346,6 +372,7 @@
     # Skip ANSIBLE0012 Commands should not change things if nothing needs doing
     # Need to check if firewall rule already exists
     - skip_ansible_lint
+  become: true
 
 - name: Add firewall rule for TCP/{{elk_server_ssl_cert_port}} (iptables-services)
   lineinfile:
@@ -356,6 +383,7 @@
     backup: yes
   when: firewalld_in_use.rc != 0 and firewalld_is_active.rc != 0 and iptables_elk_server_ssl_exists.stdout|int == 0
   register: iptables_needs_restart
+  become: true
 
 - name: Restart iptables-services for TCP/{{elk_server_ssl_cert_port}} (iptables-services)
   shell: systemctl restart iptables.service
@@ -365,6 +393,7 @@
     # Skip ANSIBLE0013 Use shell only when shell functionality is required
     # No systemctl module available in current stable release (Ansible 2.1)
     - skip_ansible_lint
+  become: true
 
 ## END NGINX FIREWALL RULES ##
 
@@ -380,18 +409,21 @@
   ignore_errors: true
   register: firewalld_in_use
   no_log: true
+  become: true
 
 - name: Determine if firewalld is active
   shell: systemctl is-active firewalld.service | grep -vq inactive
   ignore_errors: true
   register: firewalld_is_active
   no_log: true
+  become: true
 
 - name: Determine if TCP/{{fluentd_syslog_port}} is already active
   shell: firewall-cmd --list-ports | egrep -q "^{{fluentd_syslog_port}}/tcp"
   ignore_errors: true
   register: firewalld_fluentd_syslog_exists
   no_log: true
+  become: true
 
 # add firewall rule via firewall-cmd
 - name: Add firewall rule for TCP/{{fluentd_syslog_port}} (firewalld)
@@ -410,6 +442,7 @@
   register: iptables_fluentd_syslog_exists
   failed_when: iptables_fluentd_syslog_exists == 127
   no_log: true
+  become: true
 
 - name: Add firewall rule for TCP/{{fluentd_syslog_port}} (iptables-services)
   lineinfile:
@@ -420,11 +453,13 @@
     backup: yes
   when: firewalld_in_use.rc != 0 and firewalld_is_active.rc != 0 and iptables_fluentd_syslog_exists.stdout|int == 0
   register: iptables_needs_restart
+  become: true
 
 - name: Restart iptables-services for TCP/{{fluentd_syslog_port}} (iptables-services)
   shell: systemctl restart iptables.service
   ignore_errors: true
   when: iptables_needs_restart != 0 and firewalld_in_use.rc != 0 and firewalld_is_active.rc != 0
+  become: true
 
 # Firewalld
 - name: Determine if firewalld is in use
@@ -432,18 +467,21 @@
   ignore_errors: true
   register: firewalld_in_use
   no_log: true
+  become: true
 
 - name: Determine if firewalld is active
   shell: systemctl is-active firewalld.service | grep -vq inactive
   ignore_errors: true
   register: firewalld_is_active
   no_log: true
+  become: true
 
 - name: Determine if TCP/{{fluentd_http_port}} is already active
   shell: firewall-cmd --list-ports | egrep -q "^{{fluentd_http_port}}/tcp"
   ignore_errors: true
   register: firewalld_fluentd_http_exists
   no_log: true
+  become: true
 
 # add firewall rule via firewall-cmd
 - name: Add firewall rule for TCP/{{fluentd_http_port}} (firewalld)
@@ -462,6 +500,7 @@
   register: iptables_fluentd_http_exists
   failed_when: iptables_fluentd_http_exists == 127
   no_log: true
+  become: true
 
 - name: Add firewall rule for TCP/{{fluentd_http_port}} (iptables-services)
   lineinfile:
@@ -472,10 +511,12 @@
     backup: yes
   when: firewalld_in_use.rc != 0 and firewalld_is_active.rc != 0 and iptables_fluentd_http_exists.stdout|int == 0
   register: iptables_needs_restart
+  become: true
 
 - name: Restart iptables-services for TCP/{{fluentd_http_port}} (iptables-services)
   shell: systemctl restart iptables.service
   ignore_errors: true
   when: iptables_needs_restart != 0 and firewalld_in_use.rc != 0 and firewalld_is_active.rc != 0
+  become: true
 
 ## END FLUENTD FIREWALL RULES ##

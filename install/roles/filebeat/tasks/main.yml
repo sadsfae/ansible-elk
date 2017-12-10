@@ -43,6 +43,7 @@
           line="*.* @{{ elk_server }}:{{ fluentd_syslog_port }}"
   when: (logging_backend == 'fluentd')
   register: rsyslog_updated
+  become: true
 
 - name: Setup common OpenStack rsyslog logging
   template:
@@ -59,3 +60,4 @@
   command: systemctl restart rsyslog.service
   ignore_errors: true
   when: rsyslog_updated != 0
+  become: true

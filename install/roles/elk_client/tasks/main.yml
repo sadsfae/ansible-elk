@@ -14,17 +14,18 @@
     path: /etc/beat
     state: directory
     mode: 0755
+  become: true
 
 - name: Import ElasticSearch GPG Key
   rpm_key: key=http://packages.elastic.co/GPG-KEY-elasticsearch
     state=present
-
+  become: true
 
 - name: Check ELK server SSL client certificate
   stat: path=/etc/beat/beat-forwarder.crt
   ignore_errors: true
   register: elk_client_ssl_cert_exists
-
+  become: true
 
 - name: Install ELK server SSL client certificate
   get_url:

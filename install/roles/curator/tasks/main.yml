@@ -18,6 +18,7 @@
   rpm_key: key=http://packages.elastic.co/GPG-KEY-elasticsearch
     state=present
   when: install_curator_tool
+  become: true
 
 - name: Install curator and python-setuptools
   yum: name={{ item }} state=present
@@ -47,7 +48,7 @@
   become: true
   when: install_curator_tool
 
-#Runs cron job to cleanup indicies every weekday.
+# Runs cron job to cleanup indicies every weekday.
 - cron:
     name: Curator run
     weekday: '*'
@@ -57,3 +58,4 @@
     job: "/usr/local/bin/curator --config /tmp/curator-config.yml /tmp/curator-action.yml >> /tmp/curator.log 2>&1"
     cron_file: curator-daily-cleanup
   when: install_curator_tool
+  become: true

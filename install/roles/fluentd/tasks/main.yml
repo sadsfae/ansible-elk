@@ -51,6 +51,7 @@
     # Skip ANSIBLE0012 Commands should not change things if nothing needs doing
     # Need to understand if an entry exists
     - skip_ansible_lint
+  become: true
 
 # this is for compability
 - name: Add OpenSSL SANs (SubjectAltName) entry for CA
@@ -61,6 +62,7 @@
     insertbefore: '# Extensions for a typical CA'
     backup: yes
   when: subjectAltName_exists.stdout|int == 0
+  become: true
 
 - name: Install fluentd elasticsearch plugin
   gem:
@@ -95,6 +97,7 @@
   command: systemctl start td-agent.service
   ignore_errors: true
   when: fluentd_needs_restart != 0
+  become: true
 
 - name: Setup fluentd service
   service: name=td-agent state=started enabled=true
