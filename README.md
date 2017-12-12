@@ -111,22 +111,35 @@ git checkout 2.4
 │       ├── curator
 │       │   ├── files
 │       │   │   └── curator.repo
-│       │   └── tasks
-│       │       └── main.yml
+│       │   ├── tasks
+│       │   │   └── main.yml
+│       │   └── templates
+│       │       ├── curator-action.yml.j2
+│       │       └── curator-config.yml.j2
 │       ├── elasticsearch
 │       │   ├── files
 │       │   │   ├── elasticsearch.in.sh
 │       │   │   └── elasticsearch.repo
+│       │   ├── tasks
+│       │   │   └── main.yml
+│       │   └── templates
+│       │       └── elasticsearch.yml.j2
+│       ├── elk_client
+│       │   ├── files
+│       │   │   └── elk.repo
 │       │   └── tasks
 │       │       └── main.yml
 │       ├── filebeat
-│       │   ├── files
-│       │   │   └── filebeat.repo
+│       │   ├── meta
+│       │   │   └── main.yml
 │       │   ├── tasks
 │       │   │   └── main.yml
 │       │   └── templates
 │       │       ├── filebeat.yml.j2
 │       │       └── rsyslog-openstack.conf.j2
+│       ├── firewall
+│       │   └── tasks
+│       │       └── main.yml
 │       ├── fluentd
 │       │   ├── files
 │       │   │   ├── filebeat-index-template.json
@@ -136,6 +149,13 @@ git checkout 2.4
 │       │   └── templates
 │       │       ├── openssl_extras.cnf.j2
 │       │       └── td-agent.conf.j2
+│       ├── heartbeat
+│       │   ├── meta
+│       │   │   └── main.yml
+│       │   ├── tasks
+│       │   │   └── main.yml
+│       │   └── templates
+│       │       └── heartbeat.yml.j2
 │       ├── instructions
 │       │   └── tasks
 │       │       └── main.yml
@@ -156,18 +176,32 @@ git checkout 2.4
 │       │       ├── 02-beats-input.conf.j2
 │       │       ├── logstash.conf.j2
 │       │       └── openssl_extras.cnf.j2
+│       ├── metricbeat
+│       │   ├── meta
+│       │   │   └── main.yml
+│       │   ├── tasks
+│       │   │   └── main.yml
+│       │   └── templates
+│       │       └── metricbeat.yml.j2
 │       ├── nginx
 │       │   ├── tasks
 │       │   │   └── main.yml
 │       │   └── templates
 │       │       ├── kibana.conf.j2
 │       │       └── nginx.conf.j2
+│       ├── packetbeat
+│       │   ├── meta
+│       │   │   └── main.yml
+│       │   ├── tasks
+│       │   │   └── main.yml
+│       │   └── templates
+│       │       └── packetbeat.yml.j2
 │       └── xpack
 │           └── tasks
 │               └── main.yml
 └── meta
     └── main.yml
 
-32 directories, 34 files
+51 directories, 49 files
 
 ```
