@@ -1,5 +1,19 @@
-[elk]
+[elk-client]
+host-04
+
+[elk] # Used if you want everything in one
 host-01
 
-[elk-client]
+# Used if you want multi node setups
+[elasticsearch_servers]
+host-01
 host-02
+host-03
+
+[logstash_servers]
+host-01
+
+[kibana_servers]
+host-01
+
+

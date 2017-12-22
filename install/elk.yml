@@ -17,3 +17,35 @@
     - { role: xpack, when: ((install_elasticsearch_xpack) or (install_kibana_xpack) or (install_logstash_xpack)) }
     - { role: firewall, when: manage_firewall }  
     - { role: instructions }
+
+# Used for multi node setups
+- hosts: elasticsearch_servers
+  remote_user: "{{ ansible_system_user }}"
+  vars_files:
+    - group_vars/all.yml
+  roles:
+    - { role: elasticsearch }
+    - { role: curator, when: install_curator_tool }
+    - { role: xpack, when: (install_elasticsearch_xpack) }
+    - { role: firewall, when: manage_firewall }  
+
+- hosts: logstash_servers
+  remote_user: "{{ ansible_system_user }}"
+  vars_files:
+    - group_vars/all.yml
+  roles:
+    - { role: logstash, when: ((logging_backend is none) or (logging_backend == 'logstash')) }
+    - { role: fluentd, when: (logging_backend == 'fluentd') }
+    - { role: xpack, when: (install_logstash_xpack) }
+    - { role: firewall, when: manage_firewall }  
+
+- hosts: kibana_servers
+  remote_user: "{{ ansible_system_user }}"
+  vars_files:
+    - group_vars/all.yml
+  roles:
+    - { role: nginx }
+    - { role: kibana }
+    - { role: xpack, when: (install_kibana_xpack) }
+    - { role: firewall, when: manage_firewall }  
+    - { role: instructions }
