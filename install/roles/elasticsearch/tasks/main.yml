@@ -52,7 +52,7 @@
   lineinfile:
     path=/etc/elasticsearch/jvm.options
     regexp='^-Xmx2g'
-    line='-Xmx32g'
+    line='-Xmx31g'
   when: ansible_memory_mb.real.total|int >= 65536
   register: elasticsearch_updated
   become: true
