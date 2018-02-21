@@ -40,9 +40,19 @@
   when: ansible_memory_mb.real.total|int >= 65536
   become: true
 
-- name: Apply heapsize tuning for systems with greater than 64G memory
-  lineinfile: dest=/usr/share/elasticsearch/bin/elasticsearch.in.sh \
-          line="ES_HEAP_SIZE=32g" insertafter="^ES_CLASSPATH="
+- name: Apply heapsize start tuning for systems with greater than 64G memory
+  lineinfile:
+    path=/etc/elasticsearch/jvm.options
+    regexp='^-Xms2g'
+    line='-Xms32g'
+  when: ansible_memory_mb.real.total|int >= 65536
+  become: true
+
+- name: Apply heapsize end tuning for systems with greater than 64G memory
+  lineinfile:
+    path=/etc/elasticsearch/jvm.options
+    regexp='^-Xmx2g'
+    line='-Xmx32g'
   when: ansible_memory_mb.real.total|int >= 65536
   register: elasticsearch_updated
   become: true
@@ -52,10 +62,20 @@
   when: ansible_memory_mb.real.total|int >= 65536
   become: true
 
-- name: Update elasticsearch startup with heap size
+- name: Update elasticsearch startup with start heap size
   become: true
-  lineinfile: dest=/usr/share/elasticsearch/bin/elasticsearch.in.sh \
-          line="ES_HEAP_SIZE={{ (ansible_memory_mb.real.total / 2) | int }}m" insertafter="^ES_CLASSPATH="
+  lineinfile:
+    path=/etc/elasticsearch/jvm.options
+    regexp='^-Xms2g'
+    line='-Xms{{ (ansible_memory_mb.real.total / 2) | int }}m'
+  when: ansible_memory_mb.real.total|int < 65536
+
+- name: Update elasticsearch startup with end heap size
+  become: true
+  lineinfile:
+    path=/etc/elasticsearch/jvm.options
+    regexp='^-Xmx2g'
+    line='-Xmx{{ (ansible_memory_mb.real.total / 2) | int }}m'
   when: ansible_memory_mb.real.total|int < 65536
   register: elasticsearch_updated
 
@@ -76,12 +96,12 @@
     state=link
   become: true
 
-- name: Start elasticsearch service
+- name: Start or restart elasticsearch service
   command: systemctl start elasticsearch.service
   ignore_errors: true
   when: elasticsearch_updated != 0
   become: true
 
-- name: Setup elasticsearch service
+- name: Setup elasticsearch service to autostart
   service: name=elasticsearch state=started enabled=true
   become: true
