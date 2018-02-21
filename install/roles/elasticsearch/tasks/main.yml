@@ -44,7 +44,7 @@
   lineinfile:
     path=/etc/elasticsearch/jvm.options
     regexp='^-Xms2g'
-    line='-Xms32g'
+    line='-Xms31g'
   when: ansible_memory_mb.real.total|int >= 65536
   become: true
 
