@@ -21,6 +21,7 @@
   become: true
   with_items:
     - td-agent
+    - gcc
 
 - name: Setup fluentd configuration files
   template:
