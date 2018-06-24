@@ -70,16 +70,7 @@
   when: es_listen_external and firewalld_in_use.rc != 0 and firewalld_is_active.rc != 0 and iptables_es_local_port_exists.stdout|int == 0
   register: iptables_needs_restart
   become: true
-
-- name: Restart iptables-services for TCP/{{es_local_port}} (iptables-services)
-  shell: systemctl restart iptables.service
-  ignore_errors: true
-  when: es_listen_external and iptables_needs_restart != 0 and firewalld_in_use.rc != 0 and firewalld_is_active.rc != 0
-  tags:
-    # Skip ANSIBLE0013 Use shell only when shell functionality is required
-    # No systemctl module available in current stable release (Ansible 2.1)
-    - skip_ansible_lint
-  become: true
+  notify: restart iptables
 
 # Firewalld
 - name: Determine if firewalld is in use
@@ -136,16 +127,7 @@
   when: syslog_listen_external and firewalld_in_use.rc != 0 and firewalld_is_active.rc != 0 and iptables_logstash_localsyslog_port_exists.stdout|int == 0
   register: iptables_needs_restart
   become: true
-
-- name: Restart iptables-services for TCP/{{logstash_localsyslog_port}} (iptables-services)
-  shell: systemctl restart iptables.service
-  ignore_errors: true
-  when: syslog_listen_external and iptables_needs_restart != 0 and firewalld_in_use.rc != 0 and firewalld_is_active.rc != 0
-  tags:
-    # Skip ANSIBLE0013 Use shell only when shell functionality is required
-    # No systemctl module available in current stable release (Ansible 2.1)
-    - skip_ansible_lint
-  become: true
+  notify: restart iptables
 
 ## End elasticsearch rules ##
 
@@ -219,16 +201,7 @@
   when: firewalld_in_use.rc != 0 and firewalld_is_active.rc != 0 and iptables_logstash_syslog_port_exists.stdout|int == 0
   register: iptables_needs_restart
   become: true
-
-- name: Restart iptables-services for TCP/{{logstash_syslog_port}} (iptables-services)
-  shell: systemctl restart iptables.service
-  ignore_errors: true
-  when: iptables_needs_restart != 0 and firewalld_in_use.rc != 0 and firewalld_is_active.rc != 0
-  tags:
-    # Skip ANSIBLE0013 Use shell only when shell functionality is required
-    # No systemctl module available in current stable release (Ansible 2.1)
-    - skip_ansible_lint
-  become: true
+  notify: restart iptables
 
 ## END Logstash firewall rules ##
 
@@ -306,16 +279,7 @@
   when: firewalld_in_use.rc != 0 and firewalld_is_active.rc != 0 and iptables_kibana_port_exists.stdout|int == 0
   register: iptables_needs_restart
   become: true
-
-- name: Restart iptables-services for TCP/{{nginx_kibana_port}} (iptables-services)
-  shell: systemctl restart iptables.service
-  ignore_errors: true
-  when: iptables_needs_restart != 0 and firewalld_in_use.rc != 0 and firewalld_is_active.rc != 0
-  tags:
-    # Skip ANSIBLE0013 Use shell only when shell functionality is required
-    # No systemctl module available in current stable release (Ansible 2.1)
-    - skip_ansible_lint
-  become: true
+  notify: restart iptables
 
 # Firewalld
 - name: Determine if firewalld is in use
@@ -384,16 +348,7 @@
   when: firewalld_in_use.rc != 0 and firewalld_is_active.rc != 0 and iptables_elk_server_ssl_exists.stdout|int == 0
   register: iptables_needs_restart
   become: true
-
-- name: Restart iptables-services for TCP/{{elk_server_ssl_cert_port}} (iptables-services)
-  shell: systemctl restart iptables.service
-  ignore_errors: true
-  when: iptables_needs_restart != 0 and firewalld_in_use.rc != 0 and firewalld_is_active.rc != 0
-  tags:
-    # Skip ANSIBLE0013 Use shell only when shell functionality is required
-    # No systemctl module available in current stable release (Ansible 2.1)
-    - skip_ansible_lint
-  become: true
+  notify: restart iptables
 
 ## END NGINX FIREWALL RULES ##
 
@@ -454,12 +409,7 @@
   when: firewalld_in_use.rc != 0 and firewalld_is_active.rc != 0 and iptables_fluentd_syslog_exists.stdout|int == 0
   register: iptables_needs_restart
   become: true
-
-- name: Restart iptables-services for TCP/{{fluentd_syslog_port}} (iptables-services)
-  shell: systemctl restart iptables.service
-  ignore_errors: true
-  when: iptables_needs_restart != 0 and firewalld_in_use.rc != 0 and firewalld_is_active.rc != 0
-  become: true
+  notify: restart iptables
 
 # Firewalld
 - name: Determine if firewalld is in use
@@ -512,11 +462,6 @@
   when: firewalld_in_use.rc != 0 and firewalld_is_active.rc != 0 and iptables_fluentd_http_exists.stdout|int == 0
   register: iptables_needs_restart
   become: true
-
-- name: Restart iptables-services for TCP/{{fluentd_http_port}} (iptables-services)
-  shell: systemctl restart iptables.service
-  ignore_errors: true
-  when: iptables_needs_restart != 0 and firewalld_in_use.rc != 0 and firewalld_is_active.rc != 0
-  become: true
+  notify: restart iptables
 
 ## END FLUENTD FIREWALL RULES ##
