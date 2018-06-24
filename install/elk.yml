@@ -1,6 +1,6 @@
 ---
 #
-# Playbook to install the ELK stack
+# Playbook to install the ELK or EFK stack
 #
 
 - hosts: elk
@@ -17,9 +17,3 @@
     - { role: xpack, when: ((install_elasticsearch_xpack) or (install_kibana_xpack) or (install_logstash_xpack)) }
     - { role: firewall, when: manage_firewall }  
     - { role: instructions }
-  handlers:
-    - name: restart iptables
-      become: true
-      service: 
-        name: iptables
-        state: restarted
