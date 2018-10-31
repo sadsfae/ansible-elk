@@ -81,7 +81,7 @@
   register: elasticsearch_updated
 
 - name: Apply workaround for java listening port
-  raw: setcap 'cap_net_bind_service=+ep' /usr/lib/jvm/jre/bin/java
+  raw: setcap 'cap_net_bind_service=+ep' /usr/lib/jvm/java-1.8.*openjdk-*/jre/bin/java
   become: true
 
 # https://www.centos.org/forums/viewtopic.php?t=16398
