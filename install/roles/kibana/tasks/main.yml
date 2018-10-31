@@ -142,6 +142,17 @@
   when: (logging_backend != 'fluentd')
   become: true
 
+# Workaround for known logstash issue 'Missing systemd scripts in 6.2.4 #9403'
+- name: Check status of systemd logstash.service
+  stat:
+    path: /etc/systemd/system/logstash.service
+  register: logstash_service_status
+
+- name: Create logstash service if it doesn't already exists
+  shell: /usr/share/logstash/bin/system-install /etc/logstash/startup.options systemd
+  become: true
+  when: logstash_service_status.stat.exists == false
+
 # We are in the kibana playbook but starting logstash here now
 # This is needed because perms should be set on certificates before
 # logstash references them for filebeat SSL connections.

@@ -18,12 +18,13 @@
     mode=0644
   become: true
 
+# Added java-1.8.0 limitation.  Known issue: #with java10 I get these error :Unrecognized VM option 'UseParNewGC' #9316
 - name: Install elasticsearch and openjdk
   yum: name={{ item }} state=present
   become: true
   with_items:
     - elasticsearch
-    - java-openjdk-headless
+    - java-1.8.0-openjdk-headless
 
 - name: Copy templated elasticsearch.yml
   template:
@@ -80,7 +81,7 @@
   register: elasticsearch_updated
 
 - name: Apply workaround for java listening port
-  raw: setcap 'cap_net_bind_service=+ep' /usr/lib/jvm/java-1.8.*openjdk-*/jre/bin/java
+  raw: setcap 'cap_net_bind_service=+ep' /usr/lib/jvm/jre/bin/java
   become: true
 
 # https://www.centos.org/forums/viewtopic.php?t=16398

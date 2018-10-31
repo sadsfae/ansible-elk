@@ -2,7 +2,7 @@
 
 # Default Ansible user
 # change this if you use a non-root user for running Ansible playbooks
-ansible_system_user: root
+ansible_system_user: ec2-user
 
 # EPEL Repository for extra packages
 epel_repo: https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
