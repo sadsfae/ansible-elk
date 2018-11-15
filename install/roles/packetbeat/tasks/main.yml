@@ -3,11 +3,9 @@
 # install/run packetbeat elk client
 #
 - name: Install packetbeat rpms
-  yum: name={{ item }} state=present
+  yum:
+    name: [packetbeat, libpcap]
   become: true
-  with_items:
-    - packetbeat
-    - libpcap
   when: (logging_backend != 'fluentd')
 
 - name: Generate packetbeat configuration template

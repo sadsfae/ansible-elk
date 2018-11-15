@@ -1,12 +1,12 @@
 ansible-elk
 ===========
-Ansible Playbook for setting up the ELK/EFK Stack and Filebeat client on remote hosts
+Ansible Playbook for setting up the 5.x series ELK/EFK Stack and Filebeat client on remote hosts
 
 ![ELK](/image/ansible-elk.png?raw=true)
 
 ## What does it do?
    - Automated deployment of a full ELK or EFK stack (Elasticsearch, Logstash/Fluentd, Kibana)
-     * 5.5+ and 2.4 ELK versions are maintained.
+     * 5.5+ and 2.4 ELK versions are maintained, use master for 6.x or latest
      * Uses Nginx as a reverse proxy for Kibana
      * Generates SSL certificates for Filebeat or Logstash-forwarder
      * Adds either iptables or firewalld rules if firewall is active

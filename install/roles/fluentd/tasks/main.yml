@@ -17,11 +17,9 @@
     state=present
 
 - name: Install fluentd
-  yum: name={{ item }} state=present
+  yum:
+    name: [td-agent, gcc]
   become: true
-  with_items:
-    - td-agent
-    - gcc
 
 - name: Setup fluentd configuration files
   template:

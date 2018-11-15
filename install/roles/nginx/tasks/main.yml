@@ -9,12 +9,9 @@
   become: true
 
 - name: Install nginx, httpd-tools, httplib2
-  yum: name={{ item }} state=present
+  yum:
+    name: [nginx, httpd-tools, python-httplib2]
   become: true
-  with_items:
-    - nginx
-    - httpd-tools
-    - python-httplib2
 
 # SELinux boolean for nginx
 - name: Apply SELinux boolean httpd_can_network_connect

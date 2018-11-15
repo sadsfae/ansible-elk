@@ -4,10 +4,9 @@
 #
 
 - name: Install libsemanage-python and dependencies
-  yum: name={{ item }} state=present
+  yum:
+    name: libsemanage-python
   become: true
-  with_items:
-    - libsemanage-python
 
 - name: Copy elasticsearch yum repo file
   copy:
@@ -19,11 +18,9 @@
   become: true
 
 - name: Install elasticsearch and openjdk
-  yum: name={{ item }} state=present
+  yum:
+    name: [elasticsearch, java-openjdk-headless]
   become: true
-  with_items:
-    - elasticsearch
-    - java-openjdk-headless
 
 - name: Copy templated elasticsearch.yml
   template:

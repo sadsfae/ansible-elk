@@ -3,10 +3,9 @@
 # install/run filebeat elk client
 #
 - name: Install filebeat rpms
-  yum: name={{ item }} state=present
+  yum:
+    name: filebeat
   become: true
-  with_items:
-    - filebeat
   when: (logging_backend != 'fluentd')
 
 - name: Generate filebeat configuration template
@@ -32,10 +31,9 @@
   when: (logging_backend != 'fluentd')
 
 - name: Install rsyslogd for fluentd
-  yum: name={{ item }} state=present
+  yum:
+    name: rsyslog
   become: true
-  with_items:
-    - rsyslog
   when: (logging_backend == 'fluentd')
 
 - name: Setup rsyslogd for fluentd
