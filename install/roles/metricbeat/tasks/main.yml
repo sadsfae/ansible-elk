@@ -3,10 +3,9 @@
 # install/run packetbeat elk client
 #
 - name: Install metricbeat rpms
-  yum: name={{ item }} state=present
+  yum:
+    name: metricbeat
   become: true
-  with_items:
-    - metricbeat
   when: (logging_backend != 'fluentd')
 
 - name: Generate metricbeat configuration template

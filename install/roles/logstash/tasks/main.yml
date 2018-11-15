@@ -13,10 +13,9 @@
   become: true
 
 - name: Install logstash rpms
-  yum: name={{ item }} state=present
+  yum:
+    name: logstash
   become: true
-  with_items:
-    - logstash
 
 # this is a workaround for https://github.com/sadsfae/ansible-elk/issues/69
 - name: Update logstash-input-udp to latest version

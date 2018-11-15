@@ -3,10 +3,9 @@
 # install/run heartbeatbeat elk client
 #
 - name: Install heartbeat rpms
-  yum: name={{ item }} state=present
+  yum:
+    name: heartbeat
   become: true
-  with_items:
-    - heartbeat
   when: (logging_backend != 'fluentd')
 
 - name: Generate heartbeat configuration template
