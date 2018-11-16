@@ -80,11 +80,11 @@ ansible-playbook -i hosts install/elk.yml
 
 ![ELK](/image/elk6-1.png?raw=true "Click Discover")
 
-![ELK](/image/elk6.2.png?raw=true "Create index pattern")
+![ELK](/image/elk6-2.png?raw=true "Create index pattern")
 
-![ELK](/image/elk6.3.png?raw=true "Select @timestamp from the drop-down and create index pattern")
+![ELK](/image/elk6-3.png?raw=true "Select @timestamp from the drop-down and create index pattern")
 
-![ELK](/image/elk6.4.png?raw=true "Click Discover")
+![ELK](/image/elk6-4.png?raw=true "Click Discover")
 
    - At this point you can setup your client(s) to start sending data via Filebeat/SSL
 
