@@ -94,7 +94,8 @@ ansible-playbook -i hosts install/elk.yml
 ansible-playbook -i hosts install/elk-client.yml --extra-vars 'elk_server=X.X.X.X'
 ```
    - Once this completes return to your ELK and you'll see log results come in from ELK/EFK clients via filebeat
-![ELK](/image/elk-index-5.x-4.png?raw=true "watch the magic")
+
+![ELK](/image/elk6-5.png?raw=true "watch the magic")
 
 ## 5.6 ELK/EFK (Deprecated)
    - The 5.6 series of ELK/EFK is also available, to use this just use the 2.4 branch
