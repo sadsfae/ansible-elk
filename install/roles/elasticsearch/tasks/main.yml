@@ -40,7 +40,7 @@
 - name: Apply heapsize start tuning for systems with greater than 64G memory
   lineinfile:
     path=/etc/elasticsearch/jvm.options
-    regexp='^-Xms2g'
+    regexp='^-Xms1g'
     line='-Xms31g'
   when: ansible_memory_mb.real.total|int >= 65536
   become: true
@@ -48,7 +48,7 @@
 - name: Apply heapsize end tuning for systems with greater than 64G memory
   lineinfile:
     path=/etc/elasticsearch/jvm.options
-    regexp='^-Xmx2g'
+    regexp='^-Xmx1g'
     line='-Xmx31g'
   when: ansible_memory_mb.real.total|int >= 65536
   register: elasticsearch_updated
@@ -63,7 +63,7 @@
   become: true
   lineinfile:
     path=/etc/elasticsearch/jvm.options
-    regexp='^-Xms2g'
+    regexp='^-Xms1g'
     line='-Xms{{ (ansible_memory_mb.real.total / 2) | int }}m'
   when: ansible_memory_mb.real.total|int < 65536
 
@@ -71,7 +71,7 @@
   become: true
   lineinfile:
     path=/etc/elasticsearch/jvm.options
-    regexp='^-Xmx2g'
+    regexp='^-Xmx1g'
     line='-Xmx{{ (ansible_memory_mb.real.total / 2) | int }}m'
   when: ansible_memory_mb.real.total|int < 65536
   register: elasticsearch_updated
@@ -92,6 +92,24 @@
     dest='/lib64/libjli.so'
     state=link
   become: true
+
+# this seems like a packaging bug for 6.x
+- name: Create log directory structure for ES
+  file:
+    path: /usr/share/elasticsearch/logs
+    state: directory
+    owner: elasticsearch
+    group: elasticsearch
+    mode: 0755
+
+# another packaging bug, this should be done by RPM
+- name: Create datadir for elasticsearch
+  file:
+    path: /usr/share/elasticsearch/data
+    state: directory
+    owner: elasticsearch
+    group: elasticsearch
+    mode: 0755
 
 - name: Start or restart elasticsearch service
   command: systemctl restart elasticsearch.service

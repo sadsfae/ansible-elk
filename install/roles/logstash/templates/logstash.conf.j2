@@ -37,3 +37,17 @@ input {
     ssl_verify_mode => none
   }
 }
+
+### workaround/hack for https://discuss.elastic.co/t/logstash-errors-after-upgrading-to-filebeat-6-3-0/135984/28
+
+filter {
+  mutate {
+    remove_field => [ "[host]" ]
+  }
+  mutate {
+    add_field => {
+      "host" => "%{[beat][hostname]}"
+    }
+  }
+}
+

@@ -2,6 +2,11 @@
 #
 # Playbook to install the ELK or EFK stack
 #
+# versions:
+#  - 2.4 (git branch 2.4)
+#  - 5.6 (git branch 5.6)
+#  - 6.5 (git branch master)
+#
 
 - hosts: elk
   remote_user: "{{ ansible_system_user }}"
@@ -15,5 +20,5 @@
     - { role: curator, when: install_curator_tool }
     - { role: kibana }
     - { role: xpack, when: ((install_elasticsearch_xpack) or (install_kibana_xpack) or (install_logstash_xpack)) }
-    - { role: firewall, when: manage_firewall }  
+    - { role: firewall, when: manage_firewall }
     - { role: instructions }

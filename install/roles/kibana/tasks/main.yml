@@ -38,34 +38,6 @@
   when: rsyslog_updated != 0
   become: true
 
-- name: Check kibana filebeat dashboards
-  stat: path=/tmp/filebeat-dashboards.zip
-  ignore_errors: true
-  register: kibana_dashboards_present
-  become: true
-
-- name: Copy kibana filebeat dashboards
-  copy:
-    src=filebeat-dashboards.zip
-    dest=/tmp/filebeat-dashboards.zip
-    owner=root
-    group=root
-    mode=0644
-  become: true
-  ignore_errors: true
-  when: kibana_dashboards_present != 0
-
-- name: Install kibana filebeat dashboards
-  unarchive: src=/tmp/filebeat-dashboards.zip dest=/tmp/ copy=no
-  ignore_errors: true
-  when: kibana_dashboards_present != 0
-  become: true
-
-- name: Configure kibana filebeat dashboards
-  shell: sh /tmp/beats-dashboards-master/load.sh -url "http://localhost:9200" -user "{{kibana_user}}:{{kibana_password}}"
-  ignore_errors: true
-  become: true
-
 - name: Check kibana users
   stat: path=/etc/nginx/htpasswd.users
   ignore_errors: true

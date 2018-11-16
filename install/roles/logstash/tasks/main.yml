@@ -17,11 +17,6 @@
     name: logstash
   become: true
 
-# this is a workaround for https://github.com/sadsfae/ansible-elk/issues/69
-- name: Update logstash-input-udp to latest version
-  command: /usr/share/logstash/bin/logstash-plugin update logstash-input-udp
-  become: true
-
 - name: Copy logstash filter configuration
   template:
     src=logstash.conf.j2
@@ -29,6 +24,24 @@
     owner=logstash
     group=logstash
     mode=0644
+  become: true
+
+# we need a workaround for netty wanting to use /tmp
+# on most systems this is mounted via noexec for security reasons
+# https://discuss.elastic.co/t/problem-with-cipher-in-beat-input/67841/5
+
+- name: Create tmpdir for logstash netty
+  file:
+    path: /usr/share/logstash/tmpfile
+    state: directory
+    owner: logstash
+    group: logstash
+    mode: 0755
+
+- name: Apply logstash netty tmpdir workaround
+  lineinfile:
+    path=/etc/logstash/jvm.options
+    line='-Dio.netty.native.workdir=/usr/share/logstash/tmpfile/'
   become: true
 
 - name: Load OpenSSL CA Extended Configuration

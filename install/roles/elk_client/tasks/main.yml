@@ -34,7 +34,7 @@
   become: true
   when: (elk_client_ssl_cert_exists != 0)
 
-- name: Install ELK server SSL client certificate
+- name: Install ELK server SSL client key
   get_url:
     url=http://{{ elk_server }}:{{ elk_server_ssl_cert_port }}/beat-forwarder.key
     dest=/etc/beat/beat-forwarder.key

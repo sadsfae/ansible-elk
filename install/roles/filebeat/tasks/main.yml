@@ -20,7 +20,9 @@
   register: filebeat_needs_restart
 
 - name: Start filebeat service
-  command: systemctl start filebeat.service
+  service:
+    name: filebeat
+    state: started
   ignore_errors: true
   become: true
   when: ((filebeat_needs_restart != 0) and (logging_backend != 'fluentd'))
