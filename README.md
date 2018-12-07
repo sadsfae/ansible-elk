@@ -72,6 +72,7 @@ ansible-playbook -i hosts install/elk.yml
       - username: ```admin```
       - password: ```admin```
 
+### Create your Kibana Index Pattern
    - Next you'll login to your Kibana instance and create a Kibana index pattern.
 
 ![ELK](/image/elk6-0.png?raw=true "Click Explore on my Own")
