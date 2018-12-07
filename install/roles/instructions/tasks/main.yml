@@ -23,13 +23,13 @@
   when: install_kibana_xpack
 
 - name: Print index creation more instructions
-  debug: msg="*** 2) Navigate to Management (left-hand corner) --> Kibana (index patterns) ***" 
+  debug: msg="*** 2) Navigate to Discover (left-hand corner) --> Kibana (index patterns) ***"
 
 - name: Print index creation more instructions
-  debug: msg="*** 3) Type logstash-* into the index creation name ***" 
+  debug: msg="*** 3) Type logstash-* into the index creation name and click Next ***"
 
 - name: Print Index creation more instructions
-  debug: msg="*** 4) Select '@timestamp' under 'Time-field name' and Click Create Index Pattern ***"
+  debug: msg="*** 4) Select '@timestamp' under 'Time-field name' and Create Index Pattern ***"
 
 - name: Print Navigation Instructions
   debug: msg="*** 5) Click on Discover ***"
