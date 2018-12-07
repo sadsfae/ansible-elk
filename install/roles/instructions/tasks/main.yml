@@ -22,11 +22,17 @@
   debug: msg="*** 1A) (X-Pack only) Kibana account credentials login with elastic/{{xpack_elastic_user_password}} ***"
   when: install_kibana_xpack
 
+- name: Print index creation more instructions
+  debug: msg="*** 2) Navigate to Management (left-hand corner) --> Kibana (index patterns) ***" 
+
+- name: Print index creation more instructions
+  debug: msg="*** 3) Type logstash-* into the index creation name ***" 
+
 - name: Print Index creation more instructions
-  debug: msg="*** 2) Select '@timestamp' under 'Time-field name' and Click the blue CREATE button ***"
+  debug: msg="*** 4) Select '@timestamp' under 'Time-field name' and Click Create Index Pattern ***"
 
 - name: Print Navigation Instructions
-  debug: msg="*** 3) Click on Discover ***"
+  debug: msg="*** 5) Click on Discover ***"
 
 - name: Print filebeat client setup instructions
-  debug: msg="*** 4) ansible-playbook -i hosts install/elk-client.yml --extra-vars 'elk_server={{ ansible_default_ipv4.address }}' to setup clients ***"
+  debug: msg="*** 6) ansible-playbook -i hosts install/elk-client.yml --extra-vars 'elk_server={{ ansible_default_ipv4.address }}' to setup clients ***"
