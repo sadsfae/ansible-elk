@@ -37,8 +37,7 @@ sysctl -p
    - Sets the nginx htpasswd to admin/admin initially
    - nginx ports default to 80/8080 for Kibana and SSL cert retrieval (configurable)
    - Uses OpenJDK for Java
-   - It's fairly quick, takes around 3minutes on test VM
-   - Filebeat templating is focused around OpenStack service logs
+   - It's fairly quick, takes around 3minutes on a test VM
    - Fluentd can be substituted for the default Logstash
      - Set ```logging_backend: fluentd``` in ```group_vars/all.yml```
    - Install curator by setting ```install_curator_tool: true``` in ```install/group_vars/all.yml```
