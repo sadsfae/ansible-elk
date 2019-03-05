@@ -28,6 +28,7 @@ filebeat.inputs:
   # This is where you put stuff to be sent to logstash
     - /var/log/messages
     - /var/log/*/*.log
+    - /var/log/containers/*/*.log
     #- c:\programdata\elasticsearch\logs\*
 
   # Exclude lines. A list of regular expressions to match. It drops the lines that are

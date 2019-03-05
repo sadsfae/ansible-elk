@@ -159,5 +159,154 @@ $InputFileSeverity error
 $InputFileFacility local7
 $InputRunFileMonitor
 
+########### CONTAINERIZED OPENSTACK SERVICES
+# Neutron
+$InputFileName /var/log/containers/neutron/server.log
+$InputFileTag neutron-server-errors
+$InputFileStateFile neutron-server-errors
+$InputFileSeverity error
+$InputFileFacility local7
+$InputRunFileMonitor
+
+# Nova
+$InputFileName /var/log/containers/nova/nova-api.log
+$InputFileTag nova-api-errors
+$InputFileStateFile nova-api-errors
+$InputFileSeverity error
+$InputFileFacility local7
+$InputRunFileMonitor
+
+$InputFileName /var/log/containers/nova/nova-cert.log
+$InputFileTag nova-cert-errors
+$InputFileStateFile nova-cert-errors
+$InputFileSeverity error
+$InputFileFacility local7
+$InputRunFileMonitor
+
+$InputFileName /var/log/containers/nova/nova-conductor.log
+$InputFileTag nova-conductor-errors
+$InputFileStateFile nova-conductor-errors
+$InputFileSeverity error
+$InputFileFacility local7
+$InputRunFileMonitor
+
+$InputFileName /var/log/containers/nova/nova-consoleauth.log
+$InputFileTag nova-consoleauth-errors
+$InputFileStateFile nova-consoleauth-errors
+$InputFileSeverity error
+$InputFileFacility local7
+$InputRunFileMonitor
+
+$InputFileName /var/log/containers/nova/nova-manage.log
+$InputFileTag nova-manage-errors
+$InputFileStateFile nova-manage-errors
+$InputFileSeverity error
+$InputFileFacility local7
+$InputRunFileMonitor
+
+$InputFileName /var/log/containers/nova/nova-novncproxy.log
+$InputFileTag nova-novncproxy-errors
+$InputFileStateFile nova-novncproxy-errors
+$InputFileSeverity error
+$InputFileFacility local7
+$InputRunFileMonitor
+
+$InputFileName /var/log/containers/nova/nova-scheduler.log
+$InputFileTag nova-scheduler-errors
+$InputFileStateFile nova-scheduler-errors
+$InputFileSeverity error
+$InputFileFacility local7
+$InputRunFileMonitor
+
+# cinder
+$InputFileName /var/log/containers/cinder/api.log
+$InputFileTag cinder-api-errors
+$InputFileStateFile cinder-api-errors
+$InputFileSeverity error
+$InputFileFacility local7
+$InputRunFileMonitor
+
+$InputFileName /var/log/containers/cinder/backup.log
+$InputFileTag cinder-backup-errors
+$InputFileStateFile cinder-backup-errors
+$InputFileSeverity error
+$InputFileFacility local7
+$InputRunFileMonitor
+
+$InputFileName /var/log/containers/cinder/scheduler.log
+$InputFileTag cinder-scheduler-errors
+$InputFileStateFile cinder-scheduler-errors
+$InputFileSeverity error
+$InputFileFacility local7
+$InputRunFileMonitor
+
+$InputFileName /var/log/containers/cinder/volume.log
+$InputFileTag cinder-volume-errors
+$InputFileStateFile cinder-volume-errors
+$InputFileSeverity error
+$InputFileFacility local7
+$InputRunFileMonitor
+
+# glance
+$InputFileName /var/log/containers/glance/api.log
+$InputFileTag glance-api-errors
+$InputFileStateFile glance-api-errors
+$InputFileSeverity error
+$InputFileFacility local7
+$InputRunFileMonitor
+
+$InputFileName /var/log/containers/glance/registry.log
+$InputFileTag glance-registry-errors
+$InputFileStateFile glance-registry-errors
+$InputFileSeverity error
+$InputFileFacility local7
+$InputRunFileMonitor
+
+$InputFileName /var/log/containers/glance/scrubber.log
+$InputFileTag glance-scrubber-errors
+$InputFileStateFile glance-scrubber-errors
+$InputFileSeverity error
+$InputFileFacility local7
+$InputRunFileMonitor
+
+# keystone
+$InputFileName /var/log/containers/keystone/keystone.log
+$InputFileTag keystone-errors
+$InputFileStateFile keystone-errors
+$InputFileSeverity error
+$InputFileFacility local7
+$InputRunFileMonitor
+
+# horizon
+$InputFileName /var/log/containers/horizon/horizon.log
+$InputFileTag horizon-errors
+$InputFileStateFile horizon-errors
+$InputFileSeverity error
+$InputFileFacility local7
+$InputRunFileMonitor
+
+$InputFileName /var/log/containers/httpd/horizon_error.log
+$InputFileTag horizon-httpd-errors
+$InputFileStateFile horizon-httpd-errors
+$InputFileSeverity error
+$InputFileFacility local7
+$InputRunFileMonitor
+
+$InputFileName /var/log/containers/httpd/horizon_ssl_error.log
+$InputFileTag horizon-httpd_ssl-errors
+$InputFileStateFile horizon-httpd_ssl-errors
+$InputFileSeverity error
+$InputFileFacility local7
+$InputRunFileMonitor
+
+# mariadb
+$InputFileName /var/log/containers/mariadb/mariadb.log
+$InputFileTag mariadb-errors
+$InputFileStateFile mariadb-errors
+$InputFileSeverity error
+$InputFileFacility local7
+$InputRunFileMonitor
+
+
 # send to elk_server
 *.* @{{ elk_server }}:{{ fluentd_syslog_port }}
