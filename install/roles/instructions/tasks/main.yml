@@ -12,15 +12,20 @@
   debug: msg="Filebeat SSL Certificate key is located at http://{{ ansible_fqdn }}:{{ elk_server_ssl_cert_port }}/beat-forwarder.key"
   when: (logging_backend != 'fluentd')
 
-- name: Print post-setup URL
-  debug: msg="*** ELK Services available at http://{{ ansible_fqdn }}:{{ nginx_kibana_port }} ***"
+- name: Print post-setup URL for Apache
+  debug: msg="*** ELK Services available at http://{{ ansible_fqdn }}:{{ www_kibana_port }}/kibana ***"
+  when: apache_reverse_proxy|bool
+
+- name: Print post-setup URL for nginx
+  debug: msg="*** ELK Services available at http://{{ ansible_fqdn }}:{{ www_kibana_port }} ***"
+  when: apache_reverse_proxy|bool
 
 - name: Print index creation instructions
-  debug: msg="*** 1) Navigate to http://{{ ansible_fqdn }}:{{ nginx_kibana_port }} and login with {{kibana_user}}/{{kibana_password}} ***"
+  debug: msg="*** 1) Navigate to http://{{ ansible_fqdn }}:{{ www_kibana_port }} and login with {{kibana_user}}/{{kibana_password}} ***"
 
 - name: Print X-Pack instructions
   debug: msg="*** 1A) (X-Pack only) Kibana account credentials login with elastic/{{xpack_elastic_user_password}} ***"
-  when: install_kibana_xpack
+  when: install_kibana_xpack|bool
 
 - name: Print index creation more instructions
   debug: msg="*** 2) Navigate to Discover (left-hand corner) --> Kibana (index patterns) ***"
@@ -35,4 +40,4 @@
   debug: msg="*** 5) Click on Discover ***"
 
 - name: Print filebeat client setup instructions
-  debug: msg="*** 6) ansible-playbook -i hosts install/elk-client.yml --extra-vars 'elk_server={{ ansible_default_ipv4.address }}' to setup clients ***"
+  debug: msg="*** 6) ansible-playbook -i hosts install/elk_client.yml --extra-vars 'elk_server={{ ansible_default_ipv4.address }}' to setup clients ***"

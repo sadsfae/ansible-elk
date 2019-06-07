@@ -1,4 +1,4 @@
-[elk-client]
+[elk_client]
 name=Elastic repository for 6.x packages
 baseurl=https://artifacts.elastic.co/packages/6.x/yum
 gpgcheck=1

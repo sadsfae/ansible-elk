@@ -32,6 +32,16 @@
   register: rsyslog_updated
   become: true
 
+- name: Copy templated kibana.yml
+  template:
+    src=kibana.yml.j2
+    dest=/etc/kibana/kibana.yml
+    owner=root
+    group=root
+    mode=0644
+  become: true
+  ignore_errors: true
+
 - name: Populate elasticsearch index with local logs via rsyslog
   command: systemctl restart rsyslog.service
   ignore_errors: true
@@ -39,19 +49,24 @@
   become: true
 
 - name: Check kibana users
-  stat: path=/etc/nginx/htpasswd.users
+  stat: path=/etc/htpasswd.users
   ignore_errors: true
   register: kibana_user_pwfile_exists
   become: true
 
 - name: Create kibana admin user
-  command: htpasswd -b -c /etc/nginx/htpasswd.users {{kibana_user}} {{kibana_password}}
+  command: htpasswd -b -c /etc/htpasswd.users {{kibana_user}} {{kibana_password}}
   ignore_errors: true
   when: kibana_user_pwfile_exists != 0
   become: true
 
 - name: Setup kibana service
   service: name=kibana state=started enabled=true
+  become: true
+
+- name: Restart kibana server
+  command: systemctl restart kibana.service
+  when: apache_reverse_proxy|bool
   become: true
 
 - name: Check Filebeat forwarder SSL certificate
@@ -79,18 +94,38 @@
   stat: path=/usr/share/nginx/html/beat-forwarder.crt
   ignore_errors: true
   register: filebeat_forwarder_ssl_client_copy_exists
+  when: (apache_reverse_proxy is none)
   become: true
 
-- name: Copy Filebeat forwarder SSL certificate
+- name: Check Filebeat forwarder SSL certificate copy
+  stat: path=/var/www/html/beat-forwarder.crt
+  ignore_errors: true
+  register: filebeat_forwarder_ssl_client_copy_exists
+  when: (apache_reverse_proxy)
+  become: true
+
+- name: Copy Filebeat forwarder SSL certificate for nginx
   command: cp /usr/share/logstash/beat-forwarder.crt /usr/share/nginx/html/beat-forwarder.crt
   ignore_errors: true
-  when: (filebeat_forwarder_ssl_client_copy_exists != 0)
+  when: ((filebeat_forwarder_ssl_client_copy_exists != 0) and (apache_reverse_proxy is none))
   become: true
 
-- name: Copy Filebeat forwarder SSL certificate key
+- name: Copy Filebeat forwarder SSL certificate key for nginx
   command: cp /usr/share/logstash/beat-forwarder.key /usr/share/nginx/html/beat-forwarder.key
   ignore_errors: true
-  when: (filebeat_forwarder_ssl_client_copy_exists != 0)
+  when: ((filebeat_forwarder_ssl_client_copy_exists != 0) and (apache_reverse_proxy is none))
+  become: true
+
+- name: Copy Filebeat forwarder SSL certificate for apache
+  command: cp /usr/share/logstash/beat-forwarder.crt /var/www/html/beat-forwarder.crt
+  ignore_errors: true
+  when: ((filebeat_forwarder_ssl_client_copy_exists != 0) and (apache_reverse_proxy))
+  become: true
+
+- name: Copy Filebeat forwarder SSL certificate key for apache
+  command: cp /usr/share/logstash/beat-forwarder.key /var/www/html/beat-forwarder.key
+  ignore_errors: true
+  when: ((filebeat_forwarder_ssl_client_copy_exists != 0) and (apache_reverse_proxy))
   become: true
 
 - name: Set permissions on logstash certificate
@@ -145,7 +180,7 @@
     connect_timeout: 5
     timeout: 420
     state: started
-  when: install_elasticsearch_xpack
+  when: install_elasticsearch_xpack|bool
   become: true
 
 # We need to insert data to create an initial index, query if it exists

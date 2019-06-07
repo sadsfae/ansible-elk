@@ -16,9 +16,10 @@
     - { role: elasticsearch }
     - { role: fluentd, when: (logging_backend == 'fluentd') }
     - { role: logstash, when: ((logging_backend is none) or (logging_backend == 'logstash')) }
-    - { role: nginx }
-    - { role: curator, when: install_curator_tool }
+    - { role: nginx, when: (apache_reverse_proxy is none) }
+    - { role: apache, when: apache_reverse_proxy|bool }
+    - { role: curator, when: install_curator_tool|bool }
     - { role: kibana }
-    - { role: xpack, when: ((install_elasticsearch_xpack) or (install_kibana_xpack) or (install_logstash_xpack)) }
-    - { role: firewall, when: manage_firewall }
+    - { role: xpack, when: ((install_elasticsearch_xpack|bool) or (install_kibana_xpack|bool) or (install_logstash_xpack|bool)) }
+    - { role: firewall, when: manage_firewall|bool }
     - { role: instructions }

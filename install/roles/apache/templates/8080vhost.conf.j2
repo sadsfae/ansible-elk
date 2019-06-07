@@ -1,0 +1,8 @@
+Listen 0.0.0.0:{{elk_server_ssl_cert_port}}
+<VirtualHost *:{{elk_server_ssl_cert_port}}>
+ServerName {{ansible_hostname}}
+ServerAlias www.{{ansible_hostname}} 
+
+DocumentRoot /var/www/html
+
+</VirtualHost>

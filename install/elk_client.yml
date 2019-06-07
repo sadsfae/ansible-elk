@@ -3,7 +3,7 @@
 # Playbook to install the ELK client utilities
 #
 
-- hosts: elk-client
+- hosts: elk_client
   remote_user: root
   vars_files:
     - group_vars/all.yml

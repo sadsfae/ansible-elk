@@ -25,15 +25,21 @@ epel_repo: https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rp
 # then change to 'false' or empty
 manage_firewall: true
 
+### reverse proxy ###
+# we use a reverse proxy with the default being nginx
+# change apache_reverse_proxy: true if you want apache instead of nginx
+#
+apache_reverse_proxy:
+
 ### nginx ###
 # add nonstandard port here for undercloud usage
 # note: you should use nonstandard ports for both here
 # if you choose to do this.
 #
-# usage: port nginx listens to reverse-proxy Kibana
+# usage: port www listens to reverse-proxy Kibana
 # default is 80
 # e.g. 8888
-nginx_kibana_port: 80
+www_kibana_port: 80
 #
 # usage: port filebeat client grabs the client SSL certificate
 # default is 8080

@@ -102,4 +102,4 @@
   retries: 30
   delay: 10
   become: true
-  when: install_elasticsearch_xpack
+  when: install_elasticsearch_xpack|bool

@@ -7,7 +7,7 @@ Ansible Playbook for setting up the ELK/EFK Stack and Filebeat client on remote 
 ## What does it do?
    - Automated deployment of a full 6.5+ ELK or EFK stack (Elasticsearch, Logstash/Fluentd, Kibana)
      * `5.6` and `2.4` ELK versions are maintained as branches and `master` branch will be 6.x currently.
-     * Uses Nginx as a reverse proxy for Kibana
+     * Uses Nginx as a reverse proxy for Kibana, or optionally Apache via `apache_reverse_proxy: true`
      * Generates SSL certificates for Filebeat or Logstash-forwarder
      * Adds either iptables or firewalld rules if firewall is active
      * Tunes Elasticsearch heapsize to half your memory, to a max of 32G
@@ -66,7 +66,7 @@ ansible_system_user: ec2-user
 ansible-playbook -i hosts install/elk.yml
 ```
    - (see playbook messages)
-   - Navigate to the ELK at http://host-01:80
+   - Navigate to the ELK at http://host-01:80 (default, nginx) or http://host-01/kibana (apache)
    - Default login is:
       - username: ```admin```
       - password: ```admin```
@@ -121,11 +121,17 @@ git checkout 2.4
 .
 ├── hosts
 ├── install
-│   ├── elk-client.yml
+│   ├── elk_client.yml
 │   ├── elk.yml
 │   ├── group_vars
 │   │   └── all.yml
 │   └── roles
+│       ├── apache
+│       │   ├── tasks
+│       │   │   └── main.yml
+│       │   └── templates
+│       │       ├── 8080vhost.conf.j2
+│       │       └── kibana.conf.j2
 │       ├── curator
 │       │   ├── files
 │       │   │   └── curator.repo
@@ -181,11 +187,11 @@ git checkout 2.4
 │       │       └── main.yml
 │       ├── kibana
 │       │   ├── files
-│       │   │   ├── filebeat-dashboards.zip
-│       │   │   ├── kibana.repo
-│       │   │   └── logstash.repo
-│       │   └── tasks
-│       │       └── main.yml
+│       │   │   └── kibana.repo
+│       │   ├── tasks
+│       │   │   └── main.yml
+│       │   └── templates
+│       │       └── kibana.yml.j2
 │       ├── logstash
 │       │   ├── files
 │       │   │   ├── filebeat-index-template.json
@@ -222,6 +228,6 @@ git checkout 2.4
 └── meta
     └── main.yml
 
-52 directories, 50 files
+56 directories, 52 files
 
 ```

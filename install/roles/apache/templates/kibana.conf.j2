@@ -1,0 +1,13 @@
+<VirtualHost *:{{www_kibana_port}}>
+ServerName {{ansible_hostname}}
+ServerAlias www.{{ansible_hostname}}
+
+<Location /kibana>
+    AuthType Basic
+    AuthName "Kibana Dashboard"
+    AuthUserFile /etc/htpasswd.users
+    Require valid-user
+    ProxyPass         http://127.0.0.1:5601 retry=0
+  	ProxyPassReverse  http://127.0.0.1:5601
+</Location>
+</VirtualHost>

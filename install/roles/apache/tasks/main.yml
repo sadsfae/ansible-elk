@@ -1,0 +1,47 @@
+---
+#
+# Install/run apache
+#
+
+- name: Install httpd and toolsl
+  yum:
+    name: [httpd, httpd-tools, python-httplib2]
+  become: true
+
+# SELinux boolean for nginx
+- name: Apply SELinux boolean httpd_can_network_connect
+  seboolean: name=httpd_can_network_connect state=yes persistent=yes
+  become: true
+
+# deploy kibana.conf with FQDN
+- name: Setup apache reverse proxy for kibana
+  template:
+    src=kibana.conf.j2
+    dest=/etc/httpd/conf.d/kibana.conf
+    owner=root
+    group=root
+    mode=0644
+  become: true
+  register: httpd_needs_restart
+
+# deploy basic httpd 8080 vhost
+- name: Setup httpd TCP/8080 vhost for SSL certificate
+  template:
+    src=8080vhost.conf.j2
+    dest=/etc/httpd/conf.d/8080vhost.conf
+    owner=root
+    group=root
+    mode=0644
+  become: true
+
+# start httpd service
+- name: Start httpd service
+  command: systemctl restart httpd.service
+  ignore_errors: true
+  when: httpd_needs_restart != 0
+  become: true
+
+- name: Set httpd to start on boot
+  command: systemctl enable httpd.service
+  ignore_errors: true
+  become: true

@@ -21,7 +21,7 @@
   ignore_errors: true
   register: firewalld_in_use
   no_log: true
-  when: es_listen_external
+  when: es_listen_external|bool
   become: true
 
 - name: Determine if firewalld is active
@@ -29,7 +29,7 @@
   ignore_errors: true
   register: firewalld_is_active
   no_log: true
-  when: es_listen_external
+  when: es_listen_external|bool
   become: true
 
 - name: Determine if TCP/{{es_local_port}} is already active
@@ -37,7 +37,7 @@
   ignore_errors: true
   register: firewalld_es_local_port_exists
   no_log: true
-  when: es_listen_external
+  when: es_listen_external|bool
   become: true
 
 # add firewall rule via firewall-cmd
@@ -48,7 +48,7 @@
     - firewall-cmd --reload
   ignore_errors: true
   become: true
-  when: es_listen_external and firewalld_in_use.rc == 0 and firewalld_is_active.rc == 0 and firewalld_es_local_port_exists.rc != 0
+  when: es_listen_external|bool and firewalld_in_use.rc == 0 and firewalld_is_active.rc == 0 and firewalld_es_local_port_exists.rc != 0
 
 # iptables-services
 - name: check firewall rules for TCP/{{es_local_port}} (iptables-services)
@@ -57,7 +57,7 @@
   register: iptables_es_local_port_exists
   failed_when: iptables_es_local_port_exists == 127
   no_log: true
-  when: es_listen_external
+  when: es_listen_external|bool
   become: true
 
 - name: Add firewall rule for TCP/{{es_local_port}} (iptables-services)
@@ -67,7 +67,7 @@
     regexp: '^INPUT -i lo -j ACCEPT'
     insertbefore: '-A INPUT -i lo -j ACCEPT'
     backup: yes
-  when: es_listen_external and firewalld_in_use.rc != 0 and firewalld_is_active.rc != 0 and iptables_es_local_port_exists.stdout|int == 0
+  when: es_listen_external|bool and firewalld_in_use.rc != 0 and firewalld_is_active.rc != 0 and iptables_es_local_port_exists.stdout|int == 0
   register: iptables_needs_restart
   become: true
   notify: restart iptables
@@ -78,7 +78,7 @@
   ignore_errors: true
   register: firewalld_in_use
   no_log: true
-  when: syslog_listen_external
+  when: syslog_listen_external|bool
   become: true
 
 - name: Determine if firewalld is active
@@ -86,7 +86,7 @@
   ignore_errors: true
   register: firewalld_is_active
   no_log: true
-  when: syslog_listen_external
+  when: syslog_listen_external|bool
   become: true
 
 - name: Determine if TCP/{{logstash_localsyslog_port}} is already active
@@ -94,7 +94,7 @@
   ignore_errors: true
   register: firewalld_logstash_localsyslog_port_exists
   no_log: true
-  when: syslog_listen_external
+  when: syslog_listen_external|bool
   become: true
 
 # add firewall rule via firewall-cmd
@@ -105,7 +105,7 @@
     - firewall-cmd --reload
   ignore_errors: true
   become: true
-  when: syslog_listen_external and firewalld_in_use.rc == 0 and firewalld_is_active.rc == 0 and firewalld_logstash_localsyslog_port_exists.rc != 0
+  when: syslog_listen_external|bool and firewalld_in_use.rc == 0 and firewalld_is_active.rc == 0 and firewalld_logstash_localsyslog_port_exists.rc != 0
 
 # iptables-services
 - name: check firewall rules for TCP/{{logstash_localsyslog_port}} (iptables-services)
@@ -114,7 +114,7 @@
   register: iptables_logstash_localsyslog_port_exists
   failed_when: iptables_logstash_localsyslog_port_exists == 127
   no_log: true
-  when: syslog_listen_external
+  when: syslog_listen_external|bool
   become: true
 
 - name: Add firewall rule for TCP/{{logstash_localsyslog_port}} (iptables-services)
@@ -124,7 +124,7 @@
     regexp: '^INPUT -i lo -j ACCEPT'
     insertbefore: '-A INPUT -i lo -j ACCEPT'
     backup: yes
-  when: syslog_listen_external and firewalld_in_use.rc != 0 and firewalld_is_active.rc != 0 and iptables_logstash_localsyslog_port_exists.stdout|int == 0
+  when: syslog_listen_external|bool and firewalld_in_use.rc != 0 and firewalld_is_active.rc != 0 and iptables_logstash_localsyslog_port_exists.stdout|int == 0
   register: iptables_needs_restart
   become: true
   notify: restart iptables
@@ -235,8 +235,8 @@
     - skip_ansible_lint
   become: true
 
-- name: Determine if TCP/{{nginx_kibana_port}} is already active
-  shell: firewall-cmd --list-ports | egrep -q "^{{nginx_kibana_port}}/tcp"
+- name: Determine if TCP/{{www_kibana_port}} is already active
+  shell: firewall-cmd --list-ports | egrep -q "^{{www_kibana_port}}/tcp"
   ignore_errors: true
   register: firewalld_kibana_port_exists
   no_log: true
@@ -247,18 +247,18 @@
   become: true
 
 # add firewall rule via firewall-cmd
-- name: Add firewall rule for TCP/{{nginx_kibana_port}} (firewalld)
+- name: Add firewall rule for TCP/{{www_kibana_port}} (firewalld)
   command: "{{ item }}"
   with_items:
-    - firewall-cmd --zone=public --add-port={{nginx_kibana_port}}/tcp --permanent
+    - firewall-cmd --zone=public --add-port={{www_kibana_port}}/tcp --permanent
     - firewall-cmd --reload
   ignore_errors: true
   become: true
   when: firewalld_in_use.rc == 0 and firewalld_is_active.rc == 0 and firewalld_kibana_port_exists.rc != 0
 
 # iptables-services
-- name: check firewall rules for TCP/{{nginx_kibana_port}} (iptables-services)
-  shell: grep "dport {{nginx_kibana_port}} \-j ACCEPT" /etc/sysconfig/iptables | wc -l
+- name: check firewall rules for TCP/{{www_kibana_port}} (iptables-services)
+  shell: grep "dport {{www_kibana_port}} \-j ACCEPT" /etc/sysconfig/iptables | wc -l
   ignore_errors: true
   register: iptables_kibana_port_exists
   failed_when: iptables_kibana_port_exists == 127
@@ -269,10 +269,10 @@
     - skip_ansible_lint
   become: true
 
-- name: Add firewall rule for TCP/{{nginx_kibana_port}} (iptables-services)
+- name: Add firewall rule for TCP/{{www_kibana_port}} (iptables-services)
   lineinfile:
     dest: /etc/sysconfig/iptables
-    line: '-A INPUT -p tcp -m tcp --dport {{nginx_kibana_port}} -j ACCEPT'
+    line: '-A INPUT -p tcp -m tcp --dport {{www_kibana_port}} -j ACCEPT'
     regexp: '^INPUT -i lo -j ACCEPT'
     insertbefore: '-A INPUT -i lo -j ACCEPT'
     backup: yes
