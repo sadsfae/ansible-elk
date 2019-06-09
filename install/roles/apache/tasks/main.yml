@@ -3,7 +3,7 @@
 # Install/run apache
 #
 
-- name: Install httpd and toolsl
+- name: Install httpd and tools
   yum:
     name: [httpd, httpd-tools, python-httplib2]
   become: true
