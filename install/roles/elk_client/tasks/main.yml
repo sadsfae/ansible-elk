@@ -60,3 +60,4 @@
     dest=/etc/beat/beat-forwarder.key
   become: true
   when: (elk_client_ssl_cert_still_exists.stat.exists == False)
+  notify: restart filebeat
