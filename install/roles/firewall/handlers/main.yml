@@ -1,5 +1,5 @@
-
 ---
+
 - name: restart iptables
   become: true
   service:
