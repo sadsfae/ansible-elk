@@ -4,7 +4,7 @@
 #
 - name: Install heartbeat rpms
   yum:
-    name: heartbeat
+    name: heartbeat-elastic
   become: true
   when: (logging_backend != 'fluentd')
 
@@ -20,12 +20,12 @@
   register: heartbeat_needs_restart
 
 - name: Start heartbeat service
-  command: systemctl start heartbeat.service
+  command: systemctl start heartbeat-elastic.service
   ignore_errors: true
   become: true
   when: ((heartbeat_needs_restart != 0) and (logging_backend != 'fluentd'))
 
 - name: Setup heartbeat service
-  service: name=heartbeat state=started enabled=true
+  service: name=heartbeat-elastic state=started enabled=true
   become: true
   when: (logging_backend != 'fluentd')

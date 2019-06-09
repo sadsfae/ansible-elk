@@ -27,16 +27,36 @@
   register: elk_client_ssl_cert_exists
   become: true
 
+- name: Remove old ELK SSL cert if it exists
+  file:
+    path: /etc/beat/beat-forwarder.crt
+    state: absent
+  when: (elk_client_ssl_cert_exists.stat.exists == True)
+  become: true
+
+- name: Remove old ELK SSL key if it exists
+  file:
+    path: /etc/beat/beat-forwarder.key
+    state: absent
+  when: (elk_client_ssl_cert_exists.stat.exists == True)
+  become: true
+
+- name: Check ELK server SSL client cert and key again
+  stat: path=/etc/beat/beat-forwarder.crt
+  ignore_errors: true
+  register: elk_client_ssl_cert_still_exists
+  become: true
+
 - name: Install ELK server SSL client certificate
   get_url:
     url=http://{{ elk_server }}:{{ elk_server_ssl_cert_port }}/beat-forwarder.crt
     dest=/etc/beat/beat-forwarder.crt
   become: true
-  when: (elk_client_ssl_cert_exists != 0)
+  when: (elk_client_ssl_cert_still_exists.stat.exists == False)
 
 - name: Install ELK server SSL client key
   get_url:
     url=http://{{ elk_server }}:{{ elk_server_ssl_cert_port }}/beat-forwarder.key
     dest=/etc/beat/beat-forwarder.key
   become: true
-  when: (elk_client_ssl_cert_exists != 0)
+  when: (elk_client_ssl_cert_still_exists.stat.exists == False)

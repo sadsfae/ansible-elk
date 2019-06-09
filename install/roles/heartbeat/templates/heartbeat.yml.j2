@@ -12,38 +12,40 @@
 # Configure monitors
 heartbeat.monitors:
 
+### NOTE THIS IS ONLY SETUP TO MONITOR LOGSTASH
+### YOU SHOULD MANAGE THIS FILE TO YOUR NEEDS
 #HTTP Check every 10 Seconds and expects a 200 HTTP Code.
 #Internal sites only
-- type: http
+#- type: http
   # List or urls to query
-  urls:
+#  urls:
 
   # Configure task schedule
   schedule: '*/10 * * * * * *'
   # Total test connection and data exchange timeout
   #timeout: 16s
   #Configures the correct HTTP Response
-  check.response.status: 200
+  #check.response.status: 200
 
-- type: ICMP
-  urls: 
+#- type: ICMP
+#  urls:
 
 
-  schedule: '*/10 * * * * * *'
+#  schedule: '*/10 * * * * * *'
 
 #External Checking
-- type: http
+#- type: http
   # List or urls to query
-  urls:
+#  urls:
 
 
   # Configure task schedule
-  schedule: '*/10 * * * * * *'
+#  schedule: '*/10 * * * * * *'
   # Total test connection and data exchange timeout
   #timeout: 16s
   #Configures the correct HTTP Response
   check.response.status: 200
-  
+
 
 
 #================================ General =====================================
@@ -148,10 +150,7 @@ output:
 
       # Configure minimum TLS version allowed for connection to logstash
       #min_version: 1.0
-      
-      # Configure maximum TLS version allowed for connection to logstash
-      #max_version: 1.2
-      
+
 
   ### Logstash as output
   logstash:
