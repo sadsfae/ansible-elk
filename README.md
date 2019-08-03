@@ -4,7 +4,7 @@ Ansible Playbook for setting up the ELK/EFK Stack and Filebeat client on remote 
 
 ![ELK](/image/ansible-elk.png?raw=true)
 
-![CI](https://travis-ci.org/sadsfae/ansible-elk.svg?branch=master)
+[![CI](https://travis-ci.org/sadsfae/ansible-elk.svg?branch=master)](https://travis-ci.org/sadsfae/ansible-elk)
 
 ## What does it do?
    - Automated deployment of a full 6.5+ ELK or EFK stack (Elasticsearch, Logstash/Fluentd, Kibana)
