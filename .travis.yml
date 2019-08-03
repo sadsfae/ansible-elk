@@ -1,0 +1,11 @@
+language: python
+python:
+  - "3.6"
+
+# command to install dependencies
+install:
+  - pip install -r tests/test-requirements.txt
+# command to run tests
+script:
+  - ansible-lint install/elk.yml -x 303,701,601,206,602,403,301,502,306 -v
+  - ansible-lint install/elk-client.yml -x 303,701,601 -v
