@@ -1,7 +1,7 @@
 galaxy_info:
   author: Will Foster (@sadsfae)
   description: Playbook for setting up an ELK/EFK stack and clients.
-  travis_status_url: https://travis-ci.org/sadsfae/ansible-elk.svg?branch=master
+  travis_status_url: https://travis-ci.org/sadsfae/ansible-elk.svg?branch=development
   issue_tracker_url: https://github.com/sadsfae/ansible-elk/issues
   license: Apache
   min_ansible_version: 1.9
