@@ -7,7 +7,7 @@ Ansible Playbook for setting up the ELK/EFK Stack and Filebeat client on remote 
 [![CI](https://travis-ci.org/sadsfae/ansible-elk.svg?branch=master)](https://travis-ci.org/sadsfae/ansible-elk)
 
 ## What does it do?
-   - Automated deployment of a full 6.5+ ELK or EFK stack (Elasticsearch, Logstash/Fluentd, Kibana)
+   - Automated deployment of a full 6.8+ ELK or EFK stack (Elasticsearch, Logstash/Fluentd, Kibana)
      * `5.6` and `2.4` ELK versions are maintained as branches and `master` branch will be 6.x currently.
      * Uses Nginx as a reverse proxy for Kibana, or optionally Apache via `apache_reverse_proxy: true`
      * Generates SSL certificates for Filebeat or Logstash-forwarder
@@ -22,11 +22,8 @@ Ansible Playbook for setting up the ELK/EFK Stack and Filebeat client on remote 
      * This is also available on [Ansible Galaxy](https://galaxy.ansible.com/sadsfae/ansible-elk/)
 
 ## Requirements
-   - RHEL7 or CentOS7+ server/client with no modifications
+   - RHEL7 or CentOS7 server/client with no modifications
    - ELK/EFK server with at least 8G of memory (you can try with less but 5.x series is quite demanding - try 2.4 series if you have scarce resources).
-     - Fedora 23 or higher needs to have ```yum python2 python2-dnf libselinux-python``` packages.
-       * You can run this against Fedora clients prior to running Ansible ELK:
-       - ```ansible fedora-client-01 -u root -m shell -i hosts -a "dnf install yum python2 libsemanage-python python2-dnf -y"```
    - You may want to modify ```vm.swappiness``` as ELK/EFK is demanding and swapping kills the responsiveness.
      - I am leaving this up to your judgement.
 ```
