@@ -8,7 +8,3 @@ install:
 # command to run tests
 script:
   - ansible-lint install/*.yml -x 303,701,601,206,602,403,301,502,306 -v
-
-# tell galaxy about new builds
-notifications:
-    webhooks: https://galaxy.ansible.com/api/v1/notifications/
