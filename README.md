@@ -7,7 +7,7 @@ Ansible Playbook for setting up the ELK/EFK Stack and Filebeat client on remote 
 [![CI](https://travis-ci.org/sadsfae/ansible-elk.svg?branch=master)](https://travis-ci.org/sadsfae/ansible-elk)
 
 ## What does it do?
-   - Automated deployment of a full 6.8+ ELK or EFK stack (Elasticsearch, Logstash/Fluentd, Kibana)
+   - Automated deployment of a full 6.x series ELK or EFK stack (Elasticsearch, Logstash/Fluentd, Kibana)
      * `5.6` and `2.4` ELK versions are maintained as branches and `master` branch will be 6.x currently.
      * Uses Nginx as a reverse proxy for Kibana, or optionally Apache via `apache_reverse_proxy: true`
      * Generates SSL certificates for Filebeat or Logstash-forwarder
@@ -23,6 +23,7 @@ Ansible Playbook for setting up the ELK/EFK Stack and Filebeat client on remote 
 
 ## Requirements
    - RHEL7 or CentOS7 server/client with no modifications
+   - RHEL7/CentOS7 or Fedora for ELK clients using Filebeat
    - ELK/EFK server with at least 8G of memory (you can try with less but 5.x series is quite demanding - try 2.4 series if you have scarce resources).
    - You may want to modify ```vm.swappiness``` as ELK/EFK is demanding and swapping kills the responsiveness.
      - I am leaving this up to your judgement.
@@ -33,6 +34,7 @@ sysctl -p
 
 ## Notes
    - Current ELK version is 6.x but you can checkout the 5.6 or 2.4 branch if you want that series
+   - I will update this playbook for major ELK versions going forward as time allows.
    - Sets the nginx htpasswd to admin/admin initially
    - nginx ports default to 80/8080 for Kibana and SSL cert retrieval (configurable)
    - Uses OpenJDK for Java
