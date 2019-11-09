@@ -39,4 +39,8 @@
   debug: msg="*** 5) Click on Discover ***"
 
 - name: Print filebeat client setup instructions
-  debug: msg="*** 6) ansible-playbook -i hosts install/elk_client.yml --extra-vars 'elk_server={{ ansible_default_ipv4.address }}' to setup clients ***"
+  debug:
+    "msg": [
+      "*** 6) ansible-playbook -i hosts install/elk_client.yml --extra-vars 'elk_server={{ ansible_default_ipv4.address }}' to setup clients",
+      "*** To add new clients later, running on this command is required ***"
+    ]
