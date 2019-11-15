@@ -1,0 +1,15 @@
+---
+
+- name: Check if grub is present
+  stat: path=/etc/default/grub
+  register: hasgrub
+
+- block:
+    - name: Disable IPv6 in grub
+      replace:
+        dest: /etc/default/grub
+        regexp: '^GRUB_CMDLINE_LINUX="(.*)"'
+        replace: 'GRUB_CMDLINE_LINUX="\1 ipv6.disable=1"'
+        backup: yes
+      notify:
+        - grub2-mkconfig

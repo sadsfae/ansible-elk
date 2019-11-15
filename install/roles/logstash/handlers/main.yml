@@ -1,0 +1,10 @@
+- name: grub2-mkconfig
+  command: grub2-mkconfig -o /boot/grub2/grub.cfg
+
+- name: rmmodipv6
+  command: rmmod ipv6
+  ignore_errors: true
+        )
+- name: restart NetworkManager
+  service: name=NetworkManager state=restarted
+  when: ansible_os_family == "RedHat"

@@ -5,7 +5,7 @@
 # versions:
 #  - 2.4 (git branch 2.4)
 #  - 5.6 (git branch 5.6)
-#  - 6.5 (git branch master)
+#  - 6.8 (git branch master)
 #
 
 - hosts: elk

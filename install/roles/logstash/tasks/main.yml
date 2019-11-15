@@ -15,6 +15,7 @@
 - name: Install logstash rpms
   yum:
     name: logstash
+    state: present
   become: true
 
 - name: Copy logstash filter configuration
@@ -24,6 +25,24 @@
     owner=logstash
     group=logstash
     mode=0644
+  become: true
+
+# workaround, sometimes they forget to package this
+# https://github.com/elastic/logstash/issues/1130
+- name: Ensure logstash systemd unit file is present
+  copy:
+    src=logstash.service
+    dest=/etc/systemd/system/logstash.service
+    owner=root
+    group=root
+    mode=0644
+    force=no
+  register: logstash_unit_copied
+  become: true
+
+- name: Reload Systemd if we copied in logstash.service unit file
+  command: systemctl daemon-reload
+  when: logstash_unit_copied != 0
   become: true
 
 # we need a workaround for netty wanting to use /tmp
@@ -86,6 +105,38 @@
   delay: 10
   become: true
   when: not install_elasticsearch_xpack or not install_logstash_xpack or not install_kibana_xpack
+
+## Disable IPv6 because logstash/udp syslog has issues with it.
+# https://github.com/logstash-plugins/logstash-input-syslog/issues/42
+- name: Disable IPv6 with sysctl
+  sysctl: name={{ item }} value=1 state=present
+  with_items:
+    - net.ipv6.conf.all.disable_ipv6
+    - net.ipv6.conf.default.disable_ipv6
+    - net.ipv6.conf.lo.disable_ipv6
+
+- name: Disable IPv6 via modprobe
+  lineinfile: "dest=/etc/modprobe.conf line='install ipv6 /bin/true' create=yes"
+  notify:
+    - rmmodipv6
+  when: ansible_os_family == 'RedHat'
+
+- include: ipv6-grub-disable.yml
+
+- name: Disabling IPv6 via sysconfig/network
+  lineinfile:
+    dest: /etc/sysconfig/network
+    regexp: "^{{ item.regexp }}"
+    line: "{{ item.line }}"
+    backup: yes
+    create: yes
+  with_items:
+    - { regexp: 'NETWORKING_IPV6=.*', line: 'NETWORKING_IPV6=NO' }
+    - { regexp: 'IPV6INIT=.*', line: 'IPV6INIT=no' }
+  notify:
+    - restart network
+    - restart NetworkManager
+  when: ansible_os_family == 'RedHat'
 
 # X-Pack requires additional authentication
 - name: Load filebeat JSON index template (X-Pack enabled)

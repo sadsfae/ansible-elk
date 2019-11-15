@@ -42,5 +42,5 @@
   debug:
     "msg": [
       "*** 6) ansible-playbook -i hosts install/elk_client.yml --extra-vars 'elk_server={{ ansible_default_ipv4.address }}' to setup clients",
-      "*** To add new clients later, running on this command is required ***"
+      "*** To add new clients later, running only this command above is needed ***"
     ]
