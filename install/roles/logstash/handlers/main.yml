@@ -8,3 +8,7 @@
 - name: restart NetworkManager
   service: name=NetworkManager state=restarted
   when: ansible_os_family == "RedHat"
+
+- name: restart Network
+  service: name=network state=restarted
+  when: ansible_os_family == "RedHat"
