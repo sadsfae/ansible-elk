@@ -134,7 +134,7 @@
     - { regexp: 'NETWORKING_IPV6=.*', line: 'NETWORKING_IPV6=NO' }
     - { regexp: 'IPV6INIT=.*', line: 'IPV6INIT=no' }
   notify:
-    - restart network
+    - restart Network
     - restart NetworkManager
   when: ansible_os_family == 'RedHat'
 
