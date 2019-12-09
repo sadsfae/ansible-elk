@@ -34,7 +34,6 @@ http {
 
     server {
         listen       {{elk_server_ssl_cert_port}} default_server;
-        listen       [::]:{{elk_server_ssl_cert_port}} default_server;
         server_name  _;
         root         /usr/share/nginx/html;
 
