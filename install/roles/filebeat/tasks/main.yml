@@ -2,6 +2,12 @@
 #
 # install/run filebeat elk client
 #
+- name: Install Python3 for some Minimal Setups (Fedora/EL8)
+  dnf:
+    name: python3
+  become: true
+  when: ansible_distribution_major_version|int >= 8
+
 - name: Symlink Python to Python3 for EL8/Fedora
   file:
     src: /usr/bin/python3
@@ -18,7 +24,7 @@
   yum:
     name: filebeat
   become: true
-  when: (logging_backend != 'fluentd')
+  when: (logging_backend != 'fluentd') and ansible_distribution_major_version|int <= 7
 
 - name: Install filebeat rpms (EL8/Fedora)
   dnf:
