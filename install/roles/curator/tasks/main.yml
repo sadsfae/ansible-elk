@@ -47,7 +47,8 @@
 
 # Runs cron job to cleanup indices every weekday.
 # you should adjust this to your needs
-- cron:
+- name: Curator Cleanup Cronjob
+  cron:
     name: Curator run
     weekday: '*'
     minute: 0

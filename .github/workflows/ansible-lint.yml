@@ -1,0 +1,33 @@
+name: ansible-lint
+
+on:
+  push:
+    branches:
+      - development
+  pull_request:
+    branches:
+      - development
+      - master
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.6", "3.7", "3.8", "3.9", "3.10"]
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install ansible ansible-lint
+      - name: Analysing all playbooks
+        run: |
+          ansible-lint install/*.yml -x 303,701,601,206,602,403,301,502,306 -v
+      - name: Analysing all playbook roles
+        run: |
+          ansible-lint install/roles/*/*/*.yml -x 303,701,601,206,602,403,301,502,306 -v
