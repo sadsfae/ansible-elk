@@ -23,7 +23,7 @@ Ansible Playbook for setting up the ELK/EFK Stack and Filebeat client on remote 
 
 ## Requirements
    - RHEL7 or CentOS7 server/client with no modifications
-   - RHEL7/CentOS7 or Fedora for ELK clients using Filebeat
+   - RHEL7/CentOS7, Rocky or Fedora for ELK clients using Filebeat
    - ELK/EFK server with at least 8G of memory (you can try with less but 5.x series is quite demanding - try 2.4 series if you have scarce resources).
    - You may want to modify ```vm.swappiness``` as ELK/EFK is demanding and swapping kills the responsiveness.
      - I am leaving this up to your judgement.
