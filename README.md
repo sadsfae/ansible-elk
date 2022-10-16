@@ -64,7 +64,7 @@ ansible_system_user: ec2-user
 
    - Run the playbook
 ```
-ansible-playbook -i hosts install/elk.yml
+ansible-playbook -i hosts install/elk.yml -k --ask-become-pass
 ```
    - (see playbook messages)
    - Navigate to the ELK at http://host-01:80 (default, nginx) or http://host-01/kibana (apache)
