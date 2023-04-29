@@ -4,13 +4,22 @@ warn_list:
   - var-spacing
   - ignore-errors
   - risky-file-permissions
-  - empty-string-compare
-  - risky-shell-pipe
-  - yaml
-  - meta-no-info
-  - var-naming
+  - deprecated-local-action
   - literal-compare
+  - no-free-form
+  - meta-no-info
+  - fqcn[action]
+  - var-naming[filebeatJSON_output]
+  - yaml[octal-values]
+  - name[casing]
+  - name[template]
   - package-latest
+  - yaml[new-line-at-end-of-file]
+  - risky-shell-pipe
+  - yaml[truthy]
+  - name[missing]
+  - deprecated-module
+  - name[play]
 
 skip_list:
   - fqcn-builtins
