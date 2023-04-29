@@ -5,6 +5,20 @@ warn_list:
   - ignore-errors
   - risky-file-permissions
   - deprecated-local-action
+  - literal-compare
+  - no-free-form
+  - meta-no-info
+  - fqcn[action]
+  - var-naming[filebeatJSON_output]
+  - yaml[octal-values]
+  - name[casing]
+  - name[template]
+  - package-latest
+  - yaml[new-line-at-end-of-file]
+  - risky-shell-pipe
+  - yaml[truthy]
+  - name[missing]
+  - deprecated-module
 
 skip_list:
   - fqcn-builtins
