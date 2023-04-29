@@ -4,13 +4,7 @@ warn_list:
   - var-spacing
   - ignore-errors
   - risky-file-permissions
-  - empty-string-compare
-  - risky-shell-pipe
-  - yaml
-  - meta-no-info
-  - var-naming
-  - literal-compare
-  - package-latest
+  - deprecated-local-action
 
 skip_list:
   - fqcn-builtins
