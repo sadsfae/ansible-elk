@@ -19,6 +19,7 @@ warn_list:
   - yaml[truthy]
   - name[missing]
   - deprecated-module
+  - name[play]
 
 skip_list:
   - fqcn-builtins
