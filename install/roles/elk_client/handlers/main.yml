@@ -5,3 +5,4 @@
   service:
     name: filebeat
     state: restarted
+  when: effective_logging_backend != 'fluentd'

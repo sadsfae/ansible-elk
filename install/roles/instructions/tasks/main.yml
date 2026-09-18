@@ -29,8 +29,11 @@
 
 - name: Print X-Pack instructions
   debug:
-    msg: "*** 1A) (X-Pack only) Kibana account credentials login with elastic/{{ xpack_elastic_user_password }} ***"
-  when: install_kibana_xpack | bool
+    msg: >-
+      *** 1A) (ES security enabled) Login to Kibana with {{ xpack_elastic_user }} /
+      the password you set in xpack_elastic_user_password
+      (install/group_vars/all.yml) ***
+  when: install_elasticsearch_xpack | bool
 
 - name: Print index creation more instructions
   debug:

@@ -126,8 +126,29 @@
     method: PUT
     body: "{{ lookup('file', 'filebeat-index-template.json') }}"
     body_format: json
-  ignore_errors: true
+    return_content: true
+  register: filebeatJSON_output
+  until: '"json" in filebeatJSON_output and filebeatJSON_output.json.acknowledged == true'
+  retries: 30
+  delay: 10
   become: true
+  when: not install_elasticsearch_xpack | default(false) | bool
+
+- name: Load filebeat JSON index template (security enabled)
+  ansible.builtin.uri:
+    url: http://localhost:9200/_index_template/filebeat?pretty
+    method: PUT
+    user: "{{ xpack_elastic_user }}"
+    password: "{{ xpack_elastic_user_password }}"
+    body: "{{ lookup('file', 'filebeat-index-template.json') }}"
+    body_format: json
+    return_content: true
+  register: filebeatJSON_output
+  until: '"json" in filebeatJSON_output and filebeatJSON_output.json.acknowledged == true'
+  retries: 30
+  delay: 10
+  become: true
+  when: install_elasticsearch_xpack | default(false) | bool
 
 - name: Start and enable fluentd service
   ansible.builtin.service:

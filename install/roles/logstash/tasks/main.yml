@@ -137,7 +137,7 @@
   retries: 30
   delay: 10
   become: true
-  when: not install_elasticsearch_xpack | default(false) or not install_logstash_xpack | default(false) or not install_kibana_xpack | default(false)
+  when: not install_elasticsearch_xpack | default(false) | bool
 
 ## Disable IPv6 because logstash/udp syslog has issues with it.
 # https://github.com/logstash-plugins/logstash-input-syslog/issues/42
@@ -197,7 +197,7 @@
   ansible.builtin.uri:
     url: http://localhost:9200/_index_template/filebeat?pretty
     method: PUT
-    user: elastic
+    user: "{{ xpack_elastic_user }}"
     password: "{{ xpack_elastic_user_password }}"
     body: "{{ lookup('file', 'filebeat-index-template.json') }}"
     body_format: json

@@ -124,8 +124,9 @@ sysctl -p
     - Ubuntu 22.04 (Jammy) and newer
   - **Auto-Fallback:** On unsupported platforms (RHEL 10, Debian 11, Ubuntu 20.04), the playbook automatically uses Logstash backend with a warning message
   - Logstash backend (default) works on **all** supported platforms
+  - **Fluentd clients** forward syslog to the server via rsyslog instead of installing Filebeat (backs the ELK/EFK client playbook). The fluent-package v6 platform check applies to the fluentd server; clients only need rsyslog.
 - Install curator by setting `install_curator_tool: true` in `install/group_vars/all.yml`
-- **X-Pack Note**: As of Elasticsearch 6.3+, X-Pack features are built directly into the stack and no longer require separate plugin installation. Security, monitoring, and other features can be enabled via configuration in `elasticsearch.yml`.
+- **X-Pack Note**: As of Elasticsearch 6.3+, X-Pack features are built directly into the stack and no longer require separate plugin installation. Security, monitoring, and other features can be enabled via configuration in `elasticsearch.yml`. When security is enabled, set `install_elasticsearch_xpack: true` so the playbook authenticates to Elasticsearch (logstash/fluentd index-template load and output, Kibana) with the `elastic` superuser (name configurable via `xpack_elastic_user`).
 
 ## Security and Authentication
 
@@ -148,14 +149,14 @@ This playbook is designed for **development and testing environments** with a si
 
 For production deployments:
 
-1. **Enable Elasticsearch Security**: Remove or comment out these lines in `install/roles/elasticsearch/templates/elasticsearch.yml.j2`:
+1. **Enable Elasticsearch Security**: Change `xpack.security.enabled: false` to `true` in `install/roles/elasticsearch/templates/elasticsearch.yml.j2` (keep `xpack.security.http.ssl.enabled: false` so ES does not auto-configure TLS on the HTTP layer, which the playbook's localhost checks do not support), and set `install_elasticsearch_xpack: true` in `install/group_vars/all.yml` so the logstash and kibana roles use the elastic credentials:
    ```yaml
-   xpack.security.enabled: false
+   xpack.security.enabled: true
    xpack.security.http.ssl.enabled: false
    ```
-2. **Configure TLS**: Set up proper SSL certificates for ES HTTP and transport layers
-3. **Set Strong Passwords**: Update `kibana_user`, `kibana_password`, and ES `elastic` user credentials
-4. **Use Auto-Generated Credentials**: ES 9.x auto-generates secure passwords on first startup when security is enabled
+2. **Configure TLS**: Set up SSL certificates for client-facing access (nginx/apache reverse proxy). Keep `xpack.security.http.ssl.enabled: false` for the Elasticsearch HTTP layer; the playbook's localhost checks and index-template load use plain HTTP.
+3. **Set Strong Passwords**: Update `kibana_user`/`kibana_password`, and set `xpack_elastic_user` (default `elastic`) and `xpack_elastic_user_password` in `install/group_vars/all.yml` to the elastic password from step 4.
+4. **Set the elastic password**: Package installs do not print the auto-generated password at startup, so after the first start run `/usr/share/elasticsearch/bin/elasticsearch-reset-password -u elastic`, put the output in `xpack_elastic_user_password` (step 3), and re-run the playbook.
 5. **Enable Firewall Rules**: Ensure `manage_firewall: true` in `group_vars/all.yml`
 6. **Restrict ES Network Access**: Set `es_listen_external: false` (default) to limit ES to localhost
 
@@ -178,6 +179,7 @@ If you are currently running ELK 6.x or earlier:
 
 - Discovery settings changed: `discovery.zen.*` → `discovery.seed_hosts` and `cluster.initial_master_nodes`
 - Security features (formerly X-Pack plugins) are now built-in and free
+- Legacy per-component X-Pack install variables (`install_kibana_xpack`, `install_logstash_xpack`) are removed; set `install_elasticsearch_xpack: true` only when ES security is enabled
 - Legacy index templates deprecated in favor of composable templates
 - Removal of mapping types (no `_doc` type references)
 - Stricter security and TLS requirements
@@ -237,7 +239,7 @@ ansible-playbook -i hosts install/elk.yml
 - Run the client playbook against the generated `elk_server` variable
 
 ```
-ansible-playbook -i hosts install/elk-client.yml --extra-vars 'elk_server=X.X.X.X'
+ansible-playbook -i hosts install/elk_client.yml --extra-vars 'elk_server=X.X.X.X'
 ```
 
 - Once this completes return to your ELK and you'll see log results come in from ELK/EFK clients via filebeat

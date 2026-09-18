@@ -29,6 +29,12 @@
         url: https://artifacts.elastic.co/GPG-KEY-elasticsearch
         state: present
 
+    - name: Add Elastic repository (Debian)
+      ansible.builtin.apt_repository:
+        repo: "deb https://artifacts.elastic.co/packages/9.x/apt stable main"
+        state: present
+        filename: elastic-9.x
+
 - name: Creates ELK Cert Directory
   ansible.builtin.file:
     path: /etc/beat
@@ -43,6 +49,7 @@
     mode: '0644'
     force: true
   become: true
+  when: effective_logging_backend != 'fluentd'
   notify: restart filebeat
 
 - name: Install ELK server SSL client key
@@ -52,4 +59,5 @@
     mode: '0644'
     force: true
   become: true
+  when: effective_logging_backend != 'fluentd'
   notify: restart filebeat

@@ -40,7 +40,7 @@
         condition: true
         comment: "ELK SSL"
       - port: "{{ fluentd_syslog_port }}"
-        proto: tcp
+        proto: udp
         condition: true
         comment: "Fluentd Syslog"
       - port: "{{ fluentd_http_port }}"
@@ -60,6 +60,30 @@
   when:
     - is_firewalld_active
     - item.condition
+  become: true
+
+# Fluentd syslog is UDP-only; prior versions also opened the port as TCP, so
+# ensure the superseded TCP rule is removed on upgraded hosts.
+- name: Remove obsolete fluentd syslog tcp rule (firewalld)
+  ansible.posix.firewalld:
+    port: "{{ fluentd_syslog_port }}/tcp"
+    permanent: true
+    state: disabled
+    zone: public
+    immediate: true
+  when: is_firewalld_active
+  become: true
+
+- name: Remove obsolete fluentd syslog tcp rule (iptables)
+  ansible.builtin.iptables:
+    chain: INPUT
+    protocol: tcp
+    destination_port: "{{ fluentd_syslog_port }}"
+    jump: ACCEPT
+    action: insert
+    state: absent
+    comment: "Fluentd Syslog"
+  when: not is_firewalld_active
   become: true
 
 # Iptables Implementation

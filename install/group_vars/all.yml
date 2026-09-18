@@ -4,6 +4,12 @@
 # change this if you use a non-root user for running Ansible playbooks
 ansible_system_user: root
 
+# The ELK server's address used by the client playbook (install/elk_client.yml).
+# This has no default because it must point at the ELK/EFK server itself.
+# Pass it per-run when running the client playbook, e.g.:
+#   ansible-playbook -i hosts install/elk_client.yml --extra-vars 'elk_server=10.0.0.5'
+#elk_server: 10.0.0.5
+
 # EPEL Repository for extra packages
 epel_repo: "https://dl.fedoraproject.org/pub/epel/epel-release-latest-{{ ansible_distribution_major_version }}.noarch.rpm"
 
@@ -92,27 +98,24 @@ es_listen_external: false
 install_curator_tool: false
 
 ### X-PACK ###
-# NOTE: As of Elasticsearch 6.3+, X-Pack features are built-in and no longer
-# require separate plugin installation. For ELK 9.x, X-Pack is fully integrated.
-# Security features can be enabled in elasticsearch.yml configuration directly.
-# The following variables are kept for backward compatibility with some tasks
-# but the separate x-pack role has been removed.
+# As of Elasticsearch 6.3+, X-Pack features are built-in and no longer require
+# separate plugin installation. For ELK 9.x, X-Pack is fully integrated and is
+# enabled via elasticsearch.yml configuration directly.
 #
 # IMPORTANT: By default, this playbook DISABLES security (xpack.security.enabled: false)
 # in elasticsearch.yml.j2 for basic dev/test deployments. If you enable security,
-# you must either:
-#   1. Update xpack_elastic_user_password below with the auto-generated password from
-#      ES logs, OR
-#   2. Use the elasticsearch-reset-password tool to set a known password
-# Default credentials (if security is manually enabled):
-# username: elastic
-# password: changeme
+# set the elastic superuser password (package installs don't print the
+# auto-generated password at startup) and mirror it here:
+#   /usr/share/elasticsearch/bin/elasticsearch-reset-password -u elastic
+# then set xpack_elastic_user_password below to that value and re-run the
+# playbook. The superuser name defaults to elastic (xpack_elastic_user).
+xpack_elastic_user: elastic
 xpack_elastic_user_password: changeme
 
-# Legacy X-Pack variables (no longer install separate plugins in 9.x)
+# Set to true when ES security is enabled so the playbook authenticates to
+# Elasticsearch (index template load, readiness checks) instead of assuming
+# unauthenticated access.
 install_elasticsearch_xpack: false
-install_kibana_xpack: false
-install_logstash_xpack: false
 
 # Install Metricbeat
 install_metricbeat: false
