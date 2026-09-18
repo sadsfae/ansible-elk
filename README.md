@@ -124,9 +124,9 @@ sysctl -p
     - Ubuntu 22.04 (Jammy) and newer
   - **Auto-Fallback:** On unsupported platforms (RHEL 10, Debian 11, Ubuntu 20.04), the playbook automatically uses Logstash backend with a warning message
   - Logstash backend (default) works on **all** supported platforms
-  - **Fluentd clients** forward syslog to the server via rsyslog instead of installing Filebeat (backs the ELK/EFK client playbook). Use platforms supported by fluent-package v6 for both server and clients.
+  - **Fluentd clients** forward syslog to the server via rsyslog instead of installing Filebeat (backs the ELK/EFK client playbook). The fluent-package v6 platform check applies to the fluentd server; clients only need rsyslog.
 - Install curator by setting `install_curator_tool: true` in `install/group_vars/all.yml`
-- **X-Pack Note**: As of Elasticsearch 6.3+, X-Pack features are built directly into the stack and no longer require separate plugin installation. Security, monitoring, and other features can be enabled via configuration in `elasticsearch.yml`. When security is enabled, set `install_elasticsearch_xpack: true` so the logstash role authenticates to Elasticsearch when loading the filebeat index template.
+- **X-Pack Note**: As of Elasticsearch 6.3+, X-Pack features are built directly into the stack and no longer require separate plugin installation. Security, monitoring, and other features can be enabled via configuration in `elasticsearch.yml`. When security is enabled, set `install_elasticsearch_xpack: true` so the playbook authenticates to Elasticsearch (logstash index-template load and output, Kibana). The fluentd backend is not supported with Elasticsearch security enabled.
 
 ## Security and Authentication
 
@@ -149,7 +149,7 @@ This playbook is designed for **development and testing environments** with a si
 
 For production deployments:
 
-1. **Enable Elasticsearch Security**: Change `xpack.security.enabled: false` to `true` in `install/roles/elasticsearch/templates/elasticsearch.yml.j2` (keep `xpack.security.http.ssl.enabled: false` so ES does not auto-configure TLS on the HTTP layer, which the playbook's localhost checks do not support), and set `install_elasticsearch_xpack: true` in `install/group_vars/all.yml` so the logstash role authenticates to Elasticsearch:
+1. **Enable Elasticsearch Security**: Change `xpack.security.enabled: false` to `true` in `install/roles/elasticsearch/templates/elasticsearch.yml.j2` (keep `xpack.security.http.ssl.enabled: false` so ES does not auto-configure TLS on the HTTP layer, which the playbook's localhost checks do not support), and set `install_elasticsearch_xpack: true` in `install/group_vars/all.yml` so the logstash and kibana roles use the elastic credentials:
    ```yaml
    xpack.security.enabled: true
    xpack.security.http.ssl.enabled: false

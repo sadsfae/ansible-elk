@@ -23,7 +23,13 @@ filter {
 }
 
 output {
-elasticsearch { hosts => ["localhost:{{es_local_port}}"] }
+elasticsearch {
+    hosts => ["localhost:{{es_local_port}}"]
+{% if install_elasticsearch_xpack|bool %}
+    user => "elastic"
+    password => "{{ xpack_elastic_user_password }}"
+{% endif %}
+}
 # uncomment this for debug messages
 #  stdout { codec => rubydebug }
 }

@@ -15,8 +15,11 @@
   ansible.builtin.set_fact:
     effective_logging_backend: >-
       {{
-        'logstash' if ((logging_backend | default('')) == 'fluentd' and not fluentd_platform_supported | bool)
-                   else (logging_backend | default('logstash'))
+        'logstash' if (
+          (logging_backend | default('')) == 'fluentd'
+          and not fluentd_platform_supported | bool
+          and (apply_platform_fallback | default(true) | bool)
+        ) else (logging_backend | default('logstash'))
       }}
 
 - name: Warn about automatic fallback to logstash
@@ -46,3 +49,4 @@
   when:
     - logging_backend == 'fluentd'
     - not fluentd_platform_supported | bool
+    - apply_platform_fallback | default(true) | bool

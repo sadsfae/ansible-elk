@@ -20,6 +20,8 @@
       when: not (elk_server | default(""))
     - name: Resolve effective logging backend
       ansible.builtin.include_tasks: tasks/logging_backend.yml
+      vars:
+        apply_platform_fallback: false
   roles:
     - { role: filebeat }
     - { role: metricbeat, when: (install_metricbeat)}
