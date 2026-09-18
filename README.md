@@ -126,7 +126,7 @@ sysctl -p
   - Logstash backend (default) works on **all** supported platforms
   - **Fluentd clients** forward syslog to the server via rsyslog instead of installing Filebeat (backs the ELK/EFK client playbook). The fluent-package v6 platform check applies to the fluentd server; clients only need rsyslog.
 - Install curator by setting `install_curator_tool: true` in `install/group_vars/all.yml`
-- **X-Pack Note**: As of Elasticsearch 6.3+, X-Pack features are built directly into the stack and no longer require separate plugin installation. Security, monitoring, and other features can be enabled via configuration in `elasticsearch.yml`. When security is enabled, set `install_elasticsearch_xpack: true` so the playbook authenticates to Elasticsearch (logstash index-template load and output, Kibana). The fluentd backend is not supported with Elasticsearch security enabled.
+- **X-Pack Note**: As of Elasticsearch 6.3+, X-Pack features are built directly into the stack and no longer require separate plugin installation. Security, monitoring, and other features can be enabled via configuration in `elasticsearch.yml`. When security is enabled, set `install_elasticsearch_xpack: true` so the playbook authenticates to Elasticsearch (logstash/fluentd index-template load and output, Kibana) with the `elastic` superuser (name configurable via `xpack_elastic_user`).
 
 ## Security and Authentication
 
@@ -155,7 +155,7 @@ For production deployments:
    xpack.security.http.ssl.enabled: false
    ```
 2. **Configure TLS**: Set up SSL certificates for client-facing access (nginx/apache reverse proxy). Keep `xpack.security.http.ssl.enabled: false` for the Elasticsearch HTTP layer; the playbook's localhost checks and index-template load use plain HTTP.
-3. **Set Strong Passwords**: Update `kibana_user`/`kibana_password`, and set `xpack_elastic_user_password` in `install/group_vars/all.yml` to the elastic password from step 4.
+3. **Set Strong Passwords**: Update `kibana_user`/`kibana_password`, and set `xpack_elastic_user` (default `elastic`) and `xpack_elastic_user_password` in `install/group_vars/all.yml` to the elastic password from step 4.
 4. **Set the elastic password**: Package installs do not print the auto-generated password at startup, so after the first start run `/usr/share/elasticsearch/bin/elasticsearch-reset-password -u elastic`, put the output in `xpack_elastic_user_password` (step 3), and re-run the playbook.
 5. **Enable Firewall Rules**: Ensure `manage_firewall: true` in `group_vars/all.yml`
 6. **Restrict ES Network Access**: Set `es_listen_external: false` (default) to limit ES to localhost

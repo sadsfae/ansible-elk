@@ -197,7 +197,7 @@
   ansible.builtin.uri:
     url: http://localhost:9200/_index_template/filebeat?pretty
     method: PUT
-    user: elastic
+    user: "{{ xpack_elastic_user }}"
     password: "{{ xpack_elastic_user_password }}"
     body: "{{ lookup('file', 'filebeat-index-template.json') }}"
     body_format: json

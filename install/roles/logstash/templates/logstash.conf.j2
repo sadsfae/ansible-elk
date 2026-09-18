@@ -26,7 +26,7 @@ output {
 elasticsearch {
     hosts => ["localhost:{{es_local_port}}"]
 {% if install_elasticsearch_xpack|bool %}
-    user => "elastic"
+    user => "{{ xpack_elastic_user }}"
     password => "{{ xpack_elastic_user_password }}"
 {% endif %}
 }

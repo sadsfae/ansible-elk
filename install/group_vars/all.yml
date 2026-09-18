@@ -107,7 +107,9 @@ install_curator_tool: false
 # set the elastic superuser password (package installs don't print the
 # auto-generated password at startup) and mirror it here:
 #   /usr/share/elasticsearch/bin/elasticsearch-reset-password -u elastic
-# then set xpack_elastic_user_password below to that value and re-run the playbook.
+# then set xpack_elastic_user_password below to that value and re-run the
+# playbook. The superuser name defaults to elastic (xpack_elastic_user).
+xpack_elastic_user: elastic
 xpack_elastic_user_password: changeme
 
 # Set to true when ES security is enabled so the playbook authenticates to
