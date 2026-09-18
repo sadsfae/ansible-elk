@@ -234,7 +234,7 @@
   until: es_service_result.status == 200
   retries: 50
   delay: 10
-  when: not install_elasticsearch_xpack
+  when: not install_elasticsearch_xpack | default(false) | bool
   become: true
 
 # We will use a more generic check if x-pack is installed as it wraps everything
@@ -258,7 +258,7 @@
     method: GET
     return_content: true
   register: elasticsearch_index
-  when: not install_elasticsearch_xpack
+  when: not install_elasticsearch_xpack | default(false) | bool
   become: true
 
 # Make sure TCP/5000 is up and listening for logstash
