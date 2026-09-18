@@ -4,6 +4,12 @@
 # change this if you use a non-root user for running Ansible playbooks
 ansible_system_user: root
 
+# The ELK server's address used by the client playbook (install/elk_client.yml).
+# This has no default because it must point at the ELK/EFK server itself.
+# Pass it per-run when running the client playbook, e.g.:
+#   ansible-playbook -i hosts install/elk_client.yml --extra-vars 'elk_server=10.0.0.5'
+#ek_server:
+
 # EPEL Repository for extra packages
 epel_repo: "https://dl.fedoraproject.org/pub/epel/epel-release-latest-{{ ansible_distribution_major_version }}.noarch.rpm"
 

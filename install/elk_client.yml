@@ -8,6 +8,16 @@
   remote_user: root
   vars_files:
     - group_vars/all.yml
+  pre_tasks:
+    # elk_server is required by the beat templates and the elk_client role.
+    # It has no default (it is the ELK server's own address), so fail fast with
+    # a clear message instead of an undefined-variable error deep in a template.
+    - name: Ensure elk_server is defined
+      ansible.builtin.fail:
+        msg: >-
+          elk_server is not set. Pass it explicitly, e.g.
+          --extra-vars 'elk_server=X.X.X.X' (see the README client instructions).
+      when: elk_server is not defined or elk_server == ""
   roles:
     - { role: filebeat }
     - { role: metricbeat, when: (install_metricbeat)}
