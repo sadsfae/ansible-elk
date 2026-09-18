@@ -43,6 +43,7 @@
     mode: '0644'
     force: true
   become: true
+  when: effective_logging_backend != 'fluentd'
   notify: restart filebeat
 
 - name: Install ELK server SSL client key
@@ -52,4 +53,5 @@
     mode: '0644'
     force: true
   become: true
+  when: effective_logging_backend != 'fluentd'
   notify: restart filebeat

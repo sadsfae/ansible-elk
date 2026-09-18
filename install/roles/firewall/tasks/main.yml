@@ -40,7 +40,7 @@
         condition: true
         comment: "ELK SSL"
       - port: "{{ fluentd_syslog_port }}"
-        proto: tcp
+        proto: udp
         condition: true
         comment: "Fluentd Syslog"
       - port: "{{ fluentd_http_port }}"
