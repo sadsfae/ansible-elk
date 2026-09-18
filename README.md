@@ -124,6 +124,7 @@ sysctl -p
     - Ubuntu 22.04 (Jammy) and newer
   - **Auto-Fallback:** On unsupported platforms (RHEL 10, Debian 11, Ubuntu 20.04), the playbook automatically uses Logstash backend with a warning message
   - Logstash backend (default) works on **all** supported platforms
+  - **Fluentd clients** forward syslog to the server via rsyslog instead of installing Filebeat (backs the ELK/EFK client playbook). Use platforms supported by fluent-package v6 for both server and clients.
 - Install curator by setting `install_curator_tool: true` in `install/group_vars/all.yml`
 - **X-Pack Note**: As of Elasticsearch 6.3+, X-Pack features are built directly into the stack and no longer require separate plugin installation. Security, monitoring, and other features can be enabled via configuration in `elasticsearch.yml`. When security is enabled, set `install_elasticsearch_xpack: true` so the logstash role authenticates to Elasticsearch when loading the filebeat index template.
 

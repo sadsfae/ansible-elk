@@ -308,5 +308,5 @@ $InputFileFacility local7
 $InputRunFileMonitor
 
 
-# send to elk_server
-*.* @{{ elk_server }}:{{ fluentd_syslog_port }}
+# openstack-logs.conf only monitors application log files; the catch-all
+# forwarder is configured by filebeat/tasks/main.yml in /etc/rsyslog.conf.

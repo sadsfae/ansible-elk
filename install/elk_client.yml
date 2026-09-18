@@ -18,6 +18,8 @@
           elk_server is not set. Pass it explicitly, e.g.
           --extra-vars 'elk_server=X.X.X.X' (see the README client instructions).
       when: not (elk_server | default(""))
+    - name: Resolve effective logging backend
+      ansible.builtin.include_tasks: tasks/logging_backend.yml
   roles:
     - { role: filebeat }
     - { role: metricbeat, when: (install_metricbeat)}

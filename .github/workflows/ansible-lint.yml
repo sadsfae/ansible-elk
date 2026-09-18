@@ -27,7 +27,7 @@ jobs:
           pip install ansible ansible-lint
       - name: Analysing all playbooks
         run: |
-          ansible-lint install/*.yml --skip-list package-latest,deprecated-bare-vars,deprecated-command-syntax,deprecated-module,unnamed-task,yaml[truthy],role-name,meta-main[unsupported-tags],meta-runtime,var-naming[no-role-prefix],deprecated-module,var-naming[pattern],no-handler -v
+          ansible-lint install/*.yml install/tasks/*.yml --skip-list package-latest,deprecated-bare-vars,deprecated-command-syntax,deprecated-module,unnamed-task,yaml[truthy],role-name,meta-main[unsupported-tags],meta-runtime,var-naming[no-role-prefix],deprecated-module,var-naming[pattern],no-handler -v
       - name: Analysing all playbook roles
         run: |
           ansible-lint install/roles/*/*/*.yml --skip-list package-latest,deprecated-bare-vars,deprecated-command-syntax,deprecated-module,unnamed-task,yaml[truthy],role-name,meta-main[unsupported-tags],meta-runtime,var-naming[no-role-prefix],deprecated-module,var-naming[pattern],no-handler -v
